@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studieren Ohne Grenzen &mdash; Dashboard</title>
+    
+    <link rel="stylesheet" href="https://yui-s.yahooapis.com/pure/0.6.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="https://yui-s.yahooapis.com/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="https://yui-s.yahooapis.com/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="public/css/dashboard.css">
+</head>
+<body>
+
+<div id="layout" class="pure-g">
+    <div class="sidebar pure-u-1 pure-u-md-1-4">
+        <div class="header">
+            <div class="pure-img-responsive logo circular"></div>
+
+            <h1 class="brand-title">SOG Dashboard</h1>
+            <h2 class="brand-tagline">Control &amp; Rule!</h2>
+
+            <nav class="nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a class="pure-button" href="#members">Mitglieder verwalten</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="pure-button" href="#password">Passwort ändern</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="pure-button" href="#help">Hilfe</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <div class="content pure-u-1 pure-u-md-3-4" id="members">
+        <h1>Willkommen, Torsten!</h1>
+        <div class="group-chooser">
+            <form class="pure-form">
+                <fieldset>
+                    <label for="group">Deine Gruppe&nbsp;</label>
+                    <select name="group" id="group">
+                        <option value="darmstadt">Darmstadt</option>
+                        <option value="sri-lanka">Sri Lanka</option>
+                    </select>
+                </fieldset>
+            </form>
+        </div>
+        <div class="pure-g">
+            <div class="pure-u-1 pure-u-md-1-2">
+                <form class="pure-form bold-legend">
+                    <fieldset>
+                        <legend>Filtern nach...</legend>
+                        <input type="text" class="search" placeholder="Name, Email...">
+
+                        <label for="filter-by-new">
+                            <input id="filter-by-new" type="checkbox" name="filter" checked="checked" value="new">
+                            Neue Mitglieder
+                        </label>
+
+                        <label for="filter-by-group">
+                            <input id="filter-by-group" type="checkbox" name="filter" value="group">
+                            Meine Gruppe
+                        </label>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="pure-u-1 pure-u-md-1-2">
+                <p>Hier kannst du neue Mitglieder deiner Gruppe freischalten und dein Passwort ändern. Über das Suchfeld kannst du auch andere Mitglieder finden und deiner Gruppe hinzufügen.</p>
+            </div>
+        </div>
+        <div>
+            <table class="full-width pure-table pure-table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Mail</th>
+                        <th>Datum</th>
+                        <th>Aktion</th>
+                    </tr>
+                </thead>
+                <tbody class="list">
+                    <tr>
+                        <td class="name">Leinbach, Ferdinand</td>
+                        <td class="email">ferdinand@bar.com</td>
+                        <td>01.04.2015</td>
+                        <td><a href="#activate" class="pure-button button-success">freischalten</a></td>
+                    </tr>
+                    <tr>
+                        <td class="name">Heimbach, Simon</td>
+                        <td class="email">simon@bar.com</td>
+                        <td>01.04.2015</td>
+                        <td><a href="#activate" class="pure-button button-success">freischalten</a></td>
+                    </tr>
+                    <tr>
+                        <td class="name">Boschert, Fabian</td>
+                        <td class="email">fabian@bar.com</td>
+                        <td>01.04.2015</td>
+                        <td><a href="#activate" class="pure-button button-success">freischalten</a></td>
+                    </tr>
+                    <tr>
+                        <td class="name">Keck, Dennis</td>
+                        <td class="email">dennis@bar.com</td>
+                        <td>01.04.2015</td>
+                        <td><a href="#activate" class="pure-button button-warning">sperren</a></td>
+                    </tr>
+                    <tr>
+                        <td class="name">Leidig, Sebastian</td>
+                        <td class="email">fabian@bar.com</td>
+                        <td>01.04.2015</td>
+                        <td><a href="#activate" class="pure-button button-success">freischalten</a></td>
+                    </tr>
+                    <tr>
+                        <td class="name">Melzer, Leonhard</td>
+                        <td class="email">fabian@bar.com</td>
+                        <td>01.04.2015</td>
+                        <td><a href="#activate" class="pure-button button-warning">sperren</a></td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <div class="pure-menu pure-menu-horizontal">
+                <ul>
+                    <li class="pure-menu-item"><a href="https://studieren-ohne-grenzen.org/" class="pure-menu-link">Webseite</a></li>
+                    <li class="pure-menu-item"><a href="https://studieren-ohne-grenzen.org/atrium" class="pure-menu-link">Open Atrium</a></li>
+                    <li class="pure-menu-item"><a href="https://studieren-ohne-grenzen.org/owncloud" class="pure-menu-link">OwnCloud</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="public/js/list.min.js"></script>
+<script>
+    var options = {
+        valueNames: [ 'name', 'email' ]
+    };
+
+    var memberList = new List('members', options);
+</script>
+
+</body>
+</html>
