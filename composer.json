@@ -1,5 +1,5 @@
 {
     "require": {
-        "adldap/adldap": "~4.0"
+        "adldap2/adldap2": "dev-master"
     }
 }
