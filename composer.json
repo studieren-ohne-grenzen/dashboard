@@ -1,5 +1,6 @@
 {
     "require": {
-        "adldap2/adldap2": "dev-master"
+        "adldap2/adldap2": "dev-master",
+        "silex/silex": "^1.3"
     }
 }
