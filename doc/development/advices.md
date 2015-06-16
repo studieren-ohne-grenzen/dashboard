@@ -12,3 +12,7 @@
   * [https://github.com/Adldap2/Adldap2/tree/master/docs]
   * [http://adldap.sourceforge.net/wiki/doku.php?id=documentation&do=index]
   * [https://github.com/adldap/adLDAP/wiki]
+* Silex
+
+### Other recommendations
+* Editor: [PHPStorm by Jetbrains](https://www.jetbrains.com/phpstorm/)
