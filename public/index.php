@@ -6,7 +6,7 @@ $app = new Silex\Application();
 // should be disabled on production
 $app['debug'] = true;
 
-require_once __DIR__ . '/../services.php';
+require_once __DIR__ . '/../app/services.php';
 
 // now, let's set up the routes
 
