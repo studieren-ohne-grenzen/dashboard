@@ -170,3 +170,22 @@ table.full-width {
     margin: 0;
     font-weight: bold;
 }
+
+.hidden-elem {
+	display: none;
+}
+
+.user-data tr {
+	line-height: 50px;
+	}
+.user-data td {
+	padding-left: 10px;
+}
+
+.user-data .value {
+	padding-left: 30px;
+}
+
+.button-small{
+	font-size: 85%;
+}

@@ -1,0 +1,118 @@
+{% extends 'base.twig' %} {% block content %}
+<h1>{{ message | upper }}</h1>
+<div>
+	<table class="pure-table-horizontal user-data">
+		<tbody class="list">
+			<tr>
+				<td class="icon">&#9993;</td>
+				<td class="label">E-Mail</td>
+				<td class="value"><span id="view-email" class="shown-elem">torsten@bar.com
+						<button class="pure-button button-small"
+							onclick="showEdit('view-email', 'edit-email')">&#9998;&ensp;&Auml;ndern
+						</button>
+				</span><span id="edit-email" class="hidden-elem">
+						<form class="pure-form pure-form-stacked">
+							<fieldset>
+								<label for="edit-email">E-Mail-Adresse:<input type="email"
+									placeholder="E-mail-Adresse" required>
+								</label></fiedset>
+								<fieldset>
+									<button type="submit" class="pure-button pure-button-primary">&#x2713;&ensp;Speichern</button>
+									<button class="pure-button"
+										onclick="hideEdit('view-email', 'edit-email')">&#x2717;&ensp;Abbrechen</button>
+							</fieldset>
+						</form>
+				</span></td>
+			</tr>
+			<tr>
+				<td class="icon">&#9911;</td>
+				<td class="label">Passwort</td>
+				<td class="value"><span id="view-password" class="shown-elem"> **********
+						<button class="pure-button button-small"
+							onclick="showEdit('view-password', 'edit-password')">&#9998;&ensp;&Auml;ndern</button>
+				</span> <span id="edit-password" class="hidden-elem">
+						<form class="pure-form pure-form-stacked">
+							<fieldset>
+								<label for="old-password">Altes Passwort:<input type="password"
+									class="pure-input-rounded" id="old-password"
+									placeholder="altes Passwort" required> </label></fieldset>
+								<fieldset class="pure-group">
+									<label for="new-password">Neues Passwort:<input type="password" id="new-password"
+										placeholder="neues Passwort" required>
+									</label> <label for="confirm-password"><input type="password"
+										id="confirm-password" onkeyup="validatePass()" placeholder="neues Passwort wiederholen" required>
+									</label><span id="validation"></span>
+								</fieldset>
+								<fieldset>
+									<button type="submit" class="pure-button pure-button-primary">&#x2713;&ensp;Speichern</button>
+									<button class="pure-button"
+										onclick="hideEdit('view-password', 'edit-password')">&#x2717;&ensp;Abbrechen</button>
+							</fieldset>
+						</form>
+				</span></td>
+			</tr>
+			<tr>
+				<td class="icon">&#8946;</td>
+				<td class="label">Gruppen</td>
+				<td class="value">LG Aachen, Sri Lanka, Ressort Recht</td>
+			</tr>
+			<tr>
+				<td class="icon">&#9734;</td>
+				<td class="label">Beitritt am</td>
+				<td class="value">11.05.2012</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+{% endblock %} {% block scripts %} {{ parent() }}
+<script>
+	function showEdit(shownElem, hiddenElem) {
+		hideAll();
+		resetForms();
+		document.getElementById(shownElem).style.display = 'none';
+		document.getElementById(hiddenElem).style.display = 'inline';
+	}
+	function hideEdit(shownElem, hiddenElem) {
+		document.getElementById(shownElem).style.display = 'inline';
+		document.getElementById(hiddenElem).style.display = 'none';
+	}
+	function hideAll(){
+		var e = document.getElementsByClassName('hidden-elem');
+		for (var i = 0; i < e.length; ++i) {
+		    var item = e[i];  
+		    e[i].style.display = 'none';
+		}
+		e = document.getElementsByClassName('shown-elem');
+		for (var i = 0; i < e.length; ++i) {
+		    e[i].style.display = 'inline';
+		}
+	}
+	function resetForms(){
+		var e = document.getElementsByClassName('pure-form');
+		for (var i = 0; i < e.length; ++i) {
+		    e[i].reset();
+		}
+		var confPass = document.getElementById('confirm-password');
+		var message = document.getElementById('validation');
+		confPass.style.backgroundColor = null;
+		message.innerHTML = "";
+	}
+	function validatePass(){
+	    var pass = document.getElementById('new-password');
+	    var confPass = document.getElementById('confirm-password');
+	    var message = document.getElementById('validation');
+	    var colorOK = "#66cc66";
+	    var colorWrong = "#ff6666";
+	    
+	    if(pass.value == confPass.value){
+	    	confPass.style.backgroundColor = colorOK;
+	        message.style.color = colorOK;
+	        message.innerHTML = ""
+	    }else{
+	    	confPass.style.backgroundColor = colorWrong;
+	        message.style.color = colorWrong;
+	        message.innerHTML = "Passw&ouml;rter stimmen nicht &uuml;berein"
+	    }
+	}
+</script>
+{% endblock %}
