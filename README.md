@@ -18,7 +18,7 @@ Simple dashboard for different management tasks, works on our LDAP tree
 
 ## Configuration
 - The logging component *Monolog* expects a writable directory `logs` in the root. 
-- TODO: LDAP settings etc
+- LDAP etc. is configured in `app/config.php`, please see `app/config.php.sample` for details
 
 ## Building
 You probably want to use [Brunch](http://brunch.io) for build management. Install it by running `npm install -g brunch`.
@@ -42,7 +42,9 @@ Here is a general overview of the directory structure:
     | assets/                         Static assets, such as images
     | css/                            Our custom CSS files
     | js/                             Our custom JS files
+    | sog/                            PSR-0 namespaced application files, autoloaded using Composer
     | services.php                    Service definitions for Silex application
+    | config.php.sample               Rename the sample file to config.php for usage
 | bower_components/ (not in git)      Bower files
 | doc/                                Documentation
 | logs/ (not in git)                  Used by Monolog
