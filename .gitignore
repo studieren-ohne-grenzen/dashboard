@@ -16,3 +16,5 @@ brunch-config.js
 public/img
 public/css
 public/js
+
+app/config.php
