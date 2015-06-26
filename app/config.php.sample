@@ -1,0 +1,11 @@
+<?php
+$config = [];
+// see http://framework.zend.com/manual/current/en/modules/zend.ldap.api.html
+$config['ldap.options'] = [
+    'host' => 'host',
+    'username' => 'uid=someuser,ou=someou,dc=somedc for initial bind',
+    'password' => 'password for initial bind',
+    'bindRequiresDn' => true,
+    'accountFilterFormat' => 'sprintf-style LDAP filter',
+    'baseDn' => 'ou=someou,o=someo,dc=somedc'
+];

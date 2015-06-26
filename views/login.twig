@@ -1,0 +1,12 @@
+{% extends 'base.twig' %}
+{# TODO: possibly extend another template #}
+{% block content %}
+    <form action="{{ path('members_login_check') }}" method="post">
+        <p>{{ error }}</p>
+        <label for="username">Benutzername</label>
+        <input type="text" name="_username" id="username" placeholder="vorname.nachname" value="{{ last_username }}"/>
+        <label for="password">Passwort</label>
+        <input type="password" name="_password" id="password" value=""/>
+        <input type="submit" value="Login"/>
+    </form>
+{% endblock %}
