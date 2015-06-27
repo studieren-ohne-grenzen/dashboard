@@ -44,7 +44,7 @@ class LdapAuthenticationProvider implements AuthenticationProviderInterface
     public function authenticate(TokenInterface $token)
     {
         $user = $this->user_provider->loadUserByUsername($token->getUsername());
-        if ($user && $this->bind($token->getUsername(), $token->getCredentials())) {
+        if ($user && $this->checkLogin($token->getUsername(), $token->getCredentials())) {
             $roles = array_unique(array_merge($token->getRoles(), $user->getRoles()));
             return new UsernamePasswordToken($user, null, 'ldap', $roles);
         }
@@ -60,14 +60,19 @@ class LdapAuthenticationProvider implements AuthenticationProviderInterface
      * @param string $password The password to use for binding
      * @return bool Returns true if the bind was successful, false otherwise.
      */
-    private function bind($user, $password)
+    private function checkLogin($user, $password)
     {
+        $success = false;
         try {
             $this->ldap->bind($user, $password);
-            return true;
+            $success = true;
         } catch (LdapException $ex) {
-            return false;
+            $success = false;
+        } finally {
+            // rebind to privileged user
+            $this->ldap->bind();
         }
+        return $success;
     }
 
     /**
