@@ -16,10 +16,27 @@ require_once __DIR__ . '/../app/services.php';
 
 // (unprotected) index route
 $app->get('/', function () use ($app) {
-    return $app['twig']->render('home.twig', [
-        'message' => 'Hello World'
-    ]);
+    return $app->redirect($app["url_generator"]->generate("/members/manage-account"));
 });
+
+$app->get('/Benutzerdaten', function () use ($app) {
+		return $app['twig']->render('manage_account.twig', [
+				'message' => 'Hallo '
+		]);
+	})
+	->bind('/members/manage-account');
+
+$app->get('/Gruppen', function () use ($app) {
+		return $app['twig']->render('manage_groups.twig', [
+				'message' => 'Hello World'
+		]);
+	})
+	->bind('/members/manage-groups');
+	
+$app->get('/Hilfe', function () use ($app) {
+		return $app['twig']->render('help.twig');
+	})
+	->bind('help');
 
 // some LDAP test calls
 $app->get('/ldaptests', function () use ($app) {

@@ -9,6 +9,33 @@
         <link rel="stylesheet" href="{{ app.request.basepath }}/css/vendor.css">
         <link rel="stylesheet" href="{{ app.request.basepath }}/css/app.css">
     {% endblock %}
+    
+<style>
+    .bbox {
+    /* border: 1px solid white;*/
+    position: relative;
+    width: 100%;
+    padding: 5px 5px 5px 5px;
+    }
+    .lo {
+    float: right;
+    }
+    .button-secondary{
+     color: white;
+     border-radius: 4px;
+     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+     background: rgb(176, 202, 219);
+    }
+    
+    @media (min-width: 48em) {
+    	.bbox {
+    		position: absolute;
+    		bottom:0;
+    	}
+    }
+    
+</style>
+    
 </head>
 <body>
 <div id="layout" class="pure-g">
@@ -22,18 +49,23 @@
                 <h2 class="brand-tagline">Control &amp; Rule!</h2>
 
                 <nav class="nav">
-                    <ul class="nav-list">
+                      <ul class="nav-list">
                         <li class="nav-item">
-                            <a class="pure-button" href="#members">Mitglieder verwalten</a>
+                            <a class="pure-button" href="{{ path('/members/manage-groups') }}">Meine Gruppen</a>
                         </li>
                         <li class="nav-item">
-                            <a class="pure-button" href="#password">Passwort ändern</a>
+                            <a class="pure-button" href="{{ path('/members/manage-account') }}">Meine Benutzerdaten</a>
                         </li>
                         <li class="nav-item">
-                            <a class="pure-button" href="#help">Hilfe</a>
+                            <a class="pure-button" href="{{ path('help') }}">Hilfe</a>
                         </li>
                     </ul>
                 </nav>
+            </div>
+            <div class="bbox">
+            <hr/>
+            <span class="lo"><a class="pure-button button-secondary lb" href="{{ path('members_logout') }}">Abmelden</a></span>
+            <b>Max Mustermann</b><br />ist angemeldet.
             </div>
         </div>
     {% endblock %}
