@@ -40,16 +40,23 @@ $app->get('/Hilfe', function () use ($app) {
 
 // some LDAP test calls
 $app->get('/ldaptests', function () use ($app) {
-    $content = print_r($app['ldap']->getEntry('uid=leonhard.melzer,ou=active,ou=people,o=sog-de,dc=sog'), true);
-    $content .= print_r(($app['ldap']->search('objectClass=person', 'dc=sog')->getFirst()), true);
+    $dn = 'uid=leonhard.melzer,ou=active,ou=people,o=sog-de,dc=sog';
+    $content = '';
+    // fails due to insufficient permission:
+    // $content = print_r($app['ldap']->updatePassword($dn, 'test'), true);
+    $content .= print_r($app['ldap']->getGroups()->toArray(), true);
+    $content .= print_r($app['ldap']->getMemberships($dn)->toArray(), true);
     try {
-        $content .= print_r($app['ldap']->bind('uid=leonhard.melzer,ou=active,ou=people,o=sog-de,dc=sog', 'somePassword'), true);
+        $content .= print_r($app['ldap']->bind($dn, 'test'), true);
     } catch (\Zend\Ldap\Exception\LdapException $ex) {
         if ($ex->getCode() == \Zend\Ldap\Exception\LdapException::LDAP_INVALID_CREDENTIALS) {
             $content .= "Der Login war nicht erfolgreich, bitte überprüfe deinen Benutzernamen und Passwort.";
         } else {
             $content .= print_r($ex, true);
         }
+    } finally {
+        // rebind to privileged user
+        $app['ldap']->bind();
     }
     return $app['twig']->render('text.twig', [
         'content' => $content
