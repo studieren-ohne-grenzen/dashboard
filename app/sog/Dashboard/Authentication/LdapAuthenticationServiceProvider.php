@@ -32,10 +32,10 @@ class LdapAuthenticationServiceProvider implements ServiceProviderInterface
 
         $entry_point = $this->entry_point;
         // now setup the authentication listener
-        $app['security.authentication_listener.factory.ldap'] = $app->protect(function ($name) use ($app, $entry_point) {
+        $app['security.authentication_listener.factory.ldap'] = $app->protect(function ($name, $options = []) use ($app, $entry_point) {
 
             if ($entry_point && isset($app['security.entry_point.' . $name . '.' . $entry_point]) === false) {
-                $app['security.entry_point.' . $name . '.' . $entry_point] = $app['security.entry_point.' . $entry_point . '._proto']($name);
+                $app['security.entry_point.' . $name . '.' . $entry_point] = $app['security.entry_point.' . $entry_point . '._proto']($name, $options);
             }
 
             // the authentication provider handles the actual authentication and is called automatically
@@ -47,13 +47,13 @@ class LdapAuthenticationServiceProvider implements ServiceProviderInterface
             };
 
             if ($entry_point) {
-                $app['security.authentication_listener.' . $name . '.ldap'] = $app['security.authentication_listener.' . $entry_point . '._proto']($name);
+                $app['security.authentication_listener.' . $name . '.ldap'] = $app['security.authentication_listener.' . $entry_point . '._proto']($name, $options);
             }
 
             return array(
                 'security.authentication_provider.' . $name . '.ldap',
                 'security.authentication_listener.' . $name . '.ldap',
-                $entry_point ? 'security.entry_point.' . $name . '.ldap.' . $entry_point : null,
+                $entry_point ? 'security.entry_point.' . $name . '.' . $entry_point : null,
                 'pre_auth',
             );
         });
