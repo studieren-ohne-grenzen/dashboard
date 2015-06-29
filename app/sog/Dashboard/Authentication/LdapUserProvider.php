@@ -1,6 +1,7 @@
 <?php
 namespace SOG\Dashboard\Authentication;
 
+use SOG\Dashboard\LdapAdapter;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -21,7 +22,7 @@ class LdapUserProvider implements UserProviderInterface
      */
     private $ldap;
 
-    function __construct(Ldap $ldap)
+    function __construct(LdapAdapter $ldap)
     {
         $this->ldap = $ldap;
     }
@@ -31,6 +32,7 @@ class LdapUserProvider implements UserProviderInterface
      */
     public function refreshUser(UserInterface $user)
     {
+        // This could be implemented in a different manner (session?) to reduce server load
         return $this->loadUserByUsername($user->getUsername());
     }
 
@@ -44,11 +46,29 @@ class LdapUserProvider implements UserProviderInterface
             $dn = $this->ldap->getCanonicalAccountName($username, LDAP::ACCTNAME_FORM_DN);
             // then get all associated attributes
             $attributes = $this->ldap->getEntry($dn);
-            $roles = []; // TODO: assign
+            $roles = $this->getRoles($dn);
             return new LdapUser($username, null, $attributes, $roles);
         } catch (LdapException $ex) {
             throw new UsernameNotFoundException($ex->getMessage());
         }
+    }
+
+    /**
+     * Infer the rules of the given user by checking the LDAP resource. This can be extended to accommodate for
+     * ROLE_ADMIN or other cases
+     *
+     * @param string $user_dn The user DN for which to infer the rules
+     * @return array The roles of the given user
+     */
+    private function getRoles($user_dn)
+    {
+        $roles = [];
+        if ($this->ldap->isOwner($user_dn)) {
+            $roles[] = 'ROLE_GROUP_ADMIN';
+        } else {
+            $roles[] = 'ROLE_USER';
+        }
+        return $roles;
     }
 
     /**
@@ -58,4 +78,5 @@ class LdapUserProvider implements UserProviderInterface
     {
         return ($class === '\\SOG\\Dashboard\\Authentication\\LdapUser');
     }
+
 }

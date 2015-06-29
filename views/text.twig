@@ -1,6 +1,14 @@
 {% extends 'base.twig' %}
 
 {% block content %}
+    <h1>Rollen</h1>
+    {% if is_granted('ROLE_GROUP_ADMIN') %}
+        <p>Du bist Gruppen Admin.</p>
+    {% endif %}
+    {% if is_granted('ROLE_USER') %}
+        <p>Du bist normaler User.</p>
+    {% endif %}
+    <h1>Inhalt</h1>
     <pre>
     {{ content }}
     </pre>
