@@ -20,23 +20,20 @@ $app->get('/', function () use ($app) {
 });
 
 $app->get('/Benutzerdaten', function () use ($app) {
-		return $app['twig']->render('manage_account.twig', [
-				'message' => 'Hallo '
-		]);
-	})
-	->bind('/members/manage-account');
+    return $app['twig']->render('manage_account.twig', [
+        'message' => 'Hallo '
+    ]);
+})->bind('/members/manage-account');
 
 $app->get('/Gruppen', function () use ($app) {
-		return $app['twig']->render('manage_groups.twig', [
-				'message' => 'Hello World'
-		]);
-	})
-	->bind('/members/manage-groups');
-	
+    return $app['twig']->render('manage_groups.twig', [
+        'message' => 'Hello World'
+    ]);
+})->bind('/members/manage-groups');
+
 $app->get('/Hilfe', function () use ($app) {
-		return $app['twig']->render('help.twig');
-	})
-	->bind('help');
+    return $app['twig']->render('help.twig');
+})->bind('help');
 
 // some LDAP test calls
 $app->get('/ldaptests', function () use ($app) {
@@ -65,8 +62,8 @@ $app->get('/ldaptests', function () use ($app) {
 
 // this route should be protected
 $app->get('/members/test', function () use ($app) {
-    return $app['twig']->render('home.twig', [
-        'message' => 'Test, should be protected'
+    return $app['twig']->render('text.twig', [
+        'content' => 'Test, should be protected'
     ]);
 });
 
