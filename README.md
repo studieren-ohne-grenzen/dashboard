@@ -19,6 +19,7 @@ Simple dashboard for different management tasks, works on our LDAP tree
 ## Configuration
 - The logging component *Monolog* expects a writable directory `logs` in the root. 
 - LDAP etc. is configured in `app/config.php`, please see `app/config.php.sample` for details
+- You should use *STARTTLS* with the LDAP configuration, as suggested. You may need to alter your local `ldap.conf` file so the certificate will be accepted. See [php.net](https://secure.php.net/manual/de/function.ldap-start-tls.php#94893) and this [DigitalOcean guide](https://www.digitalocean.com/community/tutorials/how-to-encrypt-openldap-connections-using-starttls) for details.
 
 ## Building
 You probably want to use [Brunch](http://brunch.io) for build management. Install it by running `npm install -g brunch`.
