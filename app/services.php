@@ -25,11 +25,16 @@ $app->register(new Silex\Provider\SecurityServiceProvider(), [
     'security.firewalls' => [
         'members' => [
             'pattern' => '^/members/',
+            'logout' => [
+                'logout_path' => '/members/logout'
+            ],
+            'ldap' => [
+                'check_path' => '/members/login_check',
+                'require_previous_session' => false
+            ],
             'users' => function () use ($app) {
                 return $app['security.ldap.user_provider']($app['ldap']);
             },
-            'form' => ['login_path' => '/login', 'check_path' => '/members/login_check'],
-            'logout' => ['logout_path' => '/members/logout']
         ]
     ]
 ]);
