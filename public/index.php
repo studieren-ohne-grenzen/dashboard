@@ -1,5 +1,7 @@
 <?php
 use Symfony\Component\HttpFoundation\Request;
+use SOG\Dashboard\Authentication\LdapUserProvider;
+use Zend\Ldap\Attribute;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -20,15 +22,19 @@ $app->get('/', function () use ($app) {
 });
 
 $app->get('/Benutzerdaten', function () use ($app) {
+	$userp = new LdapUserProvider($app['ldap']);
+	$user = $userp->loadUserByUsername('leonhard.melzer');
 		return $app['twig']->render('manage_account.twig', [
-				'message' => 'Hallo '
+				'user' => $user
 		]);
 	})
 	->bind('/members/manage-account');
 
 $app->get('/Gruppen', function () use ($app) {
+	$userp = new LdapUserProvider($app['ldap']);
+	$user = $userp->loadUserByUsername('leonhard.melzer');
 		return $app['twig']->render('manage_groups.twig', [
-				'message' => 'Hello World'
+				'user' => $user
 		]);
 	})
 	->bind('/members/manage-groups');
@@ -44,6 +50,7 @@ $app->get('/ldaptests', function () use ($app) {
     $content = '';
     // fails due to insufficient permission:
     // $content = print_r($app['ldap']->updatePassword($dn, 'test'), true);
+    $content .= print_r($app['ldap']->search('objectClass=person', 'dc=sog')->getFirst(), true);
     $content .= print_r($app['ldap']->getGroups()->toArray(), true);
     $content .= print_r($app['ldap']->getMemberships($dn)->toArray(), true);
     try {

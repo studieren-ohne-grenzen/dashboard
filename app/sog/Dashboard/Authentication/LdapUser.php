@@ -2,6 +2,7 @@
 namespace SOG\Dashboard\Authentication;
 
 use Symfony\Component\Security\Core\User\UserInterface;
+use Zend\Ldap\Attribute;
 
 /**
  * This class represents an authenticated LDAP user.
@@ -16,6 +17,7 @@ class LdapUser implements UserInterface
     protected $password;
     protected $attributes;
     protected $roles;
+    protected $groups;
 
     /**
      * @param string $username
@@ -23,12 +25,13 @@ class LdapUser implements UserInterface
      * @param array $attributes
      * @param array $roles
      */
-    public function __construct($username, $password, array $attributes = [], array $roles = [])
+    public function __construct($username, $password, array $attributes = [], array $roles = [], array $groups = [])
     {
         $this->username = $username;
         $this->password = $password;
         $this->attributes = $attributes;
         $this->roles = $roles;
+        $this->groups = $groups;
     }
 
     /**
@@ -37,6 +40,11 @@ class LdapUser implements UserInterface
     public function getAttributes()
     {
         return $this->attributes;
+    }
+    
+    public function getSingleAttribute($attribName, $index)
+    {
+    	return Attribute::getAttribute($this->attributes, $attribName, $index);
     }
 
     /**
@@ -83,7 +91,22 @@ class LdapUser implements UserInterface
     {
         return $this->username;
     }
-
+    
+    /**
+     * Returns the groups the user is member of.
+     * 
+     * @return The groups containing the user
+     */
+    public function getGroups()
+    {
+    	return $this->groups;
+    }
+    
+    public function getGroupInfo($attribName, $index)
+    {
+    	return Attribute::getAttribute($this->attributes, $attribName, $index);
+    }
+    
     /**
      * {@inheritdoc}
      */

@@ -1,12 +1,12 @@
 {% extends 'base.twig' %} {% block content %}
-<h1>{{ message | upper }}</h1>
+<h1>Willkommen, {{ user.singleAttribute('givenname', 0) }}!</h1>
 <div>
 	<table class="pure-table-horizontal user-data">
 		<tbody class="list">
 			<tr>
 				<td class="icon">&#9993;</td>
 				<td class="label">E-Mail</td>
-				<td class="value"><span id="view-email" class="shown-elem">torsten@bar.com
+				<td class="value"><span id="view-email" class="shown-elem">{{ user.singleAttribute('mail', 0) }}
 						<button class="pure-button button-small"
 							onclick="showEdit('view-email', 'edit-email')">&#9998;&ensp;&Auml;ndern
 						</button>
@@ -54,12 +54,11 @@
 			<tr>
 				<td class="icon">&#8946;</td>
 				<td class="label">Gruppen</td>
-				<td class="value">LG Aachen, Sri Lanka, Ressort Recht</td>
-			</tr>
-			<tr>
-				<td class="icon">&#9734;</td>
-				<td class="label">Beitritt am</td>
-				<td class="value">11.05.2012</td>
+				<td class="value">
+{% for group in user.groups %}
+{{ group.singleAttribute('cn', 0) }}{% if not loop.last %}, {% endif %}
+{% endfor %}
+</td>
 			</tr>
 		</tbody>
 	</table>

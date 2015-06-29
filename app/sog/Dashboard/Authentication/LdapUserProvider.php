@@ -45,7 +45,14 @@ class LdapUserProvider implements UserProviderInterface
             // then get all associated attributes
             $attributes = $this->ldap->getEntry($dn);
             $roles = []; // TODO: assign
-            return new LdapUser($username, null, $attributes, $roles);
+            
+            $groups = $this->ldap->getMemberships($dn)->toArray();
+            
+            foreach ($groups as &$g){
+            	$g = new LdapGroup($g);
+            }
+            
+            return new LdapUser($username, null, $attributes, $roles, $groups);
         } catch (LdapException $ex) {
             throw new UsernameNotFoundException($ex->getMessage());
         }

@@ -1,13 +1,15 @@
 {% extends 'base.twig' %}
 
 {% block content %}
-    <h1>{{ message | upper }}</h1>
+    <h1>Willkommen, {{ user.singleAttribute('givenname', 0) }}</h1>
     <div class="group-chooser">
         <form class="pure-form">
             <fieldset>
                 <label for="group">Deine Gruppe&nbsp;</label>
                 <select name="group" id="group">
-                    <option value="darmstadt">Darmstadt</option>
+                {% for group in user.groups %}
+					<option value="{{ group.attributes['dn'] }}">{{ group.singleAttribute('cn', 0) }}</option>
+				{% endfor %}
                     <option value="sri-lanka">Sri Lanka</option>
                 </select>
             </fieldset>
@@ -43,7 +45,6 @@
             <tr>
                 <th>Name</th>
                 <th>Mail</th>
-                <th>Datum</th>
                 <th>Aktion</th>
             </tr>
             </thead>
@@ -51,37 +52,31 @@
             <tr>
                 <td class="name">Leinbach, Ferdinand</td>
                 <td class="email">ferdinand@bar.com</td>
-                <td>01.04.2015</td>
                 <td><a href="#activate" class="pure-button button-success">freischalten</a></td>
             </tr>
             <tr>
                 <td class="name">Heimbach, Simon</td>
                 <td class="email">simon@bar.com</td>
-                <td>01.04.2015</td>
                 <td><a href="#activate" class="pure-button button-success">freischalten</a></td>
             </tr>
             <tr>
                 <td class="name">Boschert, Fabian</td>
                 <td class="email">fabian@bar.com</td>
-                <td>01.04.2015</td>
                 <td><a href="#activate" class="pure-button button-success">freischalten</a></td>
             </tr>
             <tr>
                 <td class="name">Keck, Dennis</td>
                 <td class="email">dennis@bar.com</td>
-                <td>01.04.2015</td>
                 <td><a href="#activate" class="pure-button button-warning">sperren</a></td>
             </tr>
             <tr>
                 <td class="name">Leidig, Sebastian</td>
                 <td class="email">fabian@bar.com</td>
-                <td>01.04.2015</td>
                 <td><a href="#activate" class="pure-button button-success">freischalten</a></td>
             </tr>
             <tr>
                 <td class="name">Melzer, Leonhard</td>
                 <td class="email">fabian@bar.com</td>
-                <td>01.04.2015</td>
                 <td><a href="#activate" class="pure-button button-warning">sperren</a></td>
             </tr>
             </tbody>
