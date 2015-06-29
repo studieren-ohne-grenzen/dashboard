@@ -43,6 +43,7 @@ $app->get('/ldaptests', function () use ($app) {
     // $content = print_r($app['ldap']->updatePassword($dn, 'test'), true);
     $content .= print_r($app['ldap']->getGroups()->toArray(), true);
     $content .= print_r($app['ldap']->getMemberships($dn)->toArray(), true);
+    $content .= print_r($app['ldap']->getMembers('Ressort IT')->toArray(), true);
     try {
         $content .= print_r($app['ldap']->bind($dn, 'test'), true);
     } catch (\Zend\Ldap\Exception\LdapException $ex) {

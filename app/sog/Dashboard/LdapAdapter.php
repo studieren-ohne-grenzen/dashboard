@@ -18,7 +18,7 @@ class LdapAdapter extends Ldap
      *
      * @return bool|null|\Zend\Ldap\Collection
      */
-    public function getGroups()
+    public function getGroups($fields = ['cn'])
     {
         $results = null;
         try {
@@ -26,7 +26,7 @@ class LdapAdapter extends Ldap
                 '(objectClass=groupOfNames)',
                 'ou=groups,o=sog-de,dc=sog',
                 self::SEARCH_SCOPE_ONE,
-                ['cn']
+                $fields
             );
             return $results;
         } catch (LdapException $ex) {
@@ -37,8 +37,8 @@ class LdapAdapter extends Ldap
     /**
      * Adds the DN to the given group
      *
-     * @param $dnOfUser
-     * @param $dnOfGroup
+     * @param string $dnOfUser
+     * @param string $dnOfGroup
      */
     public function addToGroup($dnOfUser, $dnOfGroup)
     {
@@ -61,24 +61,50 @@ class LdapAdapter extends Ldap
     /**
      * Retrieves all memberships for the given DN
      *
-     * @param $dn The DN for which to get the memberships
+     * @param string $user_dn The DN for which to get the memberships
+     * @param array $fields A list of fields we want to return from the search
      * @return bool|null|\Zend\Ldap\Collection
      */
-    public function getMemberships($dn)
+    public function getMemberships($user_dn, $fields = ['cn'])
     {
         $results = null;
         try {
             $results = $this->search(
-                sprintf('(&(objectClass=groupOfNames)(member=%s))', $dn),
+                sprintf('(&(objectClass=groupOfNames)(member=%s))', $user_dn),
                 'ou=groups,o=sog-de,dc=sog',
                 self::SEARCH_SCOPE_ONE,
-                ['cn']
+                $fields
             );
             return $results;
         } catch (LdapException $ex) {
             return false;
         }
     }
+
+
+    /**
+     * Retrieves all members for the given group CN
+     *
+     * @param string $group_cn The common name of the group for which we want to retrieve the members
+     * @param array $fields A list of fields we want to return from the search
+     * @return bool|null|\Zend\Ldap\Collection
+     */
+    public function getMembers($group_cn, $fields = ['member'])
+    {
+        $results = null;
+        try {
+            $results = $this->search(
+                sprintf('(&(objectClass=groupOfNames)(cn=%s))', $group_cn),
+                'ou=groups,o=sog-de,dc=sog',
+                self::SEARCH_SCOPE_ONE,
+                $fields
+            );
+            return $results;
+        } catch (LdapException $ex) {
+            return false;
+        }
+    }
+
 
     /**
      * Updates the password for the given DN
