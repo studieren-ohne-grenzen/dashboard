@@ -48,7 +48,7 @@ class LdapUser implements UserInterface
     }
 
     /**
-     * @param $key The key of the property
+     * @param mixed $key The key of the property
      * @return null|mixed The value or null if the given key is not a property
      */
     public function getAttribute($key)

@@ -16,6 +16,7 @@ class LdapAdapter extends Ldap
     /**
      * Returns all groups (OUs) with their common names
      *
+     * @param array $fields A list of fields we want to return from the search
      * @return bool|null|\Zend\Ldap\Collection
      */
     public function getGroups($fields = ['cn'])
@@ -141,7 +142,7 @@ class LdapAdapter extends Ldap
     public function updatePassword($dn, $password)
     {
         $attributes = [];
-        Attribute::setPassword($attributes, $password, Attribute::PASSWORD_HASH_SHA);
+        Attribute::setPassword($attributes, $password, Attribute::PASSWORD_HASH_SSHA);
 
         try {
             $this->update($dn, $attributes);
