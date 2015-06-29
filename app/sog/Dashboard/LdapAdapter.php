@@ -107,6 +107,31 @@ class LdapAdapter extends Ldap
 
 
     /**
+     * This method can be used to assign the ROLE_GROUP_ADMIN role to a user. It checks if the given DN is a owner
+     * of any group. Further checks should be done somewhere else.
+     *
+     * @param string $user_dn The user DN for which we want to check
+     * @return bool True if the given user is a owner of any group, false otherwise.
+     */
+    public function isOwner($user_dn)
+    {
+        $results = null;
+        try {
+            $results = $this->search(
+                sprintf('(&(objectClass=groupOfNames)(owner=%s))', $user_dn),
+                'ou=groups,o=sog-de,dc=sog',
+                self::SEARCH_SCOPE_ONE,
+                ['cn']
+            );
+            // we don't care about specifics, we only want to know if the user is owner of any group
+            return ($results->count() > 0);
+        } catch (LdapException $ex) {
+            return false;
+        }
+    }
+
+
+    /**
      * Updates the password for the given DN
      *
      * @param string $dn The DN for which to update the password
