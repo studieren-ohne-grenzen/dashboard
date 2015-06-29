@@ -36,6 +36,10 @@ $app->register(new Silex\Provider\SecurityServiceProvider(), [
                 return $app['security.ldap.user_provider']($app['ldap']);
             },
         ]
+    ],
+    'security.role_hierarchy' => [
+        // 'ROLE_ADMIN' => ['ROLE_GROUP_ADMIN', 'ROLE_USER'], // unused
+        'ROLE_GROUP_ADMIN' => ['ROLE_USER']
     ]
 ]);
 
