@@ -40,9 +40,8 @@ $app->get('/Gruppen', function () use ($app) {
 	->bind('/members/manage-groups');
 	
 $app->get('/Hilfe', function () use ($app) {
-		return $app['twig']->render('help.twig');
-	})
-	->bind('help');
+    return $app['twig']->render('help.twig');
+})->bind('help');
 
 // some LDAP test calls
 $app->get('/ldaptests', function () use ($app) {
@@ -53,6 +52,7 @@ $app->get('/ldaptests', function () use ($app) {
     $content .= print_r($app['ldap']->search('objectClass=person', 'dc=sog')->getFirst(), true);
     $content .= print_r($app['ldap']->getGroups()->toArray(), true);
     $content .= print_r($app['ldap']->getMemberships($dn)->toArray(), true);
+    $content .= print_r($app['ldap']->getMembers('Ressort IT')->toArray(), true);
     try {
         $content .= print_r($app['ldap']->bind($dn, 'test'), true);
     } catch (\Zend\Ldap\Exception\LdapException $ex) {
@@ -72,8 +72,8 @@ $app->get('/ldaptests', function () use ($app) {
 
 // this route should be protected
 $app->get('/members/test', function () use ($app) {
-    return $app['twig']->render('home.twig', [
-        'message' => 'Test, should be protected'
+    return $app['twig']->render('text.twig', [
+        'content' => 'Test, should be protected'
     ]);
 });
 

@@ -3,6 +3,7 @@ $config = [];
 // see http://framework.zend.com/manual/current/en/modules/zend.ldap.api.html
 $config['ldap.options'] = [
     'host' => 'host',
+    'useStartTls' => true, // you may have to add "TLS_REQCERT never" in your *local* ldap.conf for this to work
     'username' => 'uid=someuser,ou=someou,dc=somedc for initial bind',
     'password' => 'password for initial bind',
     'bindRequiresDn' => true,
