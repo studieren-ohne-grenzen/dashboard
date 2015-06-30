@@ -133,22 +133,29 @@ class LdapAdapter extends Ldap
 
 
     /**
-     * Updates the password for the given DN
+     * Updates the password for the given DN. Only the DN him/herself can change the password.
+     * Thus we need to bind as the DN first, update the password and then rebind to the privileged user.
      *
      * @param string $dn The DN for which to update the password
-     * @param string $password The new password
+     * @param string $old_password The old password, we need to bind to the DN first
+     * @param string $new_password The new password
      * @return bool True on success, false otherwise
      */
-    public function updatePassword($dn, $password)
+    public function updatePassword($dn, $old_password, $new_password)
     {
-        $attributes = [];
-        Attribute::setPassword($attributes, $password, Attribute::PASSWORD_HASH_SSHA);
-
+        $success = false;
         try {
+            $this->bind($dn, $old_password);
+            $attributes = [];
+            Attribute::setPassword($attributes, $new_password, Attribute::PASSWORD_HASH_SSHA);
             $this->update($dn, $attributes);
-            return true;
+            $success = true;
         } catch (LdapException $ex) {
-            return false;
+            $success = false;
+        } finally {
+            // rebind to privileged user
+            $this->bind();
         }
+        return $success;
     }
 }

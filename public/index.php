@@ -1,7 +1,6 @@
 <?php
-use Symfony\Component\HttpFoundation\Request;
 use SOG\Dashboard\Authentication\LdapUserProvider;
-use Zend\Ldap\Attribute;
+use Symfony\Component\HttpFoundation\Request;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -22,23 +21,21 @@ $app->get('/', function () use ($app) {
 });
 
 $app->get('/Benutzerdaten', function () use ($app) {
-	$userp = new LdapUserProvider($app['ldap']);
-	$user = $userp->loadUserByUsername('leonhard.melzer');
-		return $app['twig']->render('manage_account.twig', [
-				'user' => $user
-		]);
-	})
-	->bind('/members/manage-account');
+    $userp = new LdapUserProvider($app['ldap']);
+    $user = $userp->loadUserByUsername('leonhard.melzer');
+    return $app['twig']->render('manage_account.twig', [
+        'user' => $user
+    ]);
+})->bind('/members/manage-account');
 
 $app->get('/Gruppen', function () use ($app) {
-	$userp = new LdapUserProvider($app['ldap']);
-	$user = $userp->loadUserByUsername('leonhard.melzer');
-		return $app['twig']->render('manage_groups.twig', [
-				'user' => $user
-		]);
-	})
-	->bind('/members/manage-groups');
-	
+    $userp = new LdapUserProvider($app['ldap']);
+    $user = $userp->loadUserByUsername('leonhard.melzer');
+    return $app['twig']->render('manage_groups.twig', [
+        'user' => $user
+    ]);
+})->bind('/members/manage-groups');
+
 $app->get('/Hilfe', function () use ($app) {
     return $app['twig']->render('help.twig');
 })->bind('help');
@@ -47,8 +44,6 @@ $app->get('/Hilfe', function () use ($app) {
 $app->get('/ldaptests', function () use ($app) {
     $dn = 'uid=leonhard.melzer,ou=active,ou=people,o=sog-de,dc=sog';
     $content = '';
-    // fails due to insufficient permission:
-    // $content = print_r($app['ldap']->updatePassword($dn, 'test'), true);
     $content .= print_r($app['ldap']->search('objectClass=person', 'dc=sog')->getFirst(), true);
     $content .= print_r($app['ldap']->getGroups()->toArray(), true);
     $content .= print_r($app['ldap']->getMemberships($dn)->toArray(), true);
