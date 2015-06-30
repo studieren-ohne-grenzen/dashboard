@@ -42,36 +42,36 @@
 <body>
 <div id="layout" class="pure-g">
     {% block sidebar %}
-    <div class="sidebar pure-u-1 pure-u-md-1-4">
-        <div class="header">
-            <div class="pure-img-responsive logo circular"></div>
+        <div class="sidebar pure-u-1 pure-u-md-1-4">
+            <div class="header">
+                <div class="pure-img-responsive logo circular"></div>
 
-            <h1 class="brand-title">SOG Dashboard</h1>
+                <h1 class="brand-title">SOG Dashboard</h1>
 
-            <h2 class="brand-tagline">Control &amp; Rule!</h2>
+                <h2 class="brand-tagline">Control &amp; Rule!</h2>
 
-            <nav class="nav">
-                <ul class="nav-list">
-                    <li class="nav-item">
-                        <a class="pure-button" href="{{ path('/members/manage-groups') }}">Meine Gruppen</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="pure-button" href="{{ path('/members/manage-account') }}">Meine Benutzerdaten</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="pure-button" href="{{ path('help') }}">Hilfe</a>
-                    </li>
-                </ul>
-            </nav>
+                <nav class="nav">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a class="pure-button" href="{{ path('/members/manage-groups') }}">Meine Gruppen</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="pure-button" href="{{ path('/members/manage-account') }}">Meine Benutzerdaten</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="pure-button" href="{{ path('help') }}">Hilfe</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            {% if app.user %}
+                <div class="bbox">
+                    <hr/>
+                    <span class="lo"><a class="pure-button button-secondary lb" href="{{ path('members_logout') }}">Abmelden</a></span>
+                    <b>{{ app.user.attributes['cn'][0] }}</b><br/>ist angemeldet.
+                </div>
+            {% endif %}
         </div>
-        {% if app.user %}
-        <div class="bbox">
-            <hr/>
-            <span class="lo"><a class="pure-button button-secondary lb" href="{{ path('members_logout') }}">Abmelden</a></span>
-            <b>{{ app.user.attributes['cn'][0] }}</b><br/>ist angemeldet.
-        </div>
-        {% endif %}
-    </div>
     {% endblock %}
 
     <div class="content pure-u-1 pure-u-md-3-4" id="members">
