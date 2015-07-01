@@ -38,25 +38,41 @@ class LdapAdapter extends Ldap
     /**
      * Adds the DN to the given group
      *
-     * @param string $dnOfUser
-     * @param string $dnOfGroup
+     * @param string $dnOfUser dn of the user to add
+     * @param string $dnOfGroup dn of the group
      */
     public function addToGroup($dnOfUser, $dnOfGroup)
-    {
-        // TODO: implement
-        // $this->setAttribute($groupData, 'member', $dnOfUser, true /* for appending */);
-        // try { $this->update($dnOfGroup, $groupData); } catch (LdapException $ex) {}
+    {   
+    	$success = false;
+    	try {
+    		$entry = $this->getEntry($dnOfGroup);
+    		Attribute::setAttribute($entry, 'member', $dnOfUser, true);
+    		$this->update($dnOfGroup, $entry);
+    		$success = true;
+    	} catch (LdapException $ex) {
+    		$success = false;
+    	}
+    	return $success;
     }
 
     /**
      * Removes the DN from the given group
      *
-     * @param $dnOfUser
-     * @param $dnOfGroup
+     * @param $dnOfUser dn of the user to remove
+     * @param $dnOfGroup dn of the group
      */
     public function removeFromGroup($dnOfUser, $dnOfGroup)
     {
-        // TODO: implement
+        $success = false;
+    	try {
+    		$entry = $this->getEntry($dnOfGroup);
+    		Attribute::removeFromAttribute($entry, 'member', $dnOfUser);
+    		$this->update($dnOfGroup, $attributes);
+    		$success = true;
+    	} catch (LdapException $ex) {
+    		$success = false;
+    	}
+    	return $success;
     }
 
     /**
@@ -116,8 +132,10 @@ class LdapAdapter extends Ldap
      */
     public function isOwner($user_dn)
     {
+    	
+    	$result = $this->getOwnedGroups($user_dn);
         // we don't care about specifics, we only want to know if the user is owner of any group
-        return ($this->getOwnedGroups($user_dn) != null && $this->getOwnedGroups($user_dn)->count() > 0);
+        return ($result != null && $result->count() > 0);
     }
 
     /**
@@ -144,13 +162,20 @@ class LdapAdapter extends Ldap
         }
     }
     
+    /**
+     * Updates the email for the given DN.
+     * 
+     * @param unknown $dn User's dn
+     * @param unknown $newEmail The new email address
+     * @return boolean true on success, false otherwise
+     */
     public function updateEmail($dn, $newEmail)
     {
     	$success = false;
     	try {
     		$entry = $this->getEntry($dn);
     		Attribute::setAttribute($entry, 'mail-alternative', $newEmail);
-    		$this->update($dn, $attributes);
+    		$this->update($dn, $entry);
     		$success = true;
     	} catch (LdapException $ex) {
     		$success = false;
@@ -166,7 +191,7 @@ class LdapAdapter extends Ldap
      * @param string $dn The DN for which to update the password
      * @param string $old_password The old password, we need to bind to the DN first
      * @param string $new_password The new password
-     * @return bool True on success, false otherwise
+     * @return bool true on success, false otherwise
      */
     public function updatePassword($dn, $old_password, $new_password)
     {
