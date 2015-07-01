@@ -7,9 +7,10 @@
             <fieldset>
                 <label for="group">Deine Gruppe&nbsp;</label>
                 <select name="group" id="group" onchange="this.form.submit()">
-                {% for i in range(low=0, high= (ownedGroups|length) - 1, step=1) %}
-					<option {% if ownedGroups[i]['ou'][0] == group %}selected {% endif %}value="{{ ownedGroups[i]['ou'][0] }}">{{ ownedGroups[i]['cn'][0] }}</option>
-				{% endfor %} 
+                    {% for i in range(low=0, high= (ownedGroups|length) - 1, step=1) %}
+                        <option {% if ownedGroups[i]['ou'][0] == group %}selected
+                                {% endif %}value="{{ ownedGroups[i]['ou'][0] }}">{{ ownedGroups[i]['cn'][0] }}</option>
+                    {% endfor %}
                 </select>
             </fieldset>
         </form>
@@ -47,19 +48,22 @@
                 <th>Aktion</th>
             </tr>
             </thead>
-            <tbody class="list"> 
-{% for person in result %}
-{% if person['displayname'][0] is defined %}
-            <tr>
-            	<td class="name">{{ person['displayname'][0] }}</td>
-                <td class="email">{% if person['mail'] is defined %}{{ person['mail'][0] }}{% endif %}</td>
-                <td><a href="#activate" class="{%  if person['dn'] in members[0]['member'] %}pure-button button-warning">entfernen{% else %}pure-button button-success">hinzuf&uuml;gen{% endif %}</a></td>
-                <td class="isMember hidden">{%  if person['dn'] in members[0]['member'] %}true{% else %}false{% endif %}</td>
-            </tr>
-	{% endif %}
-{% endfor %}
+            <tbody class="list">
+            {% for person in result %}
+                {% if person['displayname'][0] is defined %}
+                    <tr>
+                        <td class="name">{{ person['displayname'][0] }}</td>
+                        <td class="email">{% if person['mail'] is defined %}{{ person['mail'][0] }}{% endif %}</td>
+                        <td><a href="#activate"
+                               class="{% if person['dn'] in members[0]['member'] %}pure-button button-warning">entfernen{% else %}pure-button button-success">hinzuf&uuml;gen{% endif %}</a>
+                        </td>
+                        <td class="isMember hidden">{% if person['dn'] in members[0]['member'] %}true{% else %}false{% endif %}</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
             </tbody>
         </table>
+        <ul class="pagination"></ul>
     </div>
 {% endblock %}
 
@@ -67,18 +71,22 @@
     {{ parent() }}
     <script>
         var options = {
-            valueNames: ['name', 'email']
+            valueNames: ['name', 'email'],
+            page: 20,
+            plugins: [
+                ListPagination({})
+            ]
         };
 
-        var memberList = new List('list', options);
-        
+        var memberList = new List('members', options);
+
 
         /* TODO (doesn't work yet) */
-        function filterGroup(cb){
-					personList.filter(function(item) {
-						return (item.values().isMember == true);
-					});
-					return false;
+        function filterGroup(cb) {
+            personList.filter(function (item) {
+                return (item.values().isMember == true);
+            });
+            return false;
         }
     </script>
 {% endblock %}
