@@ -27,7 +27,7 @@
                     </label>
 
                     <label for="filter-by-group">
-                        <input id="filter-by-group" type="checkbox" name="filter" checked value="group">
+                        <input id="filter-by-group" type="checkbox" name="filter" onclick ="filterGroup(this)" checked value="group">
                         Meine Gruppe
                     </label>
                 </fieldset>
@@ -42,9 +42,9 @@
         <table class="full-width pure-table pure-table-bordered">
             <thead>
             <tr>
-                <th>Name</th>
-                <th>Mail</th>
-                <th>Aktion</th>
+                <th class="sort" data-sort="name">Name</th>
+                <th class="sort" data-sort="email">E-Mail-Adresse</th>
+                <th class="sort" data-sort="isMember">Aktion</th>
             </tr>
             </thead>
             <tbody class="list">
@@ -56,7 +56,7 @@
                         <td><a href="#activate"
                                class="{% if person['dn'] in members[0]['member'] %}pure-button button-warning">entfernen{% else %}pure-button button-success">hinzuf&uuml;gen{% endif %}</a>
                         </td>
-                        <td class="isMember hidden">{% if person['dn'] in members[0]['member'] %}true{% else %}false{% endif %}</td>
+                        <td class="isMember hidden">{% if person['dn'] in members[0]['member'] %}1{% else %}0{% endif %}</td>
                     </tr>
                 {% endif %}
             {% endfor %}
@@ -70,7 +70,7 @@
     {{ parent() }}
     <script>
         var options = {
-            valueNames: ['name', 'email'],
+            valueNames: ['name', 'email', 'isMember'],
             page: 20,
             plugins: [
                 ListPagination({})
@@ -79,13 +79,16 @@
 
         var memberList = new List('members', options);
 
-
+        var memberFilter = function (item) {return (item.values().isMember == '1')};
+        
         /* TODO (doesn't work yet) */
         function filterGroup(cb) {
-            personList.filter(function (item) {
-                return (item.values().isMember == true);
-            });
-            return false;
+            if (cb.checked){
+            	memberList.filter(memberFilter);
+            }else{
+            	memberList.filter();
+            }
+            return true;
         }
     </script>
 {% endblock %}
