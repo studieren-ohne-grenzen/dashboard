@@ -21,7 +21,9 @@
             <h1 class="brand-title">Willkommen im Dashboard!</h1>
 
             <form action="{{ path('members_login_check') }}" class="pure-form pure-form-aligned" method="post">
-                <p class="button-error">{{ error }}</p>
+                {% if error %}
+                    <p class="button-error">{{ error }}</p>
+                {% endif %}
 
                 <div class="pure-control-group">
                     <label for="username">Benutzername</label>

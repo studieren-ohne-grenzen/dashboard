@@ -86,7 +86,7 @@ class LdapAdapter extends Ldap
     /**
      * Retrieves all members for the given group CN
      *
-     * @param string $group_cn The common name of the group for which we want to retrieve the members
+     * @param string $group_ou The common name of the group for which we want to retrieve the members
      * @param array $fields A list of fields we want to return from the search
      * @return bool|null|\Zend\Ldap\Collection
      */
@@ -116,10 +116,10 @@ class LdapAdapter extends Ldap
      */
     public function isOwner($user_dn)
     {
-            // we don't care about specifics, we only want to know if the user is owner of any group
-            return ($this->getOwnedGroups($user_dn) != null && $this->getOwnedGroups($user_dn)->count() > 0);
+        // we don't care about specifics, we only want to know if the user is owner of any group
+        return ($this->getOwnedGroups($user_dn) != null && $this->getOwnedGroups($user_dn)->count() > 0);
     }
-    
+
     /**
      * This method can be used to assign the ROLE_GROUP_ADMIN role to a user. It checks if the given DN is a owner
      * of any group. Further checks should be done somewhere else.
@@ -129,19 +129,19 @@ class LdapAdapter extends Ldap
      */
     public function getOwnedGroups($user_dn)
     {
-    	$results = null;
-    	try {
-    		$results = $this->search(
-    				sprintf('(&(objectClass=groupOfNames)(owner=%s))', $user_dn),
-    				'ou=groups,o=sog-de,dc=sog',
-    				self::SEARCH_SCOPE_ONE,
-    				['cn', 'ou']
-    		);
-    		
-    		return $results;
-    	} catch (LdapException $ex) {
-    		return null;
-    	}
+        $results = null;
+        try {
+            $results = $this->search(
+                sprintf('(&(objectClass=groupOfNames)(owner=%s))', $user_dn),
+                'ou=groups,o=sog-de,dc=sog',
+                self::SEARCH_SCOPE_ONE,
+                ['cn', 'ou']
+            );
+
+            return $results;
+        } catch (LdapException $ex) {
+            return null;
+        }
     }
     
     public function updateEmail($dn, $newEmail)

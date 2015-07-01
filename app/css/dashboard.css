@@ -46,6 +46,7 @@ h3 {
 
 .brand-title {
     text-transform: uppercase;
+    margin-bottom: .5em;
 }
 
 .brand-tagline {
@@ -97,23 +98,22 @@ h3 {
 }
 
 .logout-box {
-            /* border: 1px solid white;*/
-            position: relative;
-            width: 100%;
-            padding: 5px 5px 5px 5px;
-        }
+    /* border: 1px solid white;*/
+    position: relative;
+    width: 100%;
+    padding: 5px 5px 5px 5px;
+}
 
 .align-right {
-	float: right;
+    float: right;
 }
 
 .logout-button {
-	color: white;
-	border-radius: 4px;
-	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-	background: rgb(176, 202, 219);
+    color: white;
+    border-radius: 4px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    background: rgb(176, 202, 219);
 }
-
 
 /* login form */
 .login-bar {
@@ -240,6 +240,17 @@ table.full-width {
     font-size: 85%;
 }
 
+/* pagination */
+.pagination {
+    text-align: center;
+}
+
+.pagination li {
+    display: inline;
+    background-color: #efefef;
+    padding: .5em;
+}
+
 /* large website */
 @media (min-width: 48em) {
     .content {
@@ -257,10 +268,11 @@ table.full-width {
         top: 0;
         bottom: 0;
     }
-	.logout-box {
-		position: absolute;
-		bottom: 0;
-	}
+
+    .logout-box {
+        position: absolute;
+        bottom: 0;
+    }
 
     .group-chooser {
         position: fixed;
