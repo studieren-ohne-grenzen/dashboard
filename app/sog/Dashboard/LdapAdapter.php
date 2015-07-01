@@ -143,6 +143,20 @@ class LdapAdapter extends Ldap
     		return null;
     	}
     }
+    
+    public function updateEmail($dn, $newEmail)
+    {
+    	$success = false;
+    	try {
+    		$entry = $this->getEntry($dn);
+    		Attribute::setAttribute($entry, 'mail-alternative', $newEmail);
+    		$this->update($dn, $attributes);
+    		$success = true;
+    	} catch (LdapException $ex) {
+    		$success = false;
+    	}
+    	return $success;
+    }
 
 
     /**

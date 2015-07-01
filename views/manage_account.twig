@@ -6,7 +6,7 @@
 			<tr>
 				<td class="icon">&#9993;</td>
 				<td class="label">E-Mail</td>
-				<td class="value"><span id="view-email" class="shown-elem">{{ user.attribute('mail', 0) }}
+				<td class="value"><span id="view-email" class="shown-elem">{{ user.attribute('mail-alternative', 0) }}
 						<button class="pure-button button-small"
 							onclick="showEdit('view-email', 'edit-email')">&#9998;&ensp;&Auml;ndern
 						</button>
@@ -35,7 +35,7 @@
 							<fieldset>
 								<label for="old-password">Altes Passwort:<input type="password"
 									class="pure-input-rounded" id="old-password"
-									placeholder="altes Passwort" required> </label></fieldset>
+									placeholder="altes Passwort" required> </label>
 								<fieldset class="pure-group">
 									<label for="new-password">Neues Passwort:<input type="password" id="new-password"
 										placeholder="neues Passwort" required>
@@ -55,7 +55,7 @@
 				<td class="icon">&#8946;</td>
 				<td class="label">Gruppen</td>
 				<td class="value">
-{% for i in range(low=0, high= (user.groups|length - 1), step=1) %}
+{% for i in user.groups|keys %}
 	{{ user.groupAttribute(i, 'cn', 0) }}{% if not loop.last %}, {% endif %}
 {% endfor %}
 </td>

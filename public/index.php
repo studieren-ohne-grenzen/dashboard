@@ -53,10 +53,13 @@ $app->get('/Hilfe', function () use ($app) {
 // some LDAP test calls
 $app->get('/ldaptests', function () use ($app) {
     $dn = 'uid=leonhard.melzer,ou=active,ou=people,o=sog-de,dc=sog';
-    $content = '';
+    $content = "search('objectClass=person', 'dc=sog')->getFirst(): ";
     $content .= print_r($app['ldap']->search('objectClass=person', 'dc=sog')->getFirst(), true);
+    $content .= "getGroups()->toArray(): ";
     $content .= print_r($app['ldap']->getGroups()->toArray(), true);
+    $content .= "getMemberships(dn)->toArray(): ";
     $content .= print_r($app['ldap']->getMemberships($dn)->toArray(), true);
+    $content .= "getMembers('ressort_it')->toArray(): ";
     $content .= print_r($app['ldap']->getMembers('ressort_it')->toArray(), true);
     try {
         $content .= print_r($app['ldap']->bind($dn, 'test'), true);

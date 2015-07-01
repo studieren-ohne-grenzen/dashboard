@@ -7,7 +7,7 @@
             <fieldset>
                 <label for="group">Deine Gruppe&nbsp;</label>
                 <select name="group" id="group" onchange="this.form.submit()">
-                {% for i in range(low=0, high= (ownedGroups|length) - 1, step=1) %}
+				{% for i in ownedGroups|keys %}
 					<option {% if ownedGroups[i]['ou'][0] == group %}selected {% endif %}value="{{ ownedGroups[i]['ou'][0] }}">{{ ownedGroups[i]['cn'][0] }}</option>
 				{% endfor %} 
                 </select>
