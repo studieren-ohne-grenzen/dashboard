@@ -49,7 +49,7 @@ class LdapAuthenticationProvider implements AuthenticationProviderInterface
             return new UsernamePasswordToken($user, null, 'ldap', $roles);
         }
 
-        throw new AuthenticationException('Der Login war nicht erfolgreich, bitte überprüfe deinen Benutzernamen und Passwort.');
+        throw new AuthenticationException('Der Login war nicht erfolgreich, bitte überprüfe deinen Benutzernamen und Passwort.' . '   ' . mb_detect_encoding($token->getCredentials()));
     }
 
     /**
@@ -66,6 +66,7 @@ class LdapAuthenticationProvider implements AuthenticationProviderInterface
         try {
             $this->ldap->bind($user, $password);
             $success = true;
+            
         } catch (LdapException $ex) {
             $success = false;
         } finally {

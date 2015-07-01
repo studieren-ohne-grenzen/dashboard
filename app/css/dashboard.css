@@ -96,6 +96,25 @@ h3 {
     background: none;
 }
 
+.logout-box {
+            /* border: 1px solid white;*/
+            position: relative;
+            width: 100%;
+            padding: 5px 5px 5px 5px;
+        }
+
+.align-right {
+	float: right;
+}
+
+.logout-button {
+	color: white;
+	border-radius: 4px;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+	background: rgb(176, 202, 219);
+}
+
+
 /* login form */
 .login-bar {
     background-color: rgb(0, 48, 73);
@@ -238,6 +257,10 @@ table.full-width {
         top: 0;
         bottom: 0;
     }
+	.logout-box {
+		position: absolute;
+		bottom: 0;
+	}
 
     .group-chooser {
         position: fixed;

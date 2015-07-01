@@ -28,11 +28,21 @@ $app->get('/Benutzerdaten', function () use ($app) {
     ]);
 })->bind('/members/manage-account');
 
-$app->get('/Gruppen', function () use ($app) {
+$app->get('/Gruppen', function (Request $request) use ($app) {
     $userp = new LdapUserProvider($app['ldap']);
-    $user = $userp->loadUserByUsername('leonhard.melzer');
+    $user = $userp->loadUserByUsername('dennis.keck');
+    $group = $request->get('group');
+    $ownedGroups = $app['ldap']->getOwnedGroups($user->getAttributes()['dn'])->toArray();
+    if(!isset($group)) $group = $ownedGroups[0]['ou'][0];
+    $result = $app['ldap']->search('objectClass=inetOrgPerson', 'ou=people,o=sog-de,dc=sog')->toArray();
+    $members = $app['ldap']->getMembers($group)->toArray();
+    
     return $app['twig']->render('manage_groups.twig', [
-        'user' => $user
+        'user' => $user,
+    	'result' => $result,
+    	'members' => $members,
+    	'group' => $group,
+    	'ownedGroups' => $ownedGroups
     ]);
 })->bind('/members/manage-groups');
 
@@ -47,7 +57,7 @@ $app->get('/ldaptests', function () use ($app) {
     $content .= print_r($app['ldap']->search('objectClass=person', 'dc=sog')->getFirst(), true);
     $content .= print_r($app['ldap']->getGroups()->toArray(), true);
     $content .= print_r($app['ldap']->getMemberships($dn)->toArray(), true);
-    $content .= print_r($app['ldap']->getMembers('Ressort IT')->toArray(), true);
+    $content .= print_r($app['ldap']->getMembers('ressort_it')->toArray(), true);
     try {
         $content .= print_r($app['ldap']->bind($dn, 'test'), true);
     } catch (\Zend\Ldap\Exception\LdapException $ex) {

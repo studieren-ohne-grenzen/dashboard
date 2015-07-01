@@ -35,28 +35,19 @@ class LdapUser implements UserInterface
     }
 
     /**
-     * @return array Returns all attributes of the user, indexed by property
+     * 
+     * @param string $attribName The name of the attribute
+     * @param int $index The index. Set null, if an array containing all attributes should be returned
+     * @return string|array Returns the specified attribute of the user or an array containing all attributes, if $index is null
      */
-    public function getAttributes()
+    public function getAttribute($attribName, $index = null)
     {
-        return $this->attributes;
+        return Attribute::getAttribute($this->attributes, $attribName, $index);
     }
     
-    public function getSingleAttribute($attribName, $index)
+    public function getAttributes()
     {
-    	return Attribute::getAttribute($this->attributes, $attribName, $index);
-    }
-
-    /**
-     * @param mixed $key The key of the property
-     * @return null|mixed The value or null if the given key is not a property
-     */
-    public function getAttribute($key)
-    {
-        if (isset($this->attributes[$key])) {
-            return $this->attributes[$key];
-        }
-        return null;
+    	return $this->attributes;
     }
 
     /**
@@ -102,9 +93,9 @@ class LdapUser implements UserInterface
     	return $this->groups;
     }
     
-    public function getGroupInfo($attribName, $index)
+    public function getGroupAttribute($groupIndex, $attribName, $index=null)
     {
-    	return Attribute::getAttribute($this->attributes, $attribName, $index);
+    	return Attribute::getAttribute($this->groups[$groupIndex], $attribName, $index);
     }
     
     /**

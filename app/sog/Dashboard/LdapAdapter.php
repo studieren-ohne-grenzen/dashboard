@@ -90,12 +90,12 @@ class LdapAdapter extends Ldap
      * @param array $fields A list of fields we want to return from the search
      * @return bool|null|\Zend\Ldap\Collection
      */
-    public function getMembers($group_cn, $fields = ['member'])
+    public function getMembers($group_ou, $fields = ['member'])
     {
         $results = null;
         try {
             $results = $this->search(
-                sprintf('(&(objectClass=groupOfNames)(cn=%s))', $group_cn),
+                sprintf('(&(objectClass=groupOfNames)(ou=%s))', $group_ou),
                 'ou=groups,o=sog-de,dc=sog',
                 self::SEARCH_SCOPE_ONE,
                 $fields
@@ -116,19 +116,32 @@ class LdapAdapter extends Ldap
      */
     public function isOwner($user_dn)
     {
-        $results = null;
-        try {
-            $results = $this->search(
-                sprintf('(&(objectClass=groupOfNames)(owner=%s))', $user_dn),
-                'ou=groups,o=sog-de,dc=sog',
-                self::SEARCH_SCOPE_ONE,
-                ['cn']
-            );
             // we don't care about specifics, we only want to know if the user is owner of any group
-            return ($results->count() > 0);
-        } catch (LdapException $ex) {
-            return false;
-        }
+            return ($this->getOwnedGroups($user_dn) != null && $this->getOwnedGroups($user_dn)->count() > 0);
+    }
+    
+    /**
+     * This method can be used to assign the ROLE_GROUP_ADMIN role to a user. It checks if the given DN is a owner
+     * of any group. Further checks should be done somewhere else.
+     *
+     * @param string $user_dn The user DN for which we want to check
+     * @return bool True if the given user is a owner of any group, false otherwise.
+     */
+    public function getOwnedGroups($user_dn)
+    {
+    	$results = null;
+    	try {
+    		$results = $this->search(
+    				sprintf('(&(objectClass=groupOfNames)(owner=%s))', $user_dn),
+    				'ou=groups,o=sog-de,dc=sog',
+    				self::SEARCH_SCOPE_ONE,
+    				['cn', 'ou']
+    		);
+    		
+    		return $results;
+    	} catch (LdapException $ex) {
+    		return null;
+    	}
     }
 
 

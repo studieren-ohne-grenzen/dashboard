@@ -10,34 +10,6 @@
         <link rel="stylesheet" href="{{ app.request.basepath }}/css/app.css">
     {% endblock %}
 
-    <style>
-        .bbox {
-            /* border: 1px solid white;*/
-            position: relative;
-            width: 100%;
-            padding: 5px 5px 5px 5px;
-        }
-
-        .lo {
-            float: right;
-        }
-
-        .button-secondary {
-            color: white;
-            border-radius: 4px;
-            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-            background: rgb(176, 202, 219);
-        }
-
-        @media (min-width: 48em) {
-            .bbox {
-                position: absolute;
-                bottom: 0;
-            }
-        }
-
-    </style>
-
 </head>
 <body>
 <div id="layout" class="pure-g">
@@ -65,9 +37,9 @@
                 </nav>
             </div>
             {% if app.user %}
-                <div class="bbox">
+                <div class="logout-box">
                     <hr/>
-                    <span class="lo"><a class="pure-button button-secondary lb" href="{{ path('members_logout') }}">Abmelden</a></span>
+                    <span class="align-right"><a class="pure-button logout-button lb" href="{{ path('members_logout') }}">Abmelden</a></span>
                     <b>{{ app.user.attributes['cn'][0] }}</b><br/>ist angemeldet.
                 </div>
             {% endif %}

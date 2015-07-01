@@ -47,12 +47,7 @@ class LdapUserProvider implements UserProviderInterface
             // then get all associated attributes
             $attributes = $this->ldap->getEntry($dn);
             // also get the groups the user is member of
-            $groups = $this->ldap->getMemberships($dn)->toArray();
-            // convert the raw data in LdapGroup-objects
-            foreach ($groups as &$g){
-            	$g = new LdapGroup($g);
-            }
-            
+            $groups = $this->ldap->getMemberships($dn, ['cn', 'ou'])->toArray();
             // assign the user's roles
             $roles = $this->getRoles($dn);
             return new LdapUser($username, null, $attributes, $roles, $groups);
