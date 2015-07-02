@@ -36,13 +36,19 @@ $app->match('/members/Benutzerdaten', function (Request $request) use ($app) {
             }
         } else
             if ($request->request->has('change-password')) {
-                try {
-                    $app['ldap']->updatePassword($user->getAttributes()['dn'], $request->request->get('old-password'), $request->request->get('new-password'));
+                $newpwd = $request->request->get('new-password');
+                if (preg_match('/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/', $newpwd) && strlen($newpwd) >= 8) {
+                    try {
+                        $app['ldap']->updatePassword($user->getAttributes()['dn'], $request->request->get('old-password'), $request->request->get('new-password'));
+                        $app['session']->getFlashBag()
+                            ->add('success', 'Passwort erfolgreich geändert!');
+                    } catch (LdapException $ex) {
+                        $app['session']->getFlashBag()
+                            ->add('error', 'Fehler beim Ändern des Passworts: ' . $ex->getMessage());
+                    }
+                } else {
                     $app['session']->getFlashBag()
-                        ->add('success', 'Passwort erfolgreich geändert!');
-                } catch (LdapException $ex) {
-                    $app['session']->getFlashBag()
-                        ->add('error', 'Fehler beim Ändern des Passworts: ' . $ex->getMessage());
+                        ->add('warning', 'Das Passwort muss 8 Zeichen lang sein und mindestens eine Zahl und einen Buchstaben enthalten');
                 }
             }
     }
@@ -73,7 +79,9 @@ $app->match('/members/Gruppen', function (Request $request) use ($app) {
                     $permission = true;
                 break;
             }
+
             if ($permission) {
+
                 if ($request->request->get('action') === 'add') {
                     try {
                         $app['ldap']->addToGroup($request->request->get('selected-member'), $groupDn);
@@ -83,7 +91,8 @@ $app->match('/members/Gruppen', function (Request $request) use ($app) {
                         $app['session']->getFlashBag()
                             ->add('error', 'Fehler beim Hinzufügen von ' . $request->request->get('member-name') . " zu der Gruppe " . $request->request->get('group-name') . ": " . $ex->getMessage());
                     }
-                } else
+
+                } else {
                     if ($request->request->get('action') === 'rm') {
                         try {
                             $app['ldap']->removeFromGroup($request->request->get('selected-member'), $groupDn);
@@ -94,6 +103,7 @@ $app->match('/members/Gruppen', function (Request $request) use ($app) {
                                 ->add('error', 'Fehler beim Entfernen von ' . $request->request->get('member-name') . " aus der Gruppe " . $request->request->get('group-name') . ": " . $ex->getMessage());
                         }
                     }
+                }
             } else {
                 $app['session']->getFlashBag()->add('error', 'Keine Berechtigung für die gewählte Gruppe');
             }
