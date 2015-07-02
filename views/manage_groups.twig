@@ -1,7 +1,7 @@
 {% extends 'base.twig' %}
 
 {% block content %}
-    <h1>Willkommen, {{ user.attribute('givenname', 0) }}</h1>
+    <h1>Willkommen, {{ app.user.attribute('givenname', 0) }}</h1>
     <div class="group-chooser">
         <form class="pure-form">
             <fieldset>
@@ -50,13 +50,14 @@
             <tbody class="list">
             {% for person in result %}
                 {% if person['displayname'][0] is defined %}
+                {% set isMember = false %}
+                {% if person['dn'] in members[0]['member'] %}{% set isMember = true %}{% endif %}
                     <tr>
                         <td class="name">{{ person['displayname'][0] }}</td>
                         <td class="email">{% if person['mail'] is defined %}{{ person['mail'][0] }}{% endif %}</td>
-                        <td><a href="#activate"
-                               class="{% if person['dn'] in members[0]['member'] %}pure-button button-warning">entfernen{% else %}pure-button button-success">hinzuf&uuml;gen{% endif %}</a>
+                        <td><button onclick="submitButton('{{ person['displayname'][0] }}', '{{ person['dn'] }}', '{% if isMember %}rm')" class="pure-button button-warning">entfernen{% else %}add')" class="pure-button button-success">hinzuf&uuml;gen{% endif %}</button>
                         </td>
-                        <td class="isMember hidden">{% if person['dn'] in members[0]['member'] %}1{% else %}0{% endif %}</td>
+                        <td class="isMember hidden">{% if isMember %}1{% else %}0{% endif %}</td>
                     </tr>
                 {% endif %}
             {% endfor %}
@@ -64,6 +65,7 @@
         </table>
         <ul class="pagination"></ul>
     </div>
+    <form method="POST" id="send-action"><input type="hidden" name="selected-group" id="selected-group" value="{{ group }}" /><input type="hidden" name="selected-member" id="selected-member" /><input type="hidden" name="action" id="action" /><input type="hidden" name="member-name" id="member-name" /><input type="hidden" name="group-name" id="group-name" /></form>
 {% endblock %}
 
 {% block scripts %}
@@ -91,5 +93,27 @@
             }
             return true;
         }
+        
+        function submitButton(name, mbr, action){
+
+        	var gc = document.getElementById("group");
+        	var groupName = gc.options[gc.selectedIndex].text;
+
+        	var confirm = false;
+        	
+            if (action === 'add'){
+        		confirm = window.confirm("Sicher, dass " + name + " zu " + groupName + " hinzugef\u00fcgt werden soll?");
+            } else {
+            	confirm = window.confirm("Sicher, dass " + name + " aus " + groupName + " entfernt werden soll?");
+            }
+            if(confirm) {
+        		var submitForm = document.getElementById('send-action');
+        		document.getElementById('selected-member').value = mbr;
+        		document.getElementById('action').value = action;
+        		document.getElementById('member-name').value = name;
+        		document.getElementById('group-name').value = groupName;
+        		submitForm.submit();
+            }
+         }
     </script>
 {% endblock %}

@@ -97,6 +97,8 @@ h3 {
     background: none;
 }
 
+/* Logout box */
+
 .logout-box {
     /* border: 1px solid white;*/
     position: relative;
@@ -167,6 +169,62 @@ h3 {
 
 .button-warning {
     background: rgb(223, 117, 20); /* this is an orange */
+}
+
+.message-box {
+	width: 100%;
+}
+
+.message-success,
+.message-error,
+.message-warning,
+.message-info {
+	position: relative;
+	padding: 10px 10px 10px 10px;
+	border-radius: 0 20px 20px 0;
+}
+
+.message-success {
+    color: #4F8A10;
+    background-color: #DFF2BF;
+    border: 1px solid #4F8A10;
+}
+
+.message-warning {
+	color: #9F6000;
+    background-color: #FEEFB3;
+    border: 1px solid #9F6000;
+}
+
+.message-error {
+    color: #D8000C;
+    background-color: #FFBABA;
+    border: 1px solid #D8000C;
+}
+.message-info {
+    color: #00529B;
+    background-color: #BDE5F8;
+    border: 1px solid #00529B;
+}
+
+.message-container {
+	margin-right: 5em;
+}
+
+.close-message {
+	position: absolute;
+	background-color: white;
+	top: 0;
+	right: 0;
+	height: 100%;
+	width: 2em;
+	align: right;
+	margin: 0 0 0 1em;
+	border-radius: 0 20px 20px 0;
+}
+
+.close-message:hover {
+	background-color: #D8000C;
 }
 
 /* custom styles */
@@ -268,6 +326,10 @@ table.full-width {
         top: 0;
         bottom: 0;
     }
+    
+    .message-box {
+	width: 50%;
+	}
 
     .logout-box {
         position: absolute;

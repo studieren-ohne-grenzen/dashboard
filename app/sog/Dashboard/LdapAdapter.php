@@ -4,6 +4,8 @@ namespace SOG\Dashboard;
 use Zend\Ldap\Attribute;
 use Zend\Ldap\Exception\LdapException;
 use Zend\Ldap\Ldap;
+use Symfony\Component\HttpFoundation\Tests\StringableObject;
+use Zend\Ldap\Collection;
 
 /**
  * This class provides an adapter for nicer querying just abobe the concrete Zend\Ldap implementation.
@@ -18,11 +20,11 @@ class LdapAdapter extends Ldap
      *
      * @param array $fields A list of fields we want to return from the search
      * @return bool|null|\Zend\Ldap\Collection
+     * @throws Exception\LdapException
      */
     public function getGroups($fields = ['cn'])
     {
         $results = null;
-        try {
             $results = $this->search(
                 '(objectClass=groupOfNames)',
                 'ou=groups,o=sog-de,dc=sog',
@@ -30,9 +32,6 @@ class LdapAdapter extends Ldap
                 $fields
             );
             return $results;
-        } catch (LdapException $ex) {
-            return false;
-        }
     }
 
     /**
@@ -40,19 +39,13 @@ class LdapAdapter extends Ldap
      *
      * @param string $dnOfUser dn of the user to add
      * @param string $dnOfGroup dn of the group
+     * @throws Exception\LdapException
      */
     public function addToGroup($dnOfUser, $dnOfGroup)
     {   
-    	$success = false;
-    	try {
     		$entry = $this->getEntry($dnOfGroup);
     		Attribute::setAttribute($entry, 'member', $dnOfUser, true);
     		$this->update($dnOfGroup, $entry);
-    		$success = true;
-    	} catch (LdapException $ex) {
-    		$success = false;
-    	}
-    	return $success;
     }
 
     /**
@@ -60,19 +53,30 @@ class LdapAdapter extends Ldap
      *
      * @param $dnOfUser dn of the user to remove
      * @param $dnOfGroup dn of the group
+     * @throws Exception\LdapException
      */
     public function removeFromGroup($dnOfUser, $dnOfGroup)
     {
-        $success = false;
-    	try {
     		$entry = $this->getEntry($dnOfGroup);
     		Attribute::removeFromAttribute($entry, 'member', $dnOfUser);
-    		$this->update($dnOfGroup, $attributes);
-    		$success = true;
-    	} catch (LdapException $ex) {
-    		$success = false;
-    	}
-    	return $success;
+    		$this->update($dnOfGroup, $entry);
+    }
+    
+    /**
+     * Returns the dn of the first group with the given ou
+     *
+     * @param string $group_ou The common name of the group
+     * @throws Exception\LdapException
+     */
+	public function getGroupDnByOu($group_ou)
+    {
+            $results = $this->search(
+                sprintf('(&(objectClass=groupOfNames)(ou=%s))', $group_ou),
+                'ou=groups,o=sog-de,dc=sog',
+                self::SEARCH_SCOPE_ONE,
+                ['dn']
+            );
+            return $results->getFirst()['dn'];
     }
 
     /**
@@ -81,11 +85,11 @@ class LdapAdapter extends Ldap
      * @param string $user_dn The DN for which to get the memberships
      * @param array $fields A list of fields we want to return from the search
      * @return bool|null|\Zend\Ldap\Collection
+     * @throws Exception\LdapException
      */
     public function getMemberships($user_dn, $fields = ['cn'])
     {
         $results = null;
-        try {
             $results = $this->search(
                 sprintf('(&(objectClass=groupOfNames)(member=%s))', $user_dn),
                 'ou=groups,o=sog-de,dc=sog',
@@ -93,9 +97,6 @@ class LdapAdapter extends Ldap
                 $fields
             );
             return $results;
-        } catch (LdapException $ex) {
-            return false;
-        }
     }
 
 
@@ -105,11 +106,11 @@ class LdapAdapter extends Ldap
      * @param string $group_ou The common name of the group for which we want to retrieve the members
      * @param array $fields A list of fields we want to return from the search
      * @return bool|null|\Zend\Ldap\Collection
+     * @throws Exception\LdapException
      */
     public function getMembers($group_ou, $fields = ['member'])
     {
         $results = null;
-        try {
             $results = $this->search(
                 sprintf('(&(objectClass=groupOfNames)(ou=%s))', $group_ou),
                 'ou=groups,o=sog-de,dc=sog',
@@ -117,9 +118,6 @@ class LdapAdapter extends Ldap
                 $fields
             );
             return $results;
-        } catch (LdapException $ex) {
-            return false;
-        }
     }
 
 
@@ -129,6 +127,7 @@ class LdapAdapter extends Ldap
      *
      * @param string $user_dn The user DN for which we want to check
      * @return bool True if the given user is a owner of any group, false otherwise.
+     * @throws Exception\LdapException
      */
     public function isOwner($user_dn)
     {
@@ -139,16 +138,15 @@ class LdapAdapter extends Ldap
     }
 
     /**
-     * This method can be used to assign the ROLE_GROUP_ADMIN role to a user. It checks if the given DN is a owner
-     * of any group. Further checks should be done somewhere else.
+     * Returns the groups owned by the user with the given dn
      *
      * @param string $user_dn The user DN for which we want to check
-     * @return bool True if the given user is a owner of any group, false otherwise.
+     * @return Collection The groups owned by the user
+     * @throws Exception\LdapException
      */
     public function getOwnedGroups($user_dn)
     {
         $results = null;
-        try {
             $results = $this->search(
                 sprintf('(&(objectClass=groupOfNames)(owner=%s))', $user_dn),
                 'ou=groups,o=sog-de,dc=sog',
@@ -157,9 +155,6 @@ class LdapAdapter extends Ldap
             );
 
             return $results;
-        } catch (LdapException $ex) {
-            return null;
-        }
     }
     
     /**
@@ -167,20 +162,14 @@ class LdapAdapter extends Ldap
      * 
      * @param unknown $dn User's dn
      * @param unknown $newEmail The new email address
-     * @return boolean true on success, false otherwise
+     * @throws Exception\LdapException
      */
     public function updateEmail($dn, $newEmail)
     {
     	$success = false;
-    	try {
     		$entry = $this->getEntry($dn);
     		Attribute::setAttribute($entry, 'mail-alternative', $newEmail);
     		$this->update($dn, $entry);
-    		$success = true;
-    	} catch (LdapException $ex) {
-    		$success = false;
-    	}
-    	return $success;
     }
 
 
@@ -191,23 +180,20 @@ class LdapAdapter extends Ldap
      * @param string $dn The DN for which to update the password
      * @param string $old_password The old password, we need to bind to the DN first
      * @param string $new_password The new password
-     * @return bool true on success, false otherwise
+     * @throws Exception\LdapException
      */
     public function updatePassword($dn, $old_password, $new_password)
     {
-        $success = false;
         try {
             $this->bind($dn, $old_password);
             $attributes = [];
             Attribute::setPassword($attributes, $new_password, Attribute::PASSWORD_HASH_SSHA);
             $this->update($dn, $attributes);
-            $success = true;
         } catch (LdapException $ex) {
-            $success = false;
+            throw $ex;
         } finally {
             // rebind to privileged user
             $this->bind();
         }
-        return $success;
     }
 }
