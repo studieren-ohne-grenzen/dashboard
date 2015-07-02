@@ -49,16 +49,16 @@
     <div class="content pure-u-1 pure-u-md-3-4" id="members">
         <div class="message-box">
     {% for message in app.session.getFlashBag.get('error') %}
-    	<div class="message-error"><div class="message-container">{{ message }}<p>Support: <a href="mailto:it@s-o-g.org">it@s-o-g.org</a></p></div><div class="close-message" onclick='removeParent(this)'></div></div>
+    	<div class="message-error"><div class="message-container">{{ message }}<p>Support: <a href="mailto:it@s-o-g.org">it@s-o-g.org</a></p></div><div class="close-message" onclick='removeParent(this)'>X</div></div>
 	{% endfor %}
 	{% for message in app.session.getFlashBag.get('warning') %}
-    	<div class="message-warning"><div class="message-container">{{ message }}</div><div class="close-message" onclick='removeParent(this)'></div></div>
+    	<div class="message-warning"><div class="message-container">{{ message }}</div><div class="close-message" onclick='removeParent(this)'>X</div></div>
 	{% endfor %}
     {% for message in app.session.getFlashBag.get('success') %}
-    	<div class="message-success"><div class="message-container">{{ message }}</div><div class="close-message" onclick='removeParent(this)'></div></div>
+    	<div class="message-success"><div class="message-container">{{ message }}</div><div class="close-message" onclick='removeParent(this)'>X</div></div>
 	{% endfor %}
 	{% for message in app.session.getFlashBag.get('info') %}
-    	<div class="message-info"><div class="message-container">{{ message }}</div><div class="close-message" onclick='removeParent(this)'></div></div>
+    	<div class="message-info"><div class="message-container">{{ message }}</div><div class="close-message" onclick='removeParent(this)'>X</div></div>
 	{% endfor %}
 	</div>
         {% block content %}{% endblock %}

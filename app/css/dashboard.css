@@ -218,13 +218,17 @@ h3 {
 	right: 0;
 	height: 100%;
 	width: 2em;
-	align: right;
 	margin: 0 0 0 1em;
 	border-radius: 0 20px 20px 0;
+    text-align: center;
+    line-height: 2.5;
+    cursor: pointer;
+    padding-right: 3px;
 }
 
 .close-message:hover {
 	background-color: #D8000C;
+    color: #efefef;
 }
 
 /* custom styles */
