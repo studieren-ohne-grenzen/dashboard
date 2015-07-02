@@ -172,16 +172,16 @@ h3 {
 }
 
 .message-box {
-	width: 100%;
+    width: 100%;
 }
 
 .message-success,
 .message-error,
 .message-warning,
 .message-info {
-	position: relative;
-	padding: 10px 10px 10px 10px;
-	border-radius: 0 20px 20px 0;
+    position: relative;
+    padding: 10px 10px 10px 10px;
+    border-radius: 0 20px 20px 0;
 }
 
 .message-success {
@@ -191,7 +191,7 @@ h3 {
 }
 
 .message-warning {
-	color: #9F6000;
+    color: #9F6000;
     background-color: #FEEFB3;
     border: 1px solid #9F6000;
 }
@@ -201,6 +201,7 @@ h3 {
     background-color: #FFBABA;
     border: 1px solid #D8000C;
 }
+
 .message-info {
     color: #00529B;
     background-color: #BDE5F8;
@@ -208,18 +209,18 @@ h3 {
 }
 
 .message-container {
-	margin-right: 5em;
+    margin-right: 5em;
 }
 
 .close-message {
-	position: absolute;
-	background-color: white;
-	top: 0;
-	right: 0;
-	height: 100%;
-	width: 2em;
-	margin: 0 0 0 1em;
-	border-radius: 0 20px 20px 0;
+    position: absolute;
+    background-color: white;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 2em;
+    margin: 0 0 0 1em;
+    border-radius: 0 20px 20px 0;
     text-align: center;
     line-height: 2.5;
     cursor: pointer;
@@ -227,7 +228,7 @@ h3 {
 }
 
 .close-message:hover {
-	background-color: #D8000C;
+    background-color: #D8000C;
     color: #efefef;
 }
 
@@ -313,6 +314,19 @@ table.full-width {
     padding: .5em;
 }
 
+/* table sorting */
+th.sort {
+    cursor: pointer;
+}
+
+th.sort.asc::after {
+    content: " ▲"
+}
+
+th.sort.desc::after {
+    content: " ▼"
+}
+
 /* large website */
 @media (min-width: 48em) {
     .content {
@@ -330,10 +344,10 @@ table.full-width {
         top: 0;
         bottom: 0;
     }
-    
+
     .message-box {
-	width: 50%;
-	}
+        width: 50%;
+    }
 
     .logout-box {
         position: absolute;
