@@ -83,8 +83,7 @@
 
         var memberFilter = function (item) {return (item.values().isMember == '1')};
         memberList.filter(memberFilter);
-        
-        /* TODO (doesn't work yet) */
+
         function filterGroup(cb) {
             if (cb.checked){
             	memberList.filter(memberFilter);

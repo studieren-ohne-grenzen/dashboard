@@ -54,11 +54,12 @@
                                        placeholder="altes Passwort" required>
                             </fieldset>
                             <fieldset class="pure-group">
-                                <label for="new-password">Neues Passwort:</label>
+                                <label for="new-password">Neues Passwort:
                                 <input type="password" id="new-password"
                                        name="new-password"
+                                       onkeyup="passStrength(this)"
                                        placeholder="neues Passwort"
-                                       required>
+                                       required><span id="strengthmeter" class="pass-strength"></span></label>
                                 <label for="confirm-password"><input type="password"
                                                                      id="confirm-password"
                                                                      name="confirm-password"
@@ -141,6 +142,23 @@
                 message.style.color = colorWrong;
                 message.innerHTML = "Passw&ouml;rter stimmen nicht &uuml;berein"
             }
+        }
+        
+        function passStrength(input){
+        	var result = zxcvbn(input.value);
+        	var text = '';
+        	switch (result.score){
+        	case 0: text='sehr schwach';
+        			break;
+        	case 1: text='schwach';
+    				break;
+        	case 2: text='naja';
+        			break;
+        	case 3: text='ganz okay';
+        			break;
+        	case 4: text='sicheres Passwort gew&auml;hlt!';
+        	}
+        	document.getElementById('strengthmeter').innerHTML = text;
         }
     </script>
 {% endblock %}

@@ -303,6 +303,11 @@ table.full-width {
     font-size: 85%;
 }
 
+.pass-strength {
+	font-size: 85%;
+	font-style: italic;
+}
+
 /* pagination */
 .pagination {
     text-align: center;

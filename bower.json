@@ -14,8 +14,9 @@
   ],
   "dependencies": {
     "list.js": "~1.1.1",
+    "list.pagination.js": "~0.1.1",
     "pure": "~0.6.0",
-    "list.pagination.js": "~0.1.1"
+    "zxcvbn": "*"
   },
   "overrides": {
     "pure": {
