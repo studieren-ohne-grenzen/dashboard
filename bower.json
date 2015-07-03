@@ -24,6 +24,11 @@
         "pure.css",
         "grids-responsive.css"
       ]
+    },
+    "zxcvbn": {
+      "main": [
+        "zxcvbn.js"
+      ]
     }
   }
 }
