@@ -10,7 +10,7 @@
                 <td class="value">
                     <div id="view-email" class="shown-elem">{{ app.user.attribute('mail-alternative', 0) }}
                         <button class="pure-button button-small"
-                                onclick="showEdit('view-email', 'edit-email')">&#9998;&ensp;&Auml;ndern
+                                onclick="showEdit('view-email', 'edit-email');">&#9998;&ensp;&Auml;ndern
                         </button>
                     </div>
 
@@ -28,7 +28,7 @@
                                         name="change-email-address">&#x2713;&ensp;Speichern
                                 </button>
                                 <button class="pure-button"
-                                        onclick="hideEdit('view-email', 'edit-email')">&#x2717;&ensp;Abbrechen
+                                        onclick="hideEdit('view-email', 'edit-email');">&#x2717;&ensp;Abbrechen
                                 </button>
                             </fieldset>
                         </form>
@@ -41,7 +41,7 @@
                 <td class="value">
                     <div id="view-password" class="shown-elem"> **********
                         <button class="pure-button button-small"
-                                onclick="showEdit('view-password', 'edit-password')">&#9998;&ensp;&Auml;ndern
+                                onclick="showEdit('view-password', 'edit-password');">&#9998;&ensp;&Auml;ndern
                         </button>
                     </div>
                     <div id="edit-password" class="hidden-elem">
@@ -73,7 +73,7 @@
                                         name="change-password">&#x2713;&ensp;Speichern
                                 </button>
                                 <button class="pure-button"
-                                        onclick="hideEdit('view-password', 'edit-password')">&#x2717;&ensp;Abbrechen
+                                        onclick="hideEdit('view-password', 'edit-password');">&#x2717;&ensp;Abbrechen
                                 </button>
                             </fieldset>
                         </form>
@@ -124,23 +124,23 @@
             var confPass = document.getElementById('confirm-password');
             var message = document.getElementById('validation');
             confPass.style.backgroundColor = null;
-            message.innerHTML = "";
+            message.innerHTML = '';
         }
         function validatePass() {
             var pass = document.getElementById('new-password');
             var confPass = document.getElementById('confirm-password');
             var message = document.getElementById('validation');
-            var colorOK = "#66cc66";
-            var colorWrong = "#ff6666";
+            var colorOK = '#66cc66';
+            var colorWrong = '#ff6666';
 
             if (pass.value == confPass.value) {
                 confPass.style.backgroundColor = colorOK;
                 message.style.color = colorOK;
-                message.innerHTML = ""
+                message.innerHTML = '';
             } else {
                 confPass.style.backgroundColor = colorWrong;
                 message.style.color = colorWrong;
-                message.innerHTML = "Passw&ouml;rter stimmen nicht &uuml;berein"
+                message.innerHTML = 'Passw&ouml;rter stimmen nicht &uuml;berein';
             }
         }
         
@@ -148,15 +148,15 @@
         	var result = zxcvbn(input.value);
         	var text = '';
         	switch (result.score){
-        	case 0: text='sehr schwach';
+        		case 0: text='sehr schwach';
         			break;
-        	case 1: text='schwach';
+        		case 1: text='schwach';
     				break;
-        	case 2: text='naja';
+        		case 2: text='naja';
         			break;
-        	case 3: text='ganz okay';
+        		case 3: text='ganz okay';
         			break;
-        	case 4: text='sicheres Passwort gew&auml;hlt!';
+        		case 4: text='sicheres Passwort gew&auml;hlt!';
         	}
         	document.getElementById('strengthmeter').innerHTML = text;
         }
