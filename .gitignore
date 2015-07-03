@@ -17,6 +17,7 @@ node_modules/
 brunch-config.js
 *.map
 
+public/favicon.ico
 public/img
 public/css
 public/js
