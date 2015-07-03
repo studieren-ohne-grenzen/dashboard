@@ -5,12 +5,12 @@
         <table class="pure-table-horizontal user-data">
             <tbody class="list">
             <tr>
-                <td class="icon">&#9993;</td>
+                <td class="icon"><i class="icon-mail font-icon">&#xe802;</i></td>
                 <td class="label">E-Mail</td>
                 <td class="value">
                     <div id="view-email" class="shown-elem">{{ app.user.attribute('mail-alternative', 0) }}
                         <button class="pure-button button-small"
-                                onclick="showEdit('view-email', 'edit-email');">&#9998;&ensp;&Auml;ndern
+                                onclick="showEdit('view-email', 'edit-email');"><i class="icon-edit font-icon">&#xe809;</i>&Auml;ndern
                         </button>
                     </div>
 
@@ -25,10 +25,10 @@
                             </fieldset>
                             <fieldset>
                                 <button type="submit" class="pure-button pure-button-primary"
-                                        name="change-email-address">&#x2713;&ensp;Speichern
+                                        name="change-email-address"><i class="icon-ok-circled2 font-icon">&#xe807;</i>&ensp;Speichern
                                 </button>
                                 <button class="pure-button"
-                                        onclick="hideEdit('view-email', 'edit-email');">&#x2717;&ensp;Abbrechen
+                                        onclick="hideEdit('view-email', 'edit-email');"><i class="icon-cancel-circled2 font-icon">&#xe808;</i>&ensp;Abbrechen
                                 </button>
                             </fieldset>
                         </form>
@@ -36,12 +36,12 @@
                 </td>
             </tr>
             <tr>
-                <td class="icon">&#9911;</td>
+                <td class="icon"><i class="icon-key font-icon">&#xe80d;</i></td>
                 <td class="label">Passwort</td>
                 <td class="value">
                     <div id="view-password" class="shown-elem"> **********
                         <button class="pure-button button-small"
-                                onclick="showEdit('view-password', 'edit-password');">&#9998;&ensp;&Auml;ndern
+                                onclick="showEdit('view-password', 'edit-password');"><i class="icon-edit font-icon">&#xe809;</i>&Auml;ndern
                         </button>
                     </div>
                     <div id="edit-password" class="hidden-elem">
@@ -70,10 +70,10 @@
                             </fieldset>
                             <fieldset>
                                 <button type="submit" class="pure-button pure-button-primary" id="change-password"
-                                        name="change-password">&#x2713;&ensp;Speichern
+                                        name="change-password"><i class="icon-ok-circled2 font-icon">&#xe807;</i>&ensp;Speichern
                                 </button>
                                 <button class="pure-button"
-                                        onclick="hideEdit('view-password', 'edit-password');">&#x2717;&ensp;Abbrechen
+                                        onclick="hideEdit('view-password', 'edit-password');"><i class="icon-cancel-circled2 font-icon">&#xe808;</i>&ensp;Abbrechen
                                 </button>
                             </fieldset>
                         </form>
@@ -81,7 +81,7 @@
                 </td>
             </tr>
             <tr>
-                <td class="icon">&#8946;</td>
+                <td class="icon"><i class="icon-users font-icon">&#xe806;</i></td>
                 <td class="label">Gruppen</td>
                 <td class="value">
                     {% for i in app.user.groups|keys %}
