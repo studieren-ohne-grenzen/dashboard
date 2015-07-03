@@ -30,6 +30,7 @@ $app->match('/members/Benutzerdaten', function (Request $request) use ($app) {
                 $app['ldap']->updateEmail($user->getAttributes()['dn'], $request->request->get('email-address'));
                 $app['session']->getFlashBag()
                     ->add('success', 'E-Mail-Adresse erfolgreich geändert: ' . $request->request->get('email-address'));
+                return $app->redirect('/members/Benutzerdaten');
             } catch (LdapException $ex) {
                 $app['session']->getFlashBag()
                     ->add('error', 'Fehler beim Ändern der E-Mail-Adresse (zu ' . $request->request->get('email-address') . '): ' . $ex->getMessage());
@@ -42,6 +43,7 @@ $app->match('/members/Benutzerdaten', function (Request $request) use ($app) {
                         $app['ldap']->updatePassword($user->getAttributes()['dn'], $request->request->get('old-password'), $request->request->get('new-password'));
                         $app['session']->getFlashBag()
                             ->add('success', 'Passwort erfolgreich geändert!');
+                        return $app->redirect('/members/Benutzerdaten');
                     } catch (LdapException $ex) {
                         $app['session']->getFlashBag()
                             ->add('error', 'Fehler beim Ändern des Passworts: ' . $ex->getMessage());
