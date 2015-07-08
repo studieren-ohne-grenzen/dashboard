@@ -30,7 +30,7 @@ You can also run `brunch b --production` to minify and mangle all CSS and JS fil
 
 ## Deployment
 
-TODO
+Simply run `./deploy.sh` from the root directory. You need to setup a local SSH alias called `sogserver` which will be used to rsync all files to the server. See the `deploy_ignore.txt` file for a list of folders/files which will not be copied. 
 
 ## Overview
 
@@ -58,6 +58,8 @@ Here is a general overview of the directory structure:
 | views/                              Twig templates
 | bower.json                          Frontend dependencies, such as List.js and PureCSS
 | composer.json                       PHP dependencies, such as Silex
+| composer.lock                       A snapshot of the currently used version numbers of the composesr dependencies
+| deploy.sh                           Script for easy deployment
 | package.json                        Development dependencies, such as plugins for Brunch
 | brunch-config.coffee                Brunch config file
 ```
