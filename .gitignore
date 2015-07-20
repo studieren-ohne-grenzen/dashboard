@@ -21,5 +21,6 @@ public/favicon.ico
 public/img
 public/css
 public/js
+public/fontello*
 
 app/config.php
