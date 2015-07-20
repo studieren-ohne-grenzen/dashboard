@@ -10,3 +10,13 @@ $config['ldap.options'] = [
     'accountFilterFormat' => 'sprintf-style LDAP filter',
     'baseDn' => 'ou=someou,o=someo,dc=somedc'
 ];
+$config['mailer.from'] = 'sender@example.com';
+// http://silex.sensiolabs.org/doc/providers/swiftmailer.html
+$config['swiftmailer.options'] = [
+    'host' => 'yourmx.example.com',
+    'port' => 'could be 25',
+    'username' => 'username',
+    'password' => 'password',
+    'encryption' => 'see doc',
+    'auth_mode' => 'see doc'
+];
