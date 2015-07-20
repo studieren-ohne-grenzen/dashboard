@@ -20,3 +20,10 @@ $config['swiftmailer.options'] = [
     'encryption' => 'see doc',
     'auth_mode' => 'see doc'
 ];
+// http://silex.sensiolabs.org/doc/providers/remember_me.html
+$config['remember_me'] = [
+    'key' => 'some random key',
+    'httponly' => true,
+    'secure' => false, /* should be true when we serve via SSL */
+    'always_remember_me' => true
+];

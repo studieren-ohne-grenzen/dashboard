@@ -40,6 +40,7 @@ $app->register(new Silex\Provider\SecurityServiceProvider(), [
             'users' => function () use ($app) {
                 return $app['security.ldap.user_provider']($app['ldap']);
             },
+            'remember_me' => $config['remember_me']
         ]
     ],
     'security.role_hierarchy' => [
