@@ -14,6 +14,11 @@ $app->register(new SOG\Dashboard\ZendLdapServiceProvider(), [
     'ldap.options' => $config['ldap.options']
 ]);
 
+// mailing
+$app->register(new Silex\Provider\SwiftmailerServiceProvider());
+$app['mailer.from'] = $config['mailer.from'];
+$app['swiftmailer.options'] = $config['swiftmailer.options'];
+
 $app->register(new Silex\Provider\SessionServiceProvider());
 
 // used for handy `path()` calls inside Twig templates
