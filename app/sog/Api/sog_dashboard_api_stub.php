@@ -1,95 +1,135 @@
 <?php
+namespace SOG\Api;
+
+use Silex\Application;
+use Silex\Provider\SwiftmailerServiceProvider;
+use SOG\Dashboard\ZendLdapServiceProvider;
 
 /**
+ * Class SogDashboardApi
+ *
  * The external Dashboard API
  *
  * example usage:
- *      $api = new SogDashboardApi();
- *      $username = $api->createUser($firstName, $lastName, $email, $lokalgruppe);
+ *
+ * ```php
+ * include $pathToConfigFile;
+ * $api = new SogDashboardApi($config);
+ * $username = $api->createUser($firstName, $lastName, $email, $group);
+ * ```
+ *
+ * @package SOG\Api
  */
 class SogDashboardApi
 {
     /**
-     * Create a new user registers it for all relevant services and informs the user and its group admin.
+     * @var Application The Silex application for the API
      */
-    public function createUser($firstName, $lastName, $email, $group) {
+    private $app;
+    /**
+     * @var string Full URL to the Dashboard application
+     */
+    private $dashboard_url = 'https://studieren-ohne-grenzen.org/dashboard';
+
+    /**
+     * Instantiates a new LdapAdapter for creating and updating relevant entities.
+     *
+     * @param array $config The configuration as e.g. stored in the config.php file
+     */
+    public function __construct(array $config)
+    {
+        $this->app = new Application();
+
+        // LdapAdapter is now available as $this->app['ldap']
+        $this->app->register(new ZendLdapServiceProvider(), [
+            'ldap.options' => $config['ldap.options']
+        ]);
+
+        // SwiftMailer is now available as $this->app['mailer']
+        $this->app->register(new SwiftmailerServiceProvider());
+        $this->app['mailer.from'] = $config['mailer.from'];
+        $this->app['swiftmailer.options'] = $config['swiftmailer.options'];
+    }
+
+
+    /**
+     * Create a new user registers it for all relevant services and informs the user and its group admin.
+     *
+     * @param string $firstName
+     * @param string $lastName
+     * @param string $email
+     * @param string $group
+     * @return string The new username.
+     */
+    public function createUser($firstName, $lastName, $email, $group)
+    {
         $username = $this->generateUsername($firstName, $lastName);
-        
+
         $this->createLdapUser($username, $firstName, $lastName, $email);
         $this->requestGroupMembership($username, $group);
         $this->requestGroupMembership($username, "Allgemein");
-        
+
         $this->resetPassword($username);
-        // password details are sent here, so $this->notifyNewUser() may be unnecessary
-        
+        // TODO: password details are sent here, so $this->notifyNewUser() may be unnecessary
+
         $this->notifyNewUserAdmin($firstName, $lastName, $email, $group);
 
         return $username;
     }
 
     /**
-     * Reset the password for the given user.
-     */
-    public function resetPassword($uid) {
-        //TODO: implement resetPassword
-    }
-
-    /**
-     * Request membership in the given group for a user
-     */
-    public function requestGroupMembership($uid, $group) {
-        //TODO: implement requestGroupMembership
-    }
-
-
-
-
-
-    /**
      * Generate a unique username.
-     * Tests whether the username is already taken. If so, appends 
+     * Tests whether the username is already taken. If so, appends
      * an increasing number until the username does not already exist
+     *
+     * @param $firstName
+     * @param $lastName
+     * @return string The unique username
      */
-    private function generateUsername($firstName, $lastName) {
+    private function generateUsername($firstName, $lastName)
+    {
         //TODO: adapt this to LDAP system
-        
-        $username = trim($firstName) . "." . trim($lastName);
+        //TODO: change username format
+
+        $username = strtolower(trim($firstName) . "." . trim($lastName));
+        // normalize special chars in username
+        $username = str_replace(
+            ['ä', 'ö', 'ü', 'ß', ' '],
+            ['ae', 'oe', 'ue', 'ss', '.'],
+            $username
+        );
 
         $foundUsername = false;
         $i = 0;
         while (!$foundUsername) {
-            if ($i == 0) {
-                $param = $username;
+            if ($i === 0) {
+                $check = $username;
             } else {
-                $param = $username.$i;
+                $check = $username . $i;
             }
-            $result = db_result(db_query("SELECT uid FROM `users` WHERE name = '%s'", $param));
-
-            if ($result == FALSE) {
-                $foundUsername = true;
-                if ($i != 0)
-                    $username = $username . $i;
-            } else {
+            if ($this->app['ldap']->exists($check)) {
                 ++$i;
+            } else {
+                $foundUsername = true;
+                if ($i !== 0)
+                    $username = $username . $i;
             }
         }
 
-        // normalize special chars in username
-        //TODO: change username format
-        /*$usernameEasy = str_replace("ä", "ae", $username);
-        $usernameEasy = str_replace("ö", "oe", $usernameEasy);
-        $usernameEasy = str_replace("ü", "ue", $usernameEasy);
-        $usernameEasy = str_replace("ß", "ss", $usernameEasy);
-        $usernameEasy = str_replace(" ", ".", $usernameEasy);*/
-        
         return $username;
     }
 
-
     /**
      * Helper function to add a new user's actual LDAP record
+     *
+     * @param $username
+     * @param $firstName
+     * @param $lastName
+     * @param $mail
      */
-    private function createLdapUser($username, $firstName, $lastName, $mail) {
+    private function createLdapUser($username, $firstName, $lastName, $mail)
+    {
+        // TODO: This should be in LdapAdapter?
 
         // add LDAP record for new user
         // needed LDAP parameters:
@@ -102,11 +142,11 @@ class SogDashboardApi
         $info["givenname"] = "$firstName";
         $info["sn"] = "$lastName";
         $info["cn"] = "$firstName $lastName";
-        
+
         //TODO: instead use the "regular" password reset?
         //$salt = substr(sha1(rand()), 0, 4);
         //$info["userpassword"] = "{SSHA}" . base64_encode( sha1($password . $salt, true) . $salt );
-        
+
         $sog_mail = "$username@studieren-ohne-grenzen.org";
         $info["mail"] = $sog_mail;
         $info["mail-alternative"] = $mail;
@@ -125,23 +165,76 @@ class SogDashboardApi
         $info["objectclass"] = "PostfixBookMailForward";
     }
 
+    /**
+     * Request membership in the given group for a user
+     *
+     * @param string $uid
+     * @param string $group
+     */
+    public function requestGroupMembership($uid, $group)
+    {
+        //TODO: implement requestGroupMembership
+    }
+
+    /**
+     * Reset the password for the given user.
+     *
+     * @param string $uid
+     */
+    public function resetPassword($uid)
+    {
+        //TODO: implement resetPassword
+    }
+
+    /**
+     * Send email to group administrator to inform about new member
+     *
+     * @param string $firstName
+     * @param string $lastName
+     * @param string $email
+     * @param string $group
+     * @return int Number of accepted recipients
+     */
+    private function notifyNewUserAdmin($firstName, $lastName, $email, $group)
+    {
+        $text = "Soeben hat sich ein neues Mitglied fuer Deine Lokalgruppe angemeldet.<br>
+Das neue Mitglied ist schon auf dem Lokalgruppen-Verteiler eingetragen und hat einen OpenAtrium-Account erhalten.<br><br>
+<b>Achtung: </b> Der OA-Account des Mitglieds muss erst von dir aktiviert werden. Bitte bestätige am Besten jetzt direkt im <a href='" . $this->dashboard_url . "'>Dashboard</a>, dass " . $firstName . " " . $lastName . " tatsächlich in eurer LG aktiv ist!
+<br><br>
+Hier die Daten des neuen Mitglieds:<br>";
+        $text .= "Vorname: " . $firstName . "<br>";
+        $text .= "Nachname: " . $lastName . "<br>";
+        $text .= "Mail: " . $email . "<br>";
+        $text .= "Standort: " . $group . "<br>";
+
+        $message = \Swift_Message::newInstance()
+            ->setSubject('[Studieren Ohne Grenzen] Neuanmeldung in deiner Lokalgruppe')
+            ->setFrom([$this->app['mailer.from']])
+            ->setTo([strtolower($group) . '@studieren-ohne-grenzen.org'])
+            ->setBody($text);
+        return $this->app['mailer']->send($message);
+    }
 
     /**
      * Send a mail to the user.
      * This is send only for OpenAtrium account details, a welcome mail is send through CiviCRM!
+     *
+     * @param string $firstName
+     * @param string $username
+     * @param string $email
+     * @param string $password
      */
-    function notifyNewUser($firstName, $username, $email, $password) {
-        //TODO: is this mail needed or are we just handling it through $this->resetPassword ?
-
+    function notifyNewUser($firstName, $username, $email, $password)
+    {
         $text = '
 <html><head><title></title></head><body>
 Hallo ' . $firstName . ',<br />
-Wir freuen uns sehr, dich als neues Mitglied bei Studieren ohne Grenzen begrüßen zu dürfen.<br />
+Wir freuen uns sehr, dich als neues Mitglied bei Studieren Ohne Grenzen begrüßen zu dürfen.<br />
 <br />
 Damit du direkt einsteigen und mitarbeiten kannst, haben wir dir automatisch einen Zugang für unsere Onlineplattform OpenAtrium erstellt. Über diese Plattform tauschen wir wichtige Nachrichten, Informationen und Dateien aus und diskutieren fleißig.<br />
 Dein Account wird freigeschaltet, sobald dein Lokalkoordinator bestätigt hat, dass du tatsächlich bei Studieren Ohne Grenzen aktiv bist.
 <br /><br />
-Um dich bei OpenAtrium einzuloggen, klicke entweder ganz unten in der Fußzeile unserer Webseite auf "OpenAtrium" oder folge diesem Link: http://www.studieren-ohne-grenzen.org/atrium <br />
+Um dich bei OpenAtrium einzuloggen, klicke entweder ganz unten in der Fußzeile unserer Webseite auf "OpenAtrium" oder folge diesem Link: <a href="https://www.studieren-ohne-grenzen.org/atrium">https://www.studieren-ohne-grenzen.org/atrium</a><br />
 <br />
 Du kannst dich dann mit folgenden Daten einloggen:<br />
 
@@ -149,34 +242,15 @@ Benutzername: ' . $username . '<br />
 Password:     ' . $password . '<br />
 <br />
 Viele Grüße,<br />
-Das SOG-IT-Team<br />
-it@studieren-ohne-grenzen.org
+Das SOG-IT-Team
 </body>
 </html>
 ';
-        $text = wordwrap($text, 70);
-        # $extra= 'From: it@studieren-ohne-grenzen.org' . "\r\n" . 'MIME-Version: 1.0' . "\r\n" . 'Content-Type: text/plain; charset=ISO-8859-1' . "\r\n" . 'Content-Transfer-Encoding: quoted-printable';
-        $extra = "From: it@studieren-ohne-grenzen.org\nContent-Type: text/html; charset=UTF-8\nContent-Transfer-Encoding: 8bit";
-        @mail($email, "Zugangsdaten OpenAtrium - Studieren Ohne Grenzen", $text, $extra);
-    }
-
-
-    /**
-     * Send email to group administrator to inform about new member
-     */
-    private function notifyNewUserAdmin($firstname, $lastname, $email, $standort) {
-        //TODO: This mail for newly registered member in addition to a group join request mail? Or is this one unnecessary now?
-
-            $text = "Soeben hat sich ein neues Mitglied fuer Deine Lokalgruppe angemeldet.<br>
-Das neue Mitglied ist schon auf dem Lokalgruppen-Verteiler eingetragen und hat einen OpenAtrium-Account erhalten.<br><br>
-<b>Achtung: </b> Der OA-Account des Mitglieds muss erst von der Mitgliederbetreuung aktiviert werden. Bitte bestätige am Besten jetzt direkt formlos per Email an <mitglieder@studieren-ohne-grenzen.org>, dass ".$vornfirstnameame." ".$lastname." tatsächlich in eurer LG aktiv ist!
-<br><br>
-Hier die Daten des neuen Mitglieds:<br>";
-            $text .= "Vorname: ".$firstname."<br>";
-            $text .= "Nachname: ".$lastname."<br>";
-            $text .= "Mail: ".$email."<br>";
-            $text .= "Standort: ".$standort."<br>";
-            $extra = "From:mitglieder@studieren-ohne-grenzen.org\nContent-Type: text/html; charset=UTF-8\nContent-Transfer-Encoding: 8bit";
-            @mail(strtolower($standort)."@studieren-ohne-grenzen.org","Neuanmeldung in deiner Lokalgruppe",$text,$extra);
+        $message = \Swift_Message::newInstance()
+            ->setSubject('[Studieren Ohne Grenzen] Zugangsdaten OpenAtrium')
+            ->setFrom([$this->app['mailer.from']])
+            ->setTo([$email])
+            ->setBody($text);
+        return $this->app['mailer']->send($message);
     }
 }
