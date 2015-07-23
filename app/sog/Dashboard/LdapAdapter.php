@@ -18,12 +18,11 @@ class LdapAdapter extends Ldap
      * Returns all groups (OUs) with their common names
      *
      * @param array $fields A list of fields we want to return from the search
-     * @return bool|null|\Zend\Ldap\Collection
+     * @return bool|\Zend\Ldap\Collection
      * @throws LdapException
      */
     public function getGroups($fields = ['cn'])
     {
-        $results = null;
         $results = $this->search(
             '(objectClass=groupOfNames)',
             'ou=groups,o=sog-de,dc=sog',
@@ -105,12 +104,11 @@ class LdapAdapter extends Ldap
      *
      * @param string $user_dn The DN for which to get the memberships
      * @param array $fields A list of fields we want to return from the search
-     * @return bool|null|\Zend\Ldap\Collection
+     * @return bool|\Zend\Ldap\Collection
      * @throws LdapException
      */
     public function getMemberships($user_dn, $fields = ['cn'])
     {
-        $results = null;
         $results = $this->search(
             sprintf('(&(objectClass=groupOfNames)(member=%s))', $user_dn),
             'ou=groups,o=sog-de,dc=sog',
@@ -127,12 +125,11 @@ class LdapAdapter extends Ldap
      *
      * @param string $group_ou The common name of the group for which we want to retrieve the members
      * @param array $fields A list of fields we want to return from the search
-     * @return bool|null|\Zend\Ldap\Collection
+     * @return bool|\Zend\Ldap\Collection
      * @throws LdapException
      */
     public function getMembers($group_ou, $fields = ['member'])
     {
-        $results = null;
         $results = $this->search(
             sprintf('(&(objectClass=groupOfNames)(ou=%s))', $group_ou),
             'ou=groups,o=sog-de,dc=sog',
@@ -169,7 +166,6 @@ class LdapAdapter extends Ldap
      */
     public function getOwnedGroups($user_dn)
     {
-        $results = null;
         $results = $this->search(
             sprintf('(&(objectClass=groupOfNames)(owner=%s))', $user_dn),
             'ou=groups,o=sog-de,dc=sog',
