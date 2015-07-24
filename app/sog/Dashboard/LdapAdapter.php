@@ -15,6 +15,11 @@ use Zend\Ldap\Ldap;
 class LdapAdapter extends Ldap
 {
     /**
+     * @var Attribute The algorithm used for password generation.
+     */
+    private $password_algorithm = Attribute::PASSWORD_HASH_SSHA;
+
+    /**
      * Returns all groups (OUs) with their common names
      *
      * @param array $fields A list of fields we want to return from the search
@@ -206,7 +211,7 @@ class LdapAdapter extends Ldap
         try {
             $this->bind($dn, $old_password);
             $attributes = [];
-            Attribute::setPassword($attributes, $new_password, Attribute::PASSWORD_HASH_SSHA);
+            Attribute::setPassword($attributes, $new_password, $this->password_algorithm);
             $this->update($dn, $attributes);
         } catch (LdapException $ex) {
             throw $ex;
@@ -214,5 +219,134 @@ class LdapAdapter extends Ldap
             // rebind to privileged user
             $this->bind();
         }
+    }
+
+
+    /**
+     * Adds a new object with the given parameters to the ou=inactive subtree.
+     *
+     * @param string $username The username of the new member
+     * @param string $password The password in plaintext
+     * @param string $firstName The first name of the new member
+     * @param string $lastName The last name of the new member
+     * @param string $mail The users' personal email address
+     * @throws LdapException
+     * @return array All stored attributes of the new member
+     */
+    public function createMember($username, $password, $firstName, $lastName, $mail)
+    {
+        $dn = sprintf('uid=%s,ou=inactive,ou=people,o=sog-de,dc=sog', $username);
+        $sog_mail = sprintf('%s@studieren-ohne-grenzen.org', $username);
+        $info = [];
+
+        // core data
+        Attribute::setAttribute($info, 'dn', $dn);
+        Attribute::setAttribute($info, 'uid', $username);
+        Attribute::setAttribute($info, 'cn', $firstName . " " . $lastName);
+        Attribute::setAttribute($info, 'displayName', $firstName);
+        Attribute::setAttribute($info, 'givenName', $firstName);
+        Attribute::setAttribute($info, 'sn', $lastName);
+        Attribute::setAttribute($info, 'cn', $firstName . " " . $lastName);
+
+        // password
+        Attribute::setPassword($attributes, $password, $this->password_algorithm);
+
+        // meta data
+        Attribute::setAttribute($info, 'mail', $sog_mail);
+        Attribute::setAttribute($info, 'mail-alternative', $mail);
+        Attribute::setAttribute($info, 'mailAlias', $mail);
+        Attribute::setAttribute($info, 'mailHomeDirectory', sprintf('/srv/vmail/%s', $sog_mail));
+        Attribute::setAttribute($info, 'mailStorageDirectory', sprintf('maildir:/srv/vmail/%s/Maildir', $sog_mail));
+        Attribute::setAttribute($info, 'mailEnabled', true);
+        Attribute::setAttribute($info, 'mailGidNumber', 5000);
+        Attribute::setAttribute($info, 'mailUidNumber', 5000);
+        Attribute::setAttribute($info, 'objectClass', [
+            'person',
+            'sogperson',
+            'organizationalPerson',
+            'inetOrgPerson',
+            'top',
+            'PostfixBookMailAccount',
+            'PostfixBookMailForward'
+        ]);
+
+        $this->add($dn, $info);
+        return $info;
+    }
+
+    /**
+     * Requesting access for the given user to $group. This will add an entry to the `pending` attribute of the $group
+     *
+     * @param string $uid The username for which to request the membership in $group
+     * @param string $group The group for which the membership of $user is requested
+     * @throws LdapException
+     */
+    public function requestGroupMembership($uid, $group)
+    {
+        $dnOfGroup = sprintf('cn=%s,ou=groups,o=sog-de,dc=sog', $group);
+        // TODO: user may not yet be in ou=active - leave like this or put in ou=inactive and update on approval?
+        $dnOfUser = sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid);
+        $entry = $this->getEntry($dnOfGroup);
+        Attribute::setAttribute($entry, 'pending', $dnOfUser, true);
+        $this->update($dnOfGroup, $entry);
+    }
+
+    /**
+     * Allowing the given user to access the given group. This will move the entry from the `pending` to the `member`
+     * field.
+     *
+     * @param string $uid The username for which to approve the membership in $group
+     * @param string $group The group for which the membership of $user is approved
+     * @throws LdapException
+     */
+    public function approveGroupMembership($uid, $group)
+    {
+        $dnOfGroup = sprintf('cn=%s,ou=groups,o=sog-de,dc=sog', $group);
+        // TODO: user may not yet be in ou=active - leave like this or put in ou=inactive and update on approval?
+        $dnOfUser = sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid);
+
+        $entry = $this->getEntry($dnOfGroup);
+        Attribute::removeFromAttribute($entry, 'pending', $dnOfUser);
+        Attribute::setAttribute($entry, 'member', $dnOfUser, true);
+        $this->update($dnOfGroup, $entry);
+    }
+
+    /**
+     * Move a (new) inactive member to the active subtree. Being in ou=active is required for certain actions such as
+     * accessing the Dashboard or Open Atrium.
+     *
+     * @param string $uid The username for the member to be activated
+     * @throws LdapException
+     */
+    public function activateMember($uid)
+    {
+        $active = sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid);
+        $inactive = sprintf('uid=%s,ou=inactive,ou=people,o=sog-de,dc=sog', $uid);
+        $this->move($inactive, $active);
+    }
+
+    /**
+     * Move an active member to the inactive subtree, thus preventing him/her from logging on to certain services.
+     *
+     * @param string $uid The username of the member to be deactivated
+     * @throws LdapException
+     */
+    public function deactivateMember($uid)
+    {
+        $active = sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid);
+        $inactive = sprintf('uid=%s,ou=inactive,ou=people,o=sog-de,dc=sog', $uid);
+        $this->move($active, $inactive);
+    }
+
+    /**
+     * Checks if the given username is already taken, looks in the active and inactive subtree
+     *
+     * @param string $uid Does this username already exist?
+     * @return bool True if member exists, false otherwise.
+     */
+    public function usernameExists($uid)
+    {
+        return ($this->exists(sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid)) ||
+            $this->exists(sprintf('uid=%s,ou=inactive,ou=people,o=sog-de,dc=sog', $uid)));
     }
 }
