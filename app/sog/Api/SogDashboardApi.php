@@ -50,6 +50,7 @@ class SogDashboardApi
         $this->app->register(new SwiftmailerServiceProvider());
         $this->app['mailer.from'] = $config['mailer.from'];
         $this->app['swiftmailer.options'] = $config['swiftmailer.options'];
+        $this->app['swiftmailer.use_spool'] = false;
 
         // can be used for passwords etc, by calling $this->app['random']($length = 8)
         $this->app->register(new RandomStringServiceProvider());
@@ -71,10 +72,11 @@ class SogDashboardApi
         $password = $this->app['random']();
 
         $this->app['ldap']->createMember($username, $password, $firstName, $lastName, $email);
-        $this->requestGroupMembership($username, $group);
-        $this->requestGroupMembership($username, "Allgemein");
 
-        $this->notifyNewUser($firstName, $lastName, $email, $password);
+        $this->requestGroupMembership($username, $group);
+        $this->requestGroupMembership($username, "allgemein");
+
+        $this->notifyNewUser($firstName, $username, $email, $password);
         $this->notifyNewUserAdmin($firstName, $lastName, $email, $group);
 
         return $username;
@@ -120,17 +122,6 @@ class SogDashboardApi
     }
 
     /**
-     * Request membership in the given group for a user.
-     *
-     * @param string $uid The generated unique username for the member
-     * @param string $group The CN of the group for which to request the membership
-     */
-    public function requestGroupMembership($uid, $group)
-    {
-        $this->app['ldap']->requestGroupMembership($uid, $group);
-    }
-
-    /**
      * Send a mail to the user.
      * This is send only for OpenAtrium account details, a welcome mail is send through CiviCRM!
      *
@@ -164,9 +155,20 @@ Das SOG-IT-Team
         $message = \Swift_Message::newInstance()
             ->setSubject('[Studieren Ohne Grenzen] Zugangsdaten OpenAtrium')
             ->setFrom([$this->app['mailer.from']])
-            ->setTo([$email])
+            ->setTo([$email => $firstName])
             ->setBody($text, 'text/html');
         return $this->app['mailer']->send($message);
+    }
+
+    /**
+     * Request membership in the given group for a user.
+     *
+     * @param string $uid The generated unique username for the member
+     * @param string $group The CN of the group for which to request the membership
+     */
+    public function requestGroupMembership($uid, $group)
+    {
+        $this->app['ldap']->requestGroupMembership($uid, $group);
     }
 
     /**
