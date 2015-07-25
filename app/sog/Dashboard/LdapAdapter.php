@@ -283,6 +283,10 @@ class LdapAdapter extends Ldap
      */
     public function requestGroupMembership($uid, $group)
     {
+        // TODO: setup `pending` attributes in LDAP tree (@kehrwoche?)
+        echo "Requesting group membership: Not yet implemented\n";
+        return;
+
         $dnOfGroup = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $group);
         $entry = $this->getEntry($dnOfGroup);
         if (is_null($entry)) {
@@ -304,6 +308,10 @@ class LdapAdapter extends Ldap
      */
     public function approveGroupMembership($uid, $group)
     {
+        // TODO: setup `pending` attributes in LDAP tree (@kehrwoche?)
+        echo "Approving group membership: Not yet implemented\n";
+        return;
+
         $dnOfGroup = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $group);
         $entry = $this->getEntry($dnOfGroup);
         if (is_null($entry)) {
