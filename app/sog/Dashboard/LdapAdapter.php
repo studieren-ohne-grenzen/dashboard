@@ -249,7 +249,7 @@ class LdapAdapter extends Ldap
         Attribute::setAttribute($info, 'cn', $firstName . " " . $lastName);
 
         // password
-        Attribute::setPassword($attributes, $password, $this->password_algorithm);
+        Attribute::setPassword($info, $password, $this->password_algorithm);
 
         // meta data
         Attribute::setAttribute($info, 'mail', $sog_mail);
@@ -278,15 +278,18 @@ class LdapAdapter extends Ldap
      * Requesting access for the given user to $group. This will add an entry to the `pending` attribute of the $group
      *
      * @param string $uid The username for which to request the membership in $group
-     * @param string $group The group for which the membership of $user is requested
+     * @param string $group The group for which the membership of $user is requested, we expect the `ou` value
      * @throws LdapException
      */
     public function requestGroupMembership($uid, $group)
     {
-        $dnOfGroup = sprintf('cn=%s,ou=groups,o=sog-de,dc=sog', $group);
+        $dnOfGroup = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $group);
+        $entry = $this->getEntry($dnOfGroup);
+        if (is_null($entry)) {
+            throw new LdapException($this, sprintf('Can\'t find group %s', $group));
+        }
         // TODO: user may not yet be in ou=active - leave like this or put in ou=inactive and update on approval?
         $dnOfUser = sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid);
-        $entry = $this->getEntry($dnOfGroup);
         Attribute::setAttribute($entry, 'pending', $dnOfUser, true);
         $this->update($dnOfGroup, $entry);
     }
@@ -296,16 +299,18 @@ class LdapAdapter extends Ldap
      * field.
      *
      * @param string $uid The username for which to approve the membership in $group
-     * @param string $group The group for which the membership of $user is approved
+     * @param string $group The group for which the membership of $user is approved, we expect the `ou` value
      * @throws LdapException
      */
     public function approveGroupMembership($uid, $group)
     {
-        $dnOfGroup = sprintf('cn=%s,ou=groups,o=sog-de,dc=sog', $group);
+        $dnOfGroup = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $group);
+        $entry = $this->getEntry($dnOfGroup);
+        if (is_null($entry)) {
+            throw new LdapException($this, sprintf('Can\'t find group %s', $group));
+        }
         // TODO: user may not yet be in ou=active - leave like this or put in ou=inactive and update on approval?
         $dnOfUser = sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid);
-
-        $entry = $this->getEntry($dnOfGroup);
         Attribute::removeFromAttribute($entry, 'pending', $dnOfUser);
         Attribute::setAttribute($entry, 'member', $dnOfUser, true);
         $this->update($dnOfGroup, $entry);
