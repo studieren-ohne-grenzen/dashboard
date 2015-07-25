@@ -127,10 +127,10 @@ $app->match('/members/Gruppen', function (Request $request) use ($app) {
     ->method('GET|POST')
     ->bind('/members/manage-groups');
 
-$app->get('/Hilfe', function () use ($app) {
+$app->get('/members/Hilfe', function () use ($app) {
     return $app['twig']->render('help.twig');
 })
-    ->bind('help');
+    ->bind('/members/help');
 
 // some LDAP test calls
 $app->get('/ldaptests', function () use ($app) {

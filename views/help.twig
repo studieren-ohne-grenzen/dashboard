@@ -1,5 +1,134 @@
 {% extends 'base.twig' %}
 
 {% block content %}
-<H1>Hilfe</H1>
+    <h1>Hilfe</h1>
+    <ol>
+        <li><a href="#faq-1">Was ist das Dashboard?</a></li>
+        <li><a href="#faq-2">Ich bin normales Mitglied, wie hilft mir das Dashboard?</a></li>
+        <li><a href="#faq-3">Ich koordiniere eine Lokalgruppe oder AG, wie hilft mir das Dashboard?</a></li>
+        <li><a href="#faq-4">Wofür brauche ich meinen SOG-Account?</a></li>
+        <li><a href="#faq-5">Wie lautet meine persönliche SOG Email-Adresse?</a></li>
+        <li><a href="#faq-6">Ich habe bereits eine Email-Adresse und möchte nicht zwei verschiedene abrufen. Was kann
+                ich machen?</a></li>
+        <li><a href="#faq-7">Ich habe mich bei einer neuen Lokalgruppe oder AG eingetragen, aber ich habe noch keinen
+                Zugriff auf den Bereich in Open Atrium. Warum?</a></li>
+        <li><a href="#faq-8">Ich habe einen Fehler im Dashboard gefunden oder eine Idee für eine neue Funktion, an wen
+                soll ich mich wenden?</a></li>
+        <li><a href="#faq-9">Ich habe ein anderes Problem, wer kann mir weiterhelfen?</a></li>
+    </ol>
+    <div class="answers">
+        <hr>
+        <section class="faq-item" id="faq-1">
+            <h2>Was ist das Dashboard?</h2>
+
+            <p>Das Dashboard ist die zentrale Anlaufstelle für die verschiedenen Verwaltungsaufgaben rund um deine
+                Mitgliedschaft. Und...</p>
+        </section>
+        <hr>
+        <section class="faq-item" id="faq-2">
+            <h2>Ich bin normales Mitglied, wie hilft mir das Dashboard?</h2>
+
+            <p>Das Dashboard bietet dir die Möglichkeit dein Passwort zu ändern und komfortabel Mitgliedschaften in
+                Gruppen
+                zu beantragen, die dich interessieren oder in denen du mitarbeiten möchstest.</p>
+        </section>
+        <hr>
+        <section class="faq-item" id="faq-3">
+            <h2>Ich koordiniere eine Lokalgruppe oder AG, wie hilft mir das Dashboard?</h2>
+
+            <p>Schön, dass du fragst - genau für Leute wie dich haben wir das Dashboard erdacht! Es soll der zentrale
+                Anlaufpunkt für all deine Verwaltungsaufgaben bezüglich deiner Gruppe sein. Du kannst hier z.B. neue
+                Mitglieder in deiner Lokalgruppe komfortabel freischalten, sie direkt zu einer Gruppe hinzufügen oder
+                Anfragen über den Zugang zu deiner Projekt-AG beantworten.</p>
+        </section>
+        <hr>
+        <section class="faq-item" id="faq-4">
+            <h2>Wofür brauche ich meinen SOG-Account?</h2>
+
+            <p>Der SOG-Account ist dein Zugang für (fast) sämtliche Dienste, die wir anbieten. Du brauchst nicht mehr x
+                verschiedene Zugänge und Passwörter, es reicht ein zentraler Login mit einem sicheren Passwort, dass du
+                auch selbst festlegen kannst. Zu den angebotenen Diensten zählen: <strong>TODO: Links? Quota für
+                    OwnCloud?
+                    Eigener Punkt?</strong></p>
+            <ul>
+                <li>Eine SOG-Email Adresse</li>
+                <li>Meine Mitgliedschaft in CiviCRM</li>
+                <li>Open Atrium</li>
+                <li>Dateiverwaltung OwnCloud</li>
+            </ul>
+        </section>
+        <hr>
+        <section class="faq-item" id="faq-5">
+            <h2>Wie lautet meine persönliche SOG Email-Adresse?</h2>
+            <!-- TODO: link zu RoundCube anpassen -->
+            <p>Deine Adresse lautet <em>{{ app.user.attributes['mail'][0] }}</em>. Über die <a href="#">Webmail-Anwendung</a>
+                kannst du Emails mit dieser Adresse empfangen oder versenden.</p>
+        </section>
+        <hr>
+        <section class="faq-item" id="faq-6">
+            <h2>Ich habe bereits eine Email-Adresse und möchte nicht zwei verschiedene abrufen. Was kann ich
+                machen?</h2>
+
+            <p>Du hast zwei Möglichkeiten:</p>
+            <ul>
+                <li>In <a href="{{ path('/members/manage-account') }}">deinen Benutzerdaten</a> kannst du eine
+                    alternative
+                    Email-Adresse festlegen, an die sämtliche Nachrichten weitergeleitet werden. Trotzdem kannst du beim
+                    Versand von z.B. offiziellen Nachrichten noch auf die SOG-Email zurückgreifen und über die
+                    Webmail-Anwendung benutzen.
+                </li>
+                <li>
+                    Falls du ein Mail-Programm wie Thunderbird verwendest, kannst du ohne Aufwand zwei verschiedene
+                    Postfächer nutzen. Verwende folgende Daten um deine SOG-Email in deinem Mail-Programm zu verwenden:
+                    <!-- TODO: link zu Server Details anpassen -->
+                    <ul>
+                        <li><strong>Host:</strong> mail.studieren-ohne-grenzen.org</li>
+                        <li><strong>Benutzername:</strong> {{ app.user.attributes['uid'][0] }}</li>
+                        <li><strong>Passwort:</strong> <em>dein Passwort</em></li>
+                        <li><strong>Verschlüsselung:</strong> StartSSL?</li>
+                        <li><strong>Konto-Typ:</strong> IMAP</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+        <hr>
+        <section class="faq-item" id="faq-7">
+            <h2>Ich habe mich bei einer neuen Lokalgruppe oder AG eingetragen, aber ich habe noch keinen Zugriff auf den
+                Bereich in Open Atrium. Warum?</h2>
+
+            <p>Aus Gründen des Datenschutzes muss der Koordinator der jeweiligen Gruppe deine Anfrage bestätigen, bevor
+                der
+                Zugang zu der neuen Gruppe freigeschaltet ist. Das kann schonmal eine kurze Weile dauern, falls es
+                dringend
+                ist, versuche bitte den Koordinator der Gruppe direkt zu kontaktieren.</p>
+        </section>
+        <hr>
+        <section class="faq-item" id="faq-8">
+            <h2>Ich habe einen Fehler im Dashboard gefunden oder eine Idee für eine neue Funktion, an wen soll ich mich
+                wenden?</h2>
+
+            <p>Sehr gut! Wir freuen uns immer über Kommentare. Schreibe uns am besten direkt eine Email an <a
+                        href="mailto:it@studieren-ohne-grenzen.org?subject=Dashboard">it@studieren-ohne-grenzen.org</a>.
+                Vielen Dank!</p>
+        </section>
+        <hr>
+        <section class="faq-item" id="faq-9">
+            <h2>Ich habe ein anderes Problem, wer kann mir weiterhelfen?</h2>
+
+            <p>Das kommt ganz darauf an, um was es geht. Am Schnellsten wird dein Anliegen bearbeitet, wenn du es direkt
+                an
+                die relevante Adresse schickst:</p>
+            <ul>
+                <li><a href="mailto:mail@studieren-ohne-grenzen.org">Mails: mail@studieren-ohne-grenzen.org</a></li>
+                <li><a href="mailto:#">Verteiler: ??</a></li>
+                <li><a href="mailto:atrium@studieren-ohne-grenzen.org">Open Atrium:
+                        atrium@studieren-ohne-grenzen.org</a>
+                </li>
+                <li><a href="mailto:website@studieren-ohne-grenzen.org">Website: website@studieren-ohne-grenzen.org</a>
+                </li>
+                <li><a href="mailto:it@studieren-ohne-grenzen.org">SOG Account: it@studieren-ohne-grenzen.org</a></li>
+                <li><a href="mailto:it@studieren-ohne-grenzen.org">Sonstiges: it@studieren-ohne-grenzen.org</a></li>
+            </ul>
+        </section>
+    </div>
 {% endblock %}

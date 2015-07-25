@@ -150,6 +150,15 @@ h3 {
     text-align: left;
 }
 
+/* Hilfe */
+.faq-item {
+    padding: 1em;
+    line-height: 1.5;
+}
+.faq-item:target {
+    background-color: #efefef;
+}
+
 /* custom buttons */
 .button-success,
 .button-error,
