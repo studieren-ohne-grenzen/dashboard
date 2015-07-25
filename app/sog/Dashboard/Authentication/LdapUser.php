@@ -13,17 +13,35 @@ use Zend\Ldap\Attribute;
  */
 class LdapUser implements UserInterface
 {
+    /**
+     * @var string The unique usernam (LDAP: uid) of the represented user
+     */
     protected $username;
+    /**
+     * @var string The hashed password
+     */
     protected $password;
+    /**
+     * @var array All LDAP attributes
+     */
     protected $attributes;
+    /**
+     * @var array All roles associated with this user
+     */
     protected $roles;
+    /**
+     * @var array All groups the user is a member of
+     */
     protected $groups;
 
     /**
+     * LdapUser constructor, set members.
+     *
      * @param string $username
      * @param string $password
      * @param array $attributes
      * @param array $roles
+     * @param array $groups
      */
     public function __construct($username, $password, array $attributes = [], array $roles = [], array $groups = [])
     {
@@ -35,7 +53,8 @@ class LdapUser implements UserInterface
     }
 
     /**
-     * 
+     * Retrieve the requested attribute with $index, there may be many of any given kind.
+     *
      * @param string $attribName The name of the attribute
      * @param int $index The index. Set null, if an array containing all attributes should be returned
      * @return string|array Returns the specified attribute of the user or an array containing all attributes, if $index is null
@@ -44,10 +63,15 @@ class LdapUser implements UserInterface
     {
         return Attribute::getAttribute($this->attributes, $attribName, $index);
     }
-    
+
+    /**
+     * Returns all attributes
+     *
+     * @return array
+     */
     public function getAttributes()
     {
-    	return $this->attributes;
+        return $this->attributes;
     }
 
     /**
@@ -82,22 +106,30 @@ class LdapUser implements UserInterface
     {
         return $this->username;
     }
-    
+
     /**
      * Returns the groups the user is member of.
-     * 
-     * @return The groups containing the user
+     *
+     * @return array The groups containing the user
      */
     public function getGroups()
     {
-    	return $this->groups;
+        return $this->groups;
     }
-    
-    public function getGroupAttribute($groupIndex, $attribName, $index=null)
+
+    /**
+     * Get an attribute of one of the associated groups.
+     *
+     * @param int $groupIndex
+     * @param string $attribName
+     * @param null $index
+     * @return array|mixed
+     */
+    public function getGroupAttribute($groupIndex, $attribName, $index = null)
     {
-    	return Attribute::getAttribute($this->groups[$groupIndex], $attribName, $index);
+        return Attribute::getAttribute($this->groups[$groupIndex], $attribName, $index);
     }
-    
+
     /**
      * {@inheritdoc}
      */

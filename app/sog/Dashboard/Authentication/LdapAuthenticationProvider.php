@@ -20,15 +20,17 @@ class LdapAuthenticationProvider implements AuthenticationProviderInterface
 {
 
     /**
-     * @var Ldap
+     * @var Ldap The actual LDAP resource to call methods on
      */
     private $ldap;
     /**
-     * @var UserProviderInterface
+     * @var UserProviderInterface The instance of our LDAP User Provider
      */
     private $user_provider;
 
     /**
+     * LdapAuthenticationProvider constructor, set members.
+     *
      * @param Ldap $ldap
      * @param UserProviderInterface $user_provider
      */
