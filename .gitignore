@@ -24,3 +24,5 @@ public/js
 public/fontello*
 
 app/config.php
+
+doc/generated
