@@ -25,17 +25,6 @@ $app->match('/members/Benutzerdaten', function (Request $request) use ($app) {
     if (null !== $token) {
         $user = $token->getUser();
 
-        if ($request->request->has('change-email-address')) {
-            try {
-                $app['ldap']->updateEmail($user->getAttributes()['dn'], $request->request->get('email-address'));
-                $app['session']->getFlashBag()
-                    ->add('success', 'E-Mail-Adresse erfolgreich geändert: ' . $request->request->get('email-address'));
-                return $app->redirect('/members/Benutzerdaten');
-            } catch (LdapException $ex) {
-                $app['session']->getFlashBag()
-                    ->add('error', 'Fehler beim Ändern der E-Mail-Adresse (zu ' . $request->request->get('email-address') . '): ' . $ex->getMessage());
-            }
-        } else
             if ($request->request->has('change-password')) {
                 $newpwd = $request->request->get('new-password');
                 if (preg_match('/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/', $newpwd) && strlen($newpwd) >= 8) {

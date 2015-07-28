@@ -8,30 +8,7 @@
                 <td class="icon"><i class="icon-mail font-icon">&#xe802;</i></td>
                 <td class="label">E-Mail</td>
                 <td class="value">
-                    <div id="view-email" class="shown-elem">{{ app.user.attribute('mail-alternative', 0) }}
-                        <button class="pure-button button-small"
-                                onclick="showEdit('view-email', 'edit-email');"><i class="icon-edit font-icon">&#xe809;</i>&Auml;ndern
-                        </button>
-                    </div>
-
-                    <div id="edit-email" class="hidden-elem">
-                        <form class="pure-form pure-form-stacked" method="POST">
-                            <fieldset>
-                                <label for="email-address">E-Mail-Adresse:</label>
-                                <input name="email-address" id="email-address"
-                                       type="email"
-                                       placeholder="{{ app.user.attribute('mail-alternative', 0) }}"
-                                       required>
-                            </fieldset>
-                            <fieldset>
-                                <button type="submit" class="pure-button pure-button-primary"
-                                        name="change-email-address"><i class="icon-ok-circled2 font-icon">&#xe807;</i>&ensp;Speichern
-                                </button>
-                                <span class="pure-button"
-                                        onclick="hideEdit('view-email', 'edit-email');"><i class="icon-cancel-circled2 font-icon">&#xe808;</i>&ensp;Abbrechen
-                                </span>
-                            </fieldset>
-                        </form>
+                    {{ app.user.attribute('mail', 0) }}<br />
                     </div>
                 </td>
             </tr>

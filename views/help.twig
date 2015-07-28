@@ -71,11 +71,16 @@
 
             <p>Du hast zwei Möglichkeiten:</p>
             <ul>
-                <li>In <a href="{{ path('/members/manage-account') }}">deinen Benutzerdaten</a> kannst du eine
-                    alternative
-                    Email-Adresse festlegen, an die sämtliche Nachrichten weitergeleitet werden. Trotzdem kannst du beim
-                    Versand von z.B. offiziellen Nachrichten noch auf die SOG-Email zurückgreifen und über die
-                    Webmail-Anwendung benutzen.
+                <li>Du kannst alle E-Mails an deinen bestehenden E-Mail-Account weiterleiten lassen:
+                    <ol>
+                        <li>Rufe die <a href="https://studieren-ohne-grenzen.org/roundcube/?_task=settings&_action=plugin.managesieve">Filtereinstellungen in Roundcube</a> auf</li>
+                        <li>Um dich in Roundcube einzuloggen benötigst du deine SOG-E-Mail-Adresse (<i>{{ app.user.attribute('mail', 0) }}</i>) und dein Passwort</li>
+                        <li>Klicke in der Box mit der Überschrift "Filter" auf das große "+" ganz unten in der Box. Wähle nun einen Namen für den Filter (z.B. "Mailweiterleitung").
+                        Falls ein entsprechender Filter bereits existiert, solltest du natürlich diesen auswählen entsprechend bearbeiten.</li>
+                        <li>Wähle im Abschnitt "Für eingehende Nachrichten" die Option "alle Nachrichten" aus</li>
+                        <li>Wähle im Abschnitt "...führe folgende Aktionen aus" die Option "Kopie senden an" aus und gebe in dem links davon erscheinenden Textfeld deine E-Mail-Adresse ein, unter der du die Mails empfangen möchtest</li>
+                        <li>Klicke abschließend auf "Speichern". Auch mit der eingerichteten Weiterleitung kannst deine Mails weiterhin wie gewohnt über deine SOG-E-Mail-Adresse empfangen</li>
+                    </ol>
                 </li>
                 <li>
                     Falls du ein Mail-Programm wie Thunderbird verwendest, kannst du ohne Aufwand zwei verschiedene
