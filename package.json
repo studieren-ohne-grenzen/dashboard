@@ -1,0 +1,31 @@
+{
+  "name": "sog-dashboard",
+  "version": "0.0.0",
+  "description": "Dashboard for Studieren Ohne Grenzen",
+  "main": "public/index.php",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/studieren-ohne-grenzen/dashboard.git"
+  },
+  "author": [
+    "Leonhard Melzer <leonhard.melzer@studieren-ohne-grenzen.org>"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/studieren-ohne-grenzen/dashboard/issues"
+  },
+  "homepage": "https://github.com/studieren-ohne-grenzen/dashboard#readme",
+  "dependencies": {
+    "auto-reload-brunch": "^1.8.0",
+    "clean-css-brunch": "^1.7.2",
+    "css-brunch": "^1.7.0",
+    "javascript-brunch": "^1.7.1",
+    "uglify-js-brunch": "^1.7.8"
+  }
+}

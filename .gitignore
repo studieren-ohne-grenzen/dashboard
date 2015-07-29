@@ -4,3 +4,23 @@ vendor/
 # Commit your application's lock file http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file
 # You may choose to ignore a library lock file http://getcomposer.org/doc/02-libraries.md#lock-file
 # composer.lock
+logs/
+.idea/
+
+.buildpath
+.project
+.settings/
+
+bower_components/
+node_modules/
+
+brunch-config.js
+*.map
+
+public/favicon.ico
+public/img
+public/css
+public/js
+public/fontello*
+
+app/config.php
