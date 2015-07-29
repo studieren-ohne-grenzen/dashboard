@@ -6,7 +6,8 @@ $app->register(new Silex\Provider\TwigServiceProvider(), [
 
 // logging
 $app->register(new Silex\Provider\MonologServiceProvider(), [
-    'monolog.logfile' => __DIR__ . '/../logs/development.log'
+    'monolog.logfile' => __DIR__ . '/../logs/development.log',
+    'monolog.name' => 'dashboard'
 ]);
 
 // ldap
@@ -49,5 +50,4 @@ $app->register(new Silex\Provider\SecurityServiceProvider(), [
     ]
 ]);
 
-// TODO: setup? checkbox?
 $app->register(new Silex\Provider\RememberMeServiceProvider());
