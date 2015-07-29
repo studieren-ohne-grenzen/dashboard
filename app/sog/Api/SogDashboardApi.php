@@ -58,7 +58,9 @@ class SogDashboardApi
 
 
     /**
-     * Create a new user registers it for all relevant services and informs the user and its group admin.
+     * Create a new user in the LDAP tree. Send notifications to the user and its group admin.
+     * The account will be inactive by default. Memberships for the general group and the given $group
+     * are also requested. 
      *
      * @param string $firstName
      * @param string $lastName
