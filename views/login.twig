@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studieren Ohne Grenzen &mdash; Dashboard</title>
+    <link rel="icon" href="/favicon.ico">
+    {% block styles %}
+        <link rel="stylesheet" href="{{ app.request.basepath }}/css/vendor.css">
+        <link rel="stylesheet" href="{{ app.request.basepath }}/css/app.css">
+    {% endblock %}
+</head>
+<body>
+<div class="login-bar">
+    <div class="pure-img-responsive logo circular"></div>
+</div>
+{% block messages %}
+    <div class="message-box login-layout">
+        {% for message in app.session.getFlashBag.get('error') %}
+            <div class="message-error">
+                <div class="message-container"><i class="icon-minus-circled font-icon">
+                        &#xe81c;</i> {{ message }}<p>
+                        Support: <a href="mailto:it@s-o-g.org">it@s-o-g.org</a></p></div>
+                <div class="close-message" onclick='removeParent(this)'><i class="icon-cancel font-icon">
+                        &#xe815;</i></div>
+            </div>
+        {% endfor %}
+        {% for message in app.session.getFlashBag.get('warning') %}
+            <div class="message-warning">
+                <div class="message-container"><i class="icon-attention font-icon">&#xe800;</i> {{ message }}
+                </div>
+                <div class="close-message" onclick='removeParent(this)'><i class="icon-cancel font-icon">
+                        &#xe815;</i></div>
+            </div>
+        {% endfor %}
+        {% for message in app.session.getFlashBag.get('success') %}
+            <div class="message-success">
+                <div class="message-container"><i class="icon-ok-circled font-icon">&#xe819;</i> {{ message }}
+                </div>
+                <div class="close-message" onclick='removeParent(this)'><i class="icon-cancel font-icon">
+                        &#xe815;</i></div>
+            </div>
+        {% endfor %}
+        {% for message in app.session.getFlashBag.get('info') %}
+            <div class="message-info">
+                <div class="message-container"><i class="icon-info-circled font-icon">&#xe801;</i> {{ message }}
+                </div>
+                <div class="close-message" onclick='removeParent(this)'><i class="icon-cancel font-icon">
+                        &#xe815;</i></div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+<div id="layout" class="login">
+    <div class="login-form">
+        {% block content %}
+            <h1 class="brand-title">Willkommen im Dashboard!</h1>
+
+            <form action="{{ path('members_login_check') }}" class="pure-form pure-form-aligned" method="post">
+                {% if error %}
+                    <p class="button-error">{{ error }}</p>
+                {% endif %}
+
+                <div class="pure-control-group">
+                    <label for="username">Benutzername</label>
+                    <input type="text" name="_username" id="username" placeholder="vorname.nachname"
+                           value="{{ last_username }}"/>
+                </div>
+                <div class="pure-control-group">
+                    <label for="password">Passwort</label>
+                    <input type="password" name="_password" id="password" value=""/>
+                </div>
+                <div class="pure-control-group">
+                    <label for="remember_me">Eingeloggt bleiben</label>
+                    <input type="checkbox" id="remember_me" name="_remember_me" checked/>
+                </div>
+                <div class="pure-controls">
+                    <button type="submit" class="pure-button pure-button-primary" value="Login">
+                        <i class="icon-login font-icon">&#xe80e;</i>&ensp;Login
+                    </button>
+                    <p><small><a href="{{ path('POST_GET_password_request') }}">Ich habe mein Passwort vergessen</a></small></p>
+                </div>
+            </form>
+        {% endblock %}
+
+        {% block footer %}
+            <div class="footer">
+                <div class="pure-menu pure-menu-horizontal">
+                    <ul>
+                        <li class="pure-menu-item"><a href="https://studieren-ohne-grenzen.org/" class="pure-menu-link">Webseite</a>
+                        </li>
+                        <li class="pure-menu-item"><a href="https://studieren-ohne-grenzen.org/atrium"
+                                                      class="pure-menu-link">Open Atrium</a></li>
+                        <li class="pure-menu-item"><a href="https://studieren-ohne-grenzen.org/owncloud"
+                                                      class="pure-menu-link">OwnCloud</a></li>
+                    </ul>
+                </div>
+            </div>
+        {% endblock %}
+    </div>
+</div>
+
+{% block scripts %}
+    <script>
+        function removeParent(element) {
+            element.parentElement.parentElement.removeChild(element.parentElement);
+        }
+    </script>
+{% endblock %}
+
+</body>
+</html>

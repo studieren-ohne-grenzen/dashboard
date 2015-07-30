@@ -1,0 +1,16 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+    <h1>Rollen</h1>
+    {% if app.user and is_granted('ROLE_GROUP_ADMIN') %}
+        <p>Du bist Gruppen Admin.</p>
+        {{ dump(app['ldap'].getOwnedGroups(app.user.getAttributes()['dn']).toArray()) }}
+    {% endif %}
+    {% if app.user and is_granted('ROLE_USER') %}
+        <p>Du bist normaler User.</p>
+    {% endif %}
+    <h1>Inhalt</h1>
+    <pre>
+    {{ content }}
+    </pre>
+{% endblock %}

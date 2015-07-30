@@ -1,0 +1,4 @@
+.DS_Store
+vendor/*/*/tests
+vendor/*/*/Tests
+vendor/*/*/test
