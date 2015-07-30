@@ -1,6 +1,9 @@
 <!doctype html>
 <html lang="de">
-<head><!--[if lt IE 9]><script language="javascript" type="text/javascript" src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+<head>
+    <!--[if lt IE 9]>
+    <script language="javascript" type="text/javascript" src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Studieren Ohne Grenzen &mdash; Dashboard</title>
@@ -24,13 +27,16 @@
                 <nav class="nav">
                     <ul class="nav-list">
                         <li class="nav-item">
-                            <a class="pure-button" href="{{ path('/members/manage-groups') }}">Meine Gruppen&ensp;<i class="icon-users font-icon">&#xe806;</i></a>
+                            <a class="pure-button" href="{{ path('/members/manage-groups') }}">Meine Gruppen&ensp;<i
+                                        class="icon-users font-icon">&#xe806;</i></a>
                         </li>
                         <li class="nav-item">
-                            <a class="pure-button" href="{{ path('/members/manage-account') }}">Meine Benutzerdaten&ensp;<i class="icon-user font-icon">&#xe805;</i></a>
+                            <a class="pure-button" href="{{ path('/members/manage-account') }}">Meine Benutzerdaten&ensp;<i
+                                        class="icon-user font-icon">&#xe805;</i></a>
                         </li>
                         <li class="nav-item">
-                            <a class="pure-button" href="{{ path('/members/help') }}">Hilfe&ensp;<i class="icon-user font-icon">&#xe81b;</i></a>
+                            <a class="pure-button" href="{{ path('/members/help') }}">Hilfe&ensp;<i
+                                        class="icon-user font-icon">&#xe81b;</i></a>
                         </li>
                     </ul>
                 </nav>
@@ -38,7 +44,9 @@
             {% if app.user %}
                 <div class="logout-box">
                     <hr/>
-                    <span class="align-right"><a class="pure-button logout-button lb" href="{{ path('members_logout') }}"><i class="icon-logout font-icon">&#xe80a;</i>Abmelden</a></span>
+                    <span class="align-right"><a class="pure-button logout-button lb"
+                                                 href="{{ path('members_logout') }}"><i class="icon-logout font-icon">
+                                &#xe80a;</i>Abmelden</a></span>
                     <b>{{ app.user.attributes['cn'][0] }}</b><br/>ist angemeldet.
                 </div>
             {% endif %}
@@ -47,31 +55,52 @@
 
     <div class="content pure-u-1 pure-u-md-3-4" id="members">
         <div class="message-box">
-    {% for message in app.session.getFlashBag.get('error') %}
-    	<div class="message-error"><div class="message-container"><i class="icon-minus-circled font-icon">&#xe81c;</i> {{ message }}<p>Support: <a href="mailto:it@s-o-g.org">it@s-o-g.org</a></p></div><div class="close-message" onclick='removeParent(this)'><i class="icon-cancel font-icon">&#xe815;</i></div></div>
-	{% endfor %}
-	{% for message in app.session.getFlashBag.get('warning') %}
-    	<div class="message-warning"><div class="message-container"><i class="icon-attention font-icon">&#xe800;</i> {{ message }}</div><div class="close-message" onclick='removeParent(this)'><i class="icon-cancel font-icon">&#xe815;</i></div></div>
-	{% endfor %}
-    {% for message in app.session.getFlashBag.get('success') %}
-    	<div class="message-success"><div class="message-container"><i class="icon-ok-circled font-icon">&#xe819;</i> {{ message }}</div><div class="close-message" onclick='removeParent(this)'><i class="icon-cancel font-icon">&#xe815;</i></div></div>
-	{% endfor %}
-	{% for message in app.session.getFlashBag.get('info') %}
-    	<div class="message-info"><div class="message-container"><i class="icon-info-circled font-icon">&#xe801;</i> {{ message }}</div><div class="close-message" onclick='removeParent(this)'><i class="icon-cancel font-icon">&#xe815;</i></div></div>
-	{% endfor %}
-	</div>
+            {% for message in app.session.getFlashBag.get('error') %}
+                <div class="message-error">
+                    <div class="message-container"><i class="icon-minus-circled font-icon">&#xe81c;</i> {{ message }}<p>
+                            Support: <a href="mailto:it@s-o-g.org">it@s-o-g.org</a></p></div>
+                    <div class="close-message" onclick='removeParent(this)'><i class="icon-cancel font-icon">
+                            &#xe815;</i></div>
+                </div>
+            {% endfor %}
+            {% for message in app.session.getFlashBag.get('warning') %}
+                <div class="message-warning">
+                    <div class="message-container"><i class="icon-attention font-icon">&#xe800;</i> {{ message }}</div>
+                    <div class="close-message" onclick='removeParent(this)'><i class="icon-cancel font-icon">
+                            &#xe815;</i></div>
+                </div>
+            {% endfor %}
+            {% for message in app.session.getFlashBag.get('success') %}
+                <div class="message-success">
+                    <div class="message-container"><i class="icon-ok-circled font-icon">&#xe819;</i> {{ message }}</div>
+                    <div class="close-message" onclick='removeParent(this)'><i class="icon-cancel font-icon">
+                            &#xe815;</i></div>
+                </div>
+            {% endfor %}
+            {% for message in app.session.getFlashBag.get('info') %}
+                <div class="message-info">
+                    <div class="message-container"><i class="icon-info-circled font-icon">&#xe801;</i> {{ message }}
+                    </div>
+                    <div class="close-message" onclick='removeParent(this)'><i class="icon-cancel font-icon">
+                            &#xe815;</i></div>
+                </div>
+            {% endfor %}
+        </div>
         {% block content %}{% endblock %}
 
         {% block footer %}
             <div class="footer">
                 <div class="pure-menu pure-menu-horizontal">
                     <ul>
-                        <li class="pure-menu-item"><a href="https://studieren-ohne-grenzen.org/" class="pure-menu-link"><i class="icon-link font-icon">&#xe81a;</i>Webseite</a>
+                        <li class="pure-menu-item"><a href="https://studieren-ohne-grenzen.org/" class="pure-menu-link"><i
+                                        class="icon-link font-icon">&#xe81a;</i>Webseite</a>
                         </li>
                         <li class="pure-menu-item"><a href="https://studieren-ohne-grenzen.org/atrium"
-                                                      class="pure-menu-link"><i class="icon-link font-icon">&#xe81a;</i>Open Atrium</a></li>
+                                                      class="pure-menu-link"><i class="icon-link font-icon">&#xe81a;</i>Open
+                                Atrium</a></li>
                         <li class="pure-menu-item"><a href="https://studieren-ohne-grenzen.org/owncloud"
-                                                      class="pure-menu-link"><i class="icon-cloud font-icon">&#xe818;</i>OwnCloud</a></li>
+                                                      class="pure-menu-link"><i class="icon-cloud font-icon">
+                                    &#xe818;</i>OwnCloud</a></li>
                     </ul>
                 </div>
             </div>
@@ -82,9 +111,9 @@
 {% block scripts %}
     <script src="{{ app.request.basepath }}/js/vendor.js"></script>
     <script>
-    function removeParent(element){
-		element.parentElement.parentElement.removeChild(element.parentElement);
-    }
+        function removeParent(element) {
+            element.parentElement.parentElement.removeChild(element.parentElement);
+        }
     </script>
 {% endblock %}
 

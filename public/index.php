@@ -1,5 +1,6 @@
 <?php
 use Symfony\Component\HttpFoundation\Request;
+use Zend\Ldap\Exception\LdapException;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -21,27 +22,28 @@ $app->get('/', function () use ($app) {
 
 $app->match('/members/Benutzerdaten', function (Request $request) use ($app) {
     $user = null;
+    /** @var \Symfony\Component\Security\Core\Authentication\Token\TokenInterface $token */
     $token = $app['security.token_storage']->getToken();
     if (null !== $token) {
         $user = $token->getUser();
 
-            if ($request->request->has('change-password')) {
-                $newpwd = $request->request->get('new-password');
-                if (preg_match('/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/', $newpwd) && strlen($newpwd) >= 8) {
-                    try {
-                        $app['ldap']->updatePassword($user->getAttributes()['dn'], $request->request->get('old-password'), $request->request->get('new-password'));
-                        $app['session']->getFlashBag()
-                            ->add('success', 'Passwort erfolgreich geändert!');
-                        return $app->redirect('/members/Benutzerdaten');
-                    } catch (LdapException $ex) {
-                        $app['session']->getFlashBag()
-                            ->add('error', 'Fehler beim Ändern des Passworts: ' . $ex->getMessage());
-                    }
-                } else {
+        if ($request->request->has('change-password')) {
+            $newpwd = $request->request->get('new-password');
+            if (preg_match('/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/', $newpwd) && strlen($newpwd) >= 8) {
+                try {
+                    $app['ldap']->updatePassword($user->getAttributes()['dn'], $request->request->get('old-password'), $request->request->get('new-password'));
                     $app['session']->getFlashBag()
-                        ->add('warning', 'Das Passwort muss 8 Zeichen lang sein und mindestens eine Zahl und einen Buchstaben enthalten');
+                        ->add('success', 'Passwort erfolgreich geändert!');
+                    return $app->redirect('/members/Benutzerdaten');
+                } catch (LdapException $ex) {
+                    $app['session']->getFlashBag()
+                        ->add('error', 'Fehler beim Ändern des Passworts: ' . $ex->getMessage());
                 }
+            } else {
+                $app['session']->getFlashBag()
+                    ->add('warning', 'Das Passwort muss 8 Zeichen lang sein und mindestens eine Zahl und einen Buchstaben enthalten');
             }
+        }
     }
 
     return $app['twig']->render('manage_account.twig', []);
@@ -51,6 +53,7 @@ $app->match('/members/Benutzerdaten', function (Request $request) use ($app) {
 
 $app->match('/members/Gruppen', function (Request $request) use ($app) {
     $user = null;
+    /** @var \Symfony\Component\Security\Core\Authentication\Token\TokenInterface $token */
     $token = $app['security.token_storage']->getToken();
 
     $user = $token->getUser();
@@ -60,6 +63,8 @@ $app->match('/members/Gruppen', function (Request $request) use ($app) {
     if (!isset($group))
         $group = $ownedGroups[0]['ou'][0];
 
+    $result = null;
+    $members = null;
     if (null !== $token) {
 
         if ($request->request->has('action')) {
@@ -138,8 +143,8 @@ $app->get('/ldaptests', function () use ($app) {
         ->toArray(), true);
     try {
         $content .= print_r($app['ldap']->bind($dn, 'test'), true);
-    } catch (\Zend\Ldap\Exception\LdapException $ex) {
-        if ($ex->getCode() == \Zend\Ldap\Exception\LdapException::LDAP_INVALID_CREDENTIALS) {
+    } catch (LdapException $ex) {
+        if ($ex->getCode() == LdapException::LDAP_INVALID_CREDENTIALS) {
             $content .= "Der Login war nicht erfolgreich, bitte überprüfe deinen Benutzernamen und Passwort.";
         } else {
             $content .= print_r($ex, true);
