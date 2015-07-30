@@ -184,6 +184,10 @@ h3 {
     width: 100%;
 }
 
+.message-box.login-layout {
+    margin: 0 auto 3em auto;
+}
+
 .message-success,
 .message-error,
 .message-warning,
