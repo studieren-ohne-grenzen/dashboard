@@ -15,6 +15,9 @@ $app->register(new SOG\Dashboard\ZendLdapServiceProvider(), [
     'ldap.options' => $config['ldap.options']
 ]);
 
+// convenience: random strings for passwords, token etc.
+$app->register(new SOG\Dashboard\RandomStringServiceProvider());
+
 // mailing
 $app->register(new Silex\Provider\SwiftmailerServiceProvider());
 $app['mailer.from'] = $config['mailer.from'];
