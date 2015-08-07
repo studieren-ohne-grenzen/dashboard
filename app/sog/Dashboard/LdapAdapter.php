@@ -280,6 +280,7 @@ class LdapAdapter extends Ldap
      * @param string $uid The username for which to request the membership in $group
      * @param string $group The group for which the membership of $user is requested, we expect the `ou` value
      * @throws LdapException
+     * @return true, if pending didn't already contain $user; false otherwise
      */
     public function requestGroupMembership($uid, $group)
     {
@@ -291,8 +292,12 @@ class LdapAdapter extends Ldap
         }
         // TODO: user may not yet be in ou=active - leave like this or put in ou=inactive and update on approval?
         $dnOfUser = sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid);
+        if(this::attributeHasValue($entry, 'pending', $dnOfUser)) {
+        	return false;
+        }
         Attribute::setAttribute($entry, 'pending', $dnOfUser, true);
         $this->update($dnOfGroup, $entry);
+        return true;
     }
 
     /**
