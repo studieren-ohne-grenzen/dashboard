@@ -292,7 +292,7 @@ class LdapAdapter extends Ldap
         }
         // TODO: user may not yet be in ou=active - leave like this or put in ou=inactive and update on approval?
         $dnOfUser = sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid);
-        if(this::attributeHasValue($entry, 'pending', $dnOfUser)) {
+        if(Attribute::attributeHasValue($entry, 'pending', $dnOfUser)) {
         	return false;
         }
         Attribute::setAttribute($entry, 'pending', $dnOfUser, true);
