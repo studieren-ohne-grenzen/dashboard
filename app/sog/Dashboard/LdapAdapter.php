@@ -237,6 +237,7 @@ class LdapAdapter extends Ldap
     {
         $dn = sprintf('uid=%s,ou=inactive,ou=people,o=sog-de,dc=sog', $username);
         $sog_mail = sprintf('%s@studieren-ohne-grenzen.org', $username);
+        $sog_mail_alias = sprintf('%s@s-o-g.org', $username);
         $info = [];
 
         // core data
@@ -254,7 +255,7 @@ class LdapAdapter extends Ldap
         // meta data
         Attribute::setAttribute($info, 'mail', $sog_mail);
         Attribute::setAttribute($info, 'mail-alternative', $mail);
-        Attribute::setAttribute($info, 'mailAlias', $mail);
+        Attribute::setAttribute($info, 'mailAlias', $sog_mail_alias);
         Attribute::setAttribute($info, 'mailHomeDirectory', sprintf('/srv/vmail/%s', $sog_mail));
         Attribute::setAttribute($info, 'mailStorageDirectory', sprintf('maildir:/srv/vmail/%s/Maildir', $sog_mail));
         Attribute::setAttribute($info, 'mailEnabled', true);
