@@ -300,6 +300,32 @@ class LdapAdapter extends Ldap
         $this->update($dnOfGroup, $entry);
         return true;
     }
+    
+    /**
+     * Remove a membership request for $group. This will remove the user's dn from the `pending` attribute of the $group
+     *
+     * @param string $uid The username of the user who has done the request
+     * @param string $group The group for which the request shall be removed, we expect the `ou` value
+     * @throws LdapException
+     * @return true, if pending contained $user and the entry has been deleted; false otherwise
+     */
+    public function dropMembershipRequest($uid, $group)
+    {
+    
+        $dnOfGroup = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $group);
+        $entry = $this->getEntry($dnOfGroup);
+        if (is_null($entry)) {
+            throw new LdapException($this, sprintf('Can\'t find group %s', $group));
+        }
+        // TODO: user may not yet be in ou=active - leave like this or put in ou=inactive and update on approval?
+        $dnOfUser = sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid);
+        if(!Attribute::attributeHasValue($entry, 'pending', $dnOfUser)) {
+            return false;
+        }
+        Attribute::removeFromAttribute($entry, 'pending', $dnOfUser);
+        $this->update($dnOfGroup, $entry);
+        return true;
+    }
 
     /**
      * Allowing the given user to access the given group. This will move the entry from the `pending` to the `member`

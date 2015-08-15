@@ -420,4 +420,8 @@ th.sort.desc::after {
         right: 3em;
         border-radius: 0 0 10px 10px;
     }
+    
+    .table-row:hover {
+		background-color: #efefef;
+	}
 }
