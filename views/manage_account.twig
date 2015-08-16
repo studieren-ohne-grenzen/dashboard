@@ -9,7 +9,6 @@
                 <td class="label">E-Mail</td>
                 <td class="value">
                     {{ app.user.attribute('mail', 0) }}<br />
-                    </div>
                 </td>
             </tr>
             <tr>
@@ -68,6 +67,7 @@
             </tr>
             </tbody>
         </table>
+        <p>In CiviCRM kannst du deine Stammdaten wie Adresse und Email-Adresse anpassen: <a href="https://civicrm.studieren-ohne-grenzen.org/user/5/edit/name_and_address">Mein Profil auf CiviCRM.</a></p>
     </div>
 {% endblock %}
 {% block scripts %} {{ parent() }}
@@ -84,12 +84,12 @@
         }
         function hideAll() {
             var e = document.getElementsByClassName('hidden-elem');
-            for (var i = 0; i < e.length; ++i) {
-                var item = e[i];
+            var i;
+            for (i = 0; i < e.length; ++i) {
                 e[i].style.display = 'none';
             }
             e = document.getElementsByClassName('shown-elem');
-            for (var i = 0; i < e.length; ++i) {
+            for (i = 0; i < e.length; ++i) {
                 e[i].style.display = 'inline';
             }
         }
@@ -120,7 +120,7 @@
                 message.innerHTML = 'Passw&ouml;rter stimmen nicht &uuml;berein';
             }
         }
-        
+
         function passStrength(input){
         	var result = zxcvbn(input.value);
         	var text = '';
