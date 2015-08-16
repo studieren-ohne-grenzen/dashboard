@@ -51,7 +51,7 @@
         };
 
         var controlList = new List('group-list', options);
-        var data = {{ groupList|json_encode|raw }}
+        var data = {{ groupList|json_encode|raw }};
         var activeFilters = [];
         
         var fMemberships = function (item) {return (item.values().is_member == true)};
