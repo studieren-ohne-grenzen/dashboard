@@ -11,7 +11,7 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 require_once '../../config.php';
 
 // create API instance
-$api = new SOG\Api\SogDashboardApi($config);
+$api = new SOG\Api\SogDashboardApi($dashboard_config);
 
 // create a new user, will return the new username
 $username = $api->createUser('Peter', 'Lustig', 'leonhard.melzer@studieren-ohne-grenzen.org', 'lg_karlsruhe');
