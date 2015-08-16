@@ -14,7 +14,7 @@ bower install
 brunch b --production
 
 # send to server, see
-rsync -az --progress --exclude-from=deploy_ignore.txt app public vendor views sogserver:/var/www/dashboard
+rsync -az --progress --exclude-from=deploy_ignore.txt app public vendor views sogserver:/var/www/studieren-ohne-grenzen.org/dashboard
 
 echo "## Finished deploy! ##"
 
