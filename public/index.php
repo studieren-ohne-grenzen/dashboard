@@ -133,72 +133,103 @@ $app->match('/members/meine-Gruppen', function (Request $request) use ($app) {
 ->method('GET|POST')
 ->bind('/members/manage-groups');
 
-$app->match('/members/Gruppen', function (Request $request) use ($app) {
-    $user = null;
+$app->match('/members/Mitglieder-verwalten', function (Request $request) use ($app) {
     /** @var \Symfony\Component\Security\Core\Authentication\Token\TokenInterface $token */
     $token = $app['security.token_storage']->getToken();
-
-    $user = $token->getUser();
-    $ownedGroups = $app['ldap']->getOwnedGroups($user->getAttributes()['dn'])
-        ->toArray();
-    $group = $request->query->get('group');
-    if (!isset($group))
-        $group = $ownedGroups[0]['ou'][0];
-
-    $result = null;
-    $members = null;
+    
     if (null !== $token) {
-
-        if ($request->request->has('action')) {
-            $groupDn = $app['ldap']->getGroupDnByOu($request->request->get('selected-group'));
-            $permission = false;
+        $user = $token->getUser();
+        $ownedGroups = $app['ldap']->getOwnedGroups($user->getAttributes()['dn'])->toArray();
+        
+        $selGroup = $request->query->get('ou');
+        if (!isset($selGroup)) $selGroup = $ownedGroups[0]['ou'][0];
+        $selGroupDN = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $selGroup);
+        
+        $action = $request->request->get('action');
+        
+        if (isset($action)) {
+            $ownerPermission = false;
+            $selGroupName = '';
             foreach ($ownedGroups as $og) {
-                if ($og['dn'] == $groupDn)
-                    $permission = true;
+                if ($og['dn'] == $selGroupDN)
+                    $ownerPermission = true;
+                    $selGroupName = $og['cn'][0];
                 break;
             }
 
-            if ($permission) {
-
-                if ($request->request->get('action') === 'add') {
-                    try {
-                        $app['ldap']->addToGroup($request->request->get('selected-member'), $groupDn);
-                        $app['session']->getFlashBag()
-                            ->add('success', $request->request->get('member-name') . " wurde zu der Gruppe " . $request->request->get('group-name') . ' hinzugefügt!');
-                    } catch (LdapException $ex) {
-                        $app['session']->getFlashBag()
-                            ->add('error', 'Fehler beim Hinzufügen von ' . $request->request->get('member-name') . " zu der Gruppe " . $request->request->get('group-name') . ": " . $ex->getMessage());
-                    }
-
-                } else {
-                    if ($request->request->get('action') === 'rm') {
+            if ($ownerPermission) {
+                $userID = $request->request->get('uid');
+                $userDN = $app['ldap']->findUserDN($userID);
+                $userAttr = $app['ldap']->getEntry($userDN, ['cn']);
+                
+                $groupAttr = $app['ldap']->getEntry($selGroupDN, ['owner']);
+                
+                switch ($action){
+                    case 'add':
                         try {
-                            $app['ldap']->removeFromGroup($request->request->get('selected-member'), $groupDn);
-                            $app['session']->getFlashBag()
-                                ->add('success', $request->request->get('member-name') . " wurde von der Gruppe " . $request->request->get('group-name') . ' entfernt!');
+                            $app['ldap']->addToGroup($userDN, $selGroupDN);
+                            $app['ldap']->dropMembershipRequest($userID, $selGroup);
+                            $app['session']->getFlashBag()->add('success', $userAttr['cn'][0] . ' wurde zu der Gruppe "' . $selGroupName . '" hinzugefügt!');
                         } catch (LdapException $ex) {
-                            $app['session']->getFlashBag()
-                                ->add('error', 'Fehler beim Entfernen von ' . $request->request->get('member-name') . " aus der Gruppe " . $request->request->get('group-name') . ": " . $ex->getMessage());
+                            $app['session']->getFlashBag()->add('error', 'Fehler beim Hinzufügen von ' . $userAttr['cn'][0] . ' zu der Gruppe "' . $selGroupName . '": ' . $ex->getMessage());
                         }
+                        break;
+
+                    case 'rm':
+                        try {
+                            if (in_array($userDN, $groupAttr['owner'])) {
+                                $app['session']->getFlashBag()->add('error', 'Nicht möglich! "' . $userAttr['cn'][0] . '" ist Koordinator der Gruppe "' . $selGroupName . '". Zum Beenden deiner Mitgliedschaft wende dich bitte an das Ressort IT.');
+                            } else {
+                            $app['ldap']->removeFromGroup($userDN, $selGroupDN);
+                            $app['session']->getFlashBag()->add('success', $userAttr['cn'][0] . ' wurde von der Gruppe "' . $selGroupName . '" entfernt!');
+                            }
+                        } catch (LdapException $ex) {
+                            $app['session']->getFlashBag()->add('error', 'Fehler beim Entfernen von ' . $userAttr['cn'][0] . ' aus der Gruppe "' . $selGroupName . '": ' . $ex->getMessage());
+                        }
+                        break;
+                    case 'rm-request':
+                        try {
+                            $app['ldap']->dropMembershipRequest($userID, $selGroup);
+                            $app['session']->getFlashBag()->add('success', 'Die Mitgliedschaftsanfrage von ' . $userAttr['cn'][0] . ' für die Gruppe "' . $selGroupName . '" wurde gelöscht!');
+                        } catch (LdapException $ex) {
+                            $app['session']->getFlashBag()->add('error', 'Fehler beim Löschen der Mitgliedschaftsanfrage von ' . $userAttr['cn'][0] . ' für die Gruppe "' . $selGroupName . '": ' . $ex->getMessage());
+                        }
+                        break;
+                    default:
+                        $app['session']->getFlashBag()->add('error', 'Fehler: Der gesendete Befehl wird nicht unterstützt.');
                     }
-                }
+                    
             } else {
                 $app['session']->getFlashBag()->add('error', 'Keine Berechtigung für die gewählte Gruppe');
             }
         }
 
-        $result = $app['ldap']->getAllUsers()
-            ->toArray();
-        $members = $app['ldap']->getMembers($group)
-            ->toArray();
+        $allUsers = $app['ldap']->getAllUsers()->toArray();
+        $groupAttr = $app['ldap']->getEntry($selGroupDN, ['owner', 'member', 'pending']);
+        
+        $memberList = [];
+        foreach ($allUsers as $u) {
+            $roles = [];
+            if (isset($groupAttr['owner']) && in_array($u['dn'] , $groupAttr['owner'])) $roles[] = 'owner';
+            if (isset($groupAttr['member']) && in_array($u['dn'] , $groupAttr['member'])) $roles[] = 'member';
+            if (isset($groupAttr['pending']) && in_array($u['dn'] , $groupAttr['pending'])) $roles[] = 'pending';
+            
+            $listentry = array(
+                'name' => $u['cn'][0],
+                'uid' => $u['uid'][0],
+                'email' => $u['mail'][0],
+                'userRoles' => $roles
+            );
+            
+            $memberList[] = $listentry;
+        }
+        
+        return $app['twig']->render('manage_members.twig', [
+            'memberList' => $memberList,
+            'ownedGroups' => $ownedGroups,
+            'selectedGroup' => $selGroup
+        ]);
     }
-
-    return $app['twig']->render('manage_members.twig', [
-        'result' => $result,
-        'members' => $members,
-        'group' => $group,
-        'ownedGroups' => $ownedGroups
-    ]);
 })
     ->method('GET|POST')
     ->bind('/members/manage-members');

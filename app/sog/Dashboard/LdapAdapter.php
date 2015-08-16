@@ -53,8 +53,8 @@ class LdapAdapter extends Ldap
             'objectClass=inetOrgPerson',
             'ou=people,o=sog-de,dc=sog',
             self::SEARCH_SCOPE_SUB,
-            ['displayname', 'mail', 'dn'],
-            'displayname'
+            ['cn', 'uid', 'mail', 'dn'],
+            'cn'
         );
         return $results;
     }
@@ -85,23 +85,6 @@ class LdapAdapter extends Ldap
         $entry = $this->getEntry($dnOfGroup);
         Attribute::removeFromAttribute($entry, 'member', $dnOfUser);
         $this->update($dnOfGroup, $entry);
-    }
-
-    /**
-     * Returns the dn of the first group with the given ou
-     *
-     * @param string $group_ou The common name of the group
-     * @throws LdapException
-     */
-    public function getGroupDnByOu($group_ou)
-    {
-        $results = $this->search(
-            sprintf('(&(objectClass=groupOfNames)(ou=%s))', $group_ou),
-            'ou=groups,o=sog-de,dc=sog',
-            self::SEARCH_SCOPE_ONE,
-            ['dn']
-        );
-        return $results->getFirst()['dn'];
     }
 
     /**
@@ -387,5 +370,24 @@ class LdapAdapter extends Ldap
     {
         return ($this->exists(sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid)) ||
             $this->exists(sprintf('uid=%s,ou=inactive,ou=people,o=sog-de,dc=sog', $uid)));
+    }
+    
+    /**
+     * Returns the dn of the first user with the given uid
+     *
+     * @param string $uid The uid of the user
+     * @return dn of the first user with the given uid
+     * @throws LdapException
+     */
+    public function findUserDN($uid)
+    {
+        $results = $this->search(
+            sprintf('(&(objectClass=inetOrgPerson)(uid=%s))', $uid),
+            'ou=people,o=sog-de,dc=sog',
+            self::SEARCH_SCOPE_SUB,
+            ['dn'],
+            'dn'
+        );
+        return $results->getFirst()['dn'];
     }
 }
