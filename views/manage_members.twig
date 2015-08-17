@@ -6,7 +6,7 @@
         <form class="pure-form">
             <fieldset>
                 <label for="group">Deine Gruppe&nbsp;</label>
-                <select name="group" id="group" onchange="this.form.submit()">
+                <select name="ou" id="group" onchange="this.form.submit()">
 				{% for i in ownedGroups|keys %}
 					<option {% if ownedGroups[i]['ou'][0] == selectedGroup %}selected {% endif %}value="{{ ownedGroups[i]['ou'][0] }}">{{ ownedGroups[i]['cn'][0] }}</option>
 				{% endfor %}
@@ -26,7 +26,7 @@
                         Neue Mitglieder
                     </label>
                     <label for="filter-by-member">
-                        <input id="filter-by-member" type="checkbox" name="filter" onclick ="setFilter(this, fMember)" checked>
+                        <input id="filter-by-member" type="checkbox" name="filter" onclick="setFilter(this, fMember)" checked>
                         Meine Gruppe
                     </label>
                 </fieldset>
@@ -52,7 +52,10 @@
         </table>
         <ul class="pagination"></ul>
     </div>
-    <form method="POST" id="send-action"><input type="hidden" name="ou" id="ou" value="{{ selectedGroup }}" /><input type="hidden" name="uid" id="uid" /><input type="hidden" name="action" id="action" /></form>
+    <form method="POST" id="send-action">
+        <input type="hidden" name="ou" id="ou" value="{{ selectedGroup }}" />
+        <input type="hidden" name="uid" id="uid" /><input type="hidden" name="action" id="action" />
+    </form>
 {% endblock %}
 
 {% block scripts %}
@@ -75,7 +78,6 @@
         var fNew = function (item) {return (item.values().is_pending == true)};
 
         createList();
-        setTimeout(function(){setFilter(document.getElementById('filter-by-new'), fNew); setFilter(document.getElementById('filter-by-member'), fMember);}, 1500);
         
         function setFilter(cb, filter) {
             if (cb.checked){
@@ -84,19 +86,19 @@
             	activeFilters.splice(activeFilters.indexOf(filter), 1);
             }
             if (activeFilters.length > 0) {
-                controlList.filter(listfilter);
+                controlList.filter(listFilter);
             } else {
             	controlList.filter();
             }
         }
 
-        var listfilter = function (item) {
+        var listFilter = function (item) {
             var s = false;
             for (var i=0; i<activeFilters.length; i++) {
                 if (activeFilters[i](item) == true) s = true;
             }
             return s;
-        }
+        };
         
         function submitButton(name, uid, action){
         	var gc = document.getElementById('group');
@@ -126,9 +128,9 @@
                 
                 for (var j=0; j<data[i]['userRoles'].length; j++) {
                     switch (data[i]['userRoles'][j]) {
-                    case 'owner': owner = true; break;
-                    case 'member': member = true; break;
-                    case 'pending': pending = true;
+                        case 'owner': owner = true; break;
+                        case 'member': member = true; break;
+                        case 'pending': pending = true;
                     }
                 }
 
@@ -144,6 +146,10 @@
                 
                 controlList.add({name: data[i]['name'], email: data[i]['email'], actions: buttons, is_owner: owner, is_member: member, is_pending: pending});
             }
+
+            // execute filters now, as the control list has been fully setup
+            setFilter(document.getElementById('filter-by-new'), fNew);
+            setFilter(document.getElementById('filter-by-member'), fMember);
         }
     </script>
 {% endblock %}
