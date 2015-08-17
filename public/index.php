@@ -146,15 +146,16 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
         $selGroupDN = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $selGroup);
         
         $action = $request->request->get('action');
-        
+
         if (isset($action)) {
             $ownerPermission = false;
             $selGroupName = '';
             foreach ($ownedGroups as $og) {
-                if ($og['dn'] == $selGroupDN)
+                if ($og['dn'] == $selGroupDN) {
                     $ownerPermission = true;
                     $selGroupName = $og['cn'][0];
-                break;
+                    break;
+                }
             }
 
             if ($ownerPermission) {
@@ -165,6 +166,14 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
                 $groupAttr = $app['ldap']->getEntry($selGroupDN, ['owner']);
                 
                 switch ($action){
+                    case 'activate':
+                        try {
+                            $app['ldap']->activateMember($userID);
+                            $app['session']->getFlashBag()->add('success', $userAttr['cn'][0] . ' wurde freigeschaltet, du kannst ihn/sie nun zu deiner Gruppe "' . $selGroupName . '" hinzufügen!');
+                        } catch (LdapException $ex) {
+                            $app['session']->getFlashBag()->add('error', 'Fehler beim Freischalten von ' . $userAttr['cn'][0] . ': ' . $ex->getMessage());
+                        }
+                        break;
                     case 'add':
                         try {
                             $app['ldap']->addToGroup($userDN, $selGroupDN);
@@ -174,7 +183,6 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
                             $app['session']->getFlashBag()->add('error', 'Fehler beim Hinzufügen von ' . $userAttr['cn'][0] . ' zu der Gruppe "' . $selGroupName . '": ' . $ex->getMessage());
                         }
                         break;
-
                     case 'rm':
                         try {
                             if (in_array($userDN, $groupAttr['owner'])) {
@@ -213,7 +221,9 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
             if (isset($groupAttr['owner']) && in_array($u['dn'] , $groupAttr['owner'])) $roles[] = 'owner';
             if (isset($groupAttr['member']) && in_array($u['dn'] , $groupAttr['member'])) $roles[] = 'member';
             if (isset($groupAttr['pending']) && in_array($u['dn'] , $groupAttr['pending'])) $roles[] = 'pending';
-            
+            // we handle inactive members like the other cases, the UI is just so similar
+            if (strstr($u['dn'], 'ou=inactive')) $roles[] = 'inactive';
+
             $listentry = array(
                 'name' => $u['cn'][0],
                 'uid' => $u['uid'][0],

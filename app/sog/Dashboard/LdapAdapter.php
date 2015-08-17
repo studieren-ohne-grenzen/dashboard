@@ -3,6 +3,7 @@ namespace SOG\Dashboard;
 
 use Zend\Ldap\Attribute;
 use Zend\Ldap\Collection;
+use Zend\Ldap\Dn;
 use Zend\Ldap\Exception\LdapException;
 use Zend\Ldap\Ldap;
 
@@ -259,58 +260,6 @@ class LdapAdapter extends Ldap
     }
 
     /**
-     * Requesting access for the given user to $group. This will add an entry to the `pending` attribute of the $group
-     *
-     * @param string $uid The username for which to request the membership in $group
-     * @param string $group The group for which the membership of $user is requested, we expect the `ou` value
-     * @throws LdapException
-     * @return true, if pending didn't already contain $user; false otherwise
-     */
-    public function requestGroupMembership($uid, $group)
-    {
-
-        $dnOfGroup = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $group);
-        $entry = $this->getEntry($dnOfGroup);
-        if (is_null($entry)) {
-            throw new LdapException($this, sprintf('Can\'t find group %s', $group));
-        }
-        // TODO: user may not yet be in ou=active - leave like this or put in ou=inactive and update on approval?
-        $dnOfUser = sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid);
-        if(Attribute::attributeHasValue($entry, 'pending', $dnOfUser)) {
-        	return false;
-        }
-        Attribute::setAttribute($entry, 'pending', $dnOfUser, true);
-        $this->update($dnOfGroup, $entry);
-        return true;
-    }
-    
-    /**
-     * Remove a membership request for $group. This will remove the user's dn from the `pending` attribute of the $group
-     *
-     * @param string $uid The username of the user who has done the request
-     * @param string $group The group for which the request shall be removed, we expect the `ou` value
-     * @throws LdapException
-     * @return true, if pending contained $user and the entry has been deleted; false otherwise
-     */
-    public function dropMembershipRequest($uid, $group)
-    {
-    
-        $dnOfGroup = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $group);
-        $entry = $this->getEntry($dnOfGroup);
-        if (is_null($entry)) {
-            throw new LdapException($this, sprintf('Can\'t find group %s', $group));
-        }
-        // TODO: user may not yet be in ou=active - leave like this or put in ou=inactive and update on approval?
-        $dnOfUser = sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid);
-        if(!Attribute::attributeHasValue($entry, 'pending', $dnOfUser)) {
-            return false;
-        }
-        Attribute::removeFromAttribute($entry, 'pending', $dnOfUser);
-        $this->update($dnOfGroup, $entry);
-        return true;
-    }
-
-    /**
      * Allowing the given user to access the given group. This will move the entry from the `pending` to the `member`
      * field.
      *
@@ -326,11 +275,33 @@ class LdapAdapter extends Ldap
         if (is_null($entry)) {
             throw new LdapException($this, sprintf('Can\'t find group %s', $group));
         }
-        // TODO: user may not yet be in ou=active - leave like this or put in ou=inactive and update on approval?
-        $dnOfUser = sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid);
+        $dnOfUser = $this->findUserDN($uid);
         Attribute::removeFromAttribute($entry, 'pending', $dnOfUser);
         Attribute::setAttribute($entry, 'member', $dnOfUser, true);
         $this->update($dnOfGroup, $entry);
+    }
+
+    /**
+     * Returns the dn of the first user with the given uid
+     *
+     * @param string $uid The uid of the user
+     * @return string dn of the first user with the given uid
+     * @throws LdapException
+     */
+    public function findUserDN($uid)
+    {
+        // return early if we deal with a DN anyways
+        if (Dn::checkDn($uid)) {
+            return $uid;
+        }
+        $results = $this->search(
+            sprintf('(&(objectClass=inetOrgPerson)(uid=%s))', $uid),
+            'ou=people,o=sog-de,dc=sog',
+            self::SEARCH_SCOPE_SUB,
+            ['dn'],
+            'dn'
+        );
+        return $results->getFirst()['dn'];
     }
 
     /**
@@ -345,6 +316,79 @@ class LdapAdapter extends Ldap
         $active = sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid);
         $inactive = sprintf('uid=%s,ou=inactive,ou=people,o=sog-de,dc=sog', $uid);
         $this->move($inactive, $active);
+
+        $this->refreshPendingRequests($inactive, $active);
+    }
+
+    /**
+     * For all groups, update the pending field from the inactive DN to the active DN.
+     *
+     * @param string $from Inactive DN
+     * @param string $to Active DN
+     * @throws LdapException
+     */
+    private function refreshPendingRequests($from, $to)
+    {
+        $results = $this->search(
+            sprintf('(&(objectClass=groupOfNames)(pending=%s))', $from),
+            'ou=groups,o=sog-de,dc=sog',
+            self::SEARCH_SCOPE_ONE,
+            ['ou']
+        );
+
+        foreach ($results as $group) {
+            $this->dropMembershipRequest($from, Attribute::getAttribute($group, 'ou', 0));
+            $this->requestGroupMembership($to, Attribute::getAttribute($group, 'ou', 0));
+        }
+    }
+
+    /**
+     * Remove a membership request for $group. This will remove the user's dn from the `pending` attribute of the $group
+     *
+     * @param string $uid The username of the user who has done the request
+     * @param string $group The group for which the request shall be removed, we expect the `ou` value
+     * @throws LdapException
+     * @return true, if pending contained $user and the entry has been deleted; false otherwise
+     */
+    public function dropMembershipRequest($uid, $group)
+    {
+
+        $dnOfGroup = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $group);
+        $entry = $this->getEntry($dnOfGroup);
+        if (is_null($entry)) {
+            throw new LdapException($this, sprintf('Can\'t find group %s', $group));
+        }
+        $dnOfUser = $this->findUserDN($uid);
+        if (!Attribute::attributeHasValue($entry, 'pending', $dnOfUser)) {
+            return false;
+        }
+        Attribute::removeFromAttribute($entry, 'pending', $dnOfUser);
+        $this->update($dnOfGroup, $entry);
+        return true;
+    }
+
+    /**
+     * Requesting access for the given user to $group. This will add an entry to the `pending` attribute of the $group
+     *
+     * @param string $uid The username for which to request the membership in $group
+     * @param string $group The group for which the membership of $user is requested, we expect the `ou` value
+     * @throws LdapException
+     * @return true, if pending didn't already contain $user; false otherwise
+     */
+    public function requestGroupMembership($uid, $group)
+    {
+        $dnOfGroup = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $group);
+        $entry = $this->getEntry($dnOfGroup);
+        if (is_null($entry)) {
+            throw new LdapException($this, sprintf('Can\'t find group %s', $group));
+        }
+        $dnOfUser = $this->findUserDN($uid);
+        if (Attribute::attributeHasValue($entry, 'pending', $dnOfUser)) {
+            return false;
+        }
+        Attribute::setAttribute($entry, 'pending', $dnOfUser, true);
+        $this->update($dnOfGroup, $entry);
+        return true;
     }
 
     /**
@@ -370,24 +414,5 @@ class LdapAdapter extends Ldap
     {
         return ($this->exists(sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid)) ||
             $this->exists(sprintf('uid=%s,ou=inactive,ou=people,o=sog-de,dc=sog', $uid)));
-    }
-    
-    /**
-     * Returns the dn of the first user with the given uid
-     *
-     * @param string $uid The uid of the user
-     * @return string dn of the first user with the given uid
-     * @throws LdapException
-     */
-    public function findUserDN($uid)
-    {
-        $results = $this->search(
-            sprintf('(&(objectClass=inetOrgPerson)(uid=%s))', $uid),
-            'ou=people,o=sog-de,dc=sog',
-            self::SEARCH_SCOPE_SUB,
-            ['dn'],
-            'dn'
-        );
-        return $results->getFirst()['dn'];
     }
 }
