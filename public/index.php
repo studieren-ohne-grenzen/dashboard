@@ -239,45 +239,6 @@ $app->get('/members/Hilfe', function () use ($app) {
 })
     ->bind('/members/help');
 
-// some LDAP test calls
-$app->get('/ldaptests', function () use ($app) {
-    $dn = 'uid=leonhard.melzer,ou=active,ou=people,o=sog-de,dc=sog';
-    $content = "search('objectClass=person', 'dc=sog')->getFirst(): ";
-    $content .= print_r($app['ldap']->search('objectClass=person', 'dc=sog')
-        ->getFirst(), true);
-    $content .= "getGroups()->toArray(): ";
-    $content .= print_r($app['ldap']->getGroups()
-        ->toArray(), true);
-    $content .= "getMemberships(dn)->toArray(): ";
-    $content .= print_r($app['ldap']->getMemberships($dn)
-        ->toArray(), true);
-    $content .= "getMembers('ressort_it')->toArray(): ";
-    $content .= print_r($app['ldap']->getMembers('ressort_it')
-        ->toArray(), true);
-    try {
-        $content .= print_r($app['ldap']->bind($dn, 'test'), true);
-    } catch (LdapException $ex) {
-        if ($ex->getCode() == LdapException::LDAP_INVALID_CREDENTIALS) {
-            $content .= "Der Login war nicht erfolgreich, bitte überprüfe deinen Benutzernamen und Passwort.";
-        } else {
-            $content .= print_r($ex, true);
-        }
-    } finally {
-        // rebind to privileged user
-        $app['ldap']->bind();
-    }
-    return $app['twig']->render('text.twig', [
-        'content' => $content
-    ]);
-});
-
-// this route should be protected
-$app->get('/members/test', function () use ($app) {
-    return $app['twig']->render('text.twig', [
-        'content' => 'Test, should be protected'
-    ]);
-});
-
 $app->get('/login', function (Request $request) use ($app) {
     return $app['twig']->render('login.twig', [
         'error' => $app['security.last_error']($request),
