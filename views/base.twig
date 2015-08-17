@@ -26,10 +26,12 @@
 
                 <nav class="nav">
                     <ul class="nav-list">
+                        {% if app.user and is_granted('ROLE_GROUP_ADMIN') %}
                         <li class="nav-item">
                             <a class="pure-button" href="{{ path('/members/manage-members') }}">Mitglieder verwalten&ensp;<i
                                         class="icon-user-plus font-icon">&#xe803;</i></a>
                         </li>
+                        {% endif %}
                         <li class="nav-item">
                             <a class="pure-button" href="{{ path('/members/manage-groups') }}">Meine Gruppen&ensp;<i
                                         class="icon-users font-icon">&#xe806;</i></a>
@@ -99,12 +101,15 @@
                         <li class="pure-menu-item"><a href="https://studieren-ohne-grenzen.org/" class="pure-menu-link"><i
                                         class="icon-link font-icon">&#xe81a;</i>Webseite</a>
                         </li>
-                        <li class="pure-menu-item"><a href="https://studieren-ohne-grenzen.org/atrium"
+                        <li class="pure-menu-item"><a href="https://atrium.studieren-ohne-grenzen.org"
                                                       class="pure-menu-link"><i class="icon-link font-icon">&#xe81a;</i>Open
                                 Atrium</a></li>
                         <li class="pure-menu-item"><a href="https://studieren-ohne-grenzen.org/owncloud"
                                                       class="pure-menu-link"><i class="icon-cloud font-icon">
                                     &#xe818;</i>OwnCloud</a></li>
+                        <li class="pure-menu-item"><a href="https://webmail.studieren-ohne-grenzen.org"
+                                                      class="pure-menu-link"><i class="icon-mail font-icon">
+                                    &#xe802;</i>Webmail</a></li>
                     </ul>
                 </div>
             </div>
