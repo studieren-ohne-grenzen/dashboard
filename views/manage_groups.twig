@@ -40,14 +40,17 @@
         </table>
         <ul class="pagination"></ul>
     </div>
-   <form method="POST" id="send-action"><input type="hidden" name="ou" id="ou" /><input type="hidden" name="action" id="action" /></form>
+   <form method="POST" id="send-action">
+       <input type="hidden" name="ou" id="ou" />
+       <input type="hidden" name="action" id="action" />
+   </form>
 {% endblock %}
 
 {% block scripts %}
     {{ parent() }}
     <script>
         var options = {
-            valueNames: ['group_name', 'owner', 'actions', 'is_owner', 'is_member', 'is_pending'],
+            valueNames: ['group_name', 'owner', 'actions', 'is_owner', 'is_member', 'is_pending']
         };
 
         var controlList = new List('group-list', options);
@@ -66,19 +69,19 @@
             	activeFilters.splice(activeFilters.indexOf(filter), 1);
             }
             if (activeFilters.length > 0) {
-                controlList.filter(listfilter);
+                controlList.filter(listFilter);
             } else {
             	controlList.filter();
             }
         }
 
-        var listfilter = function (item) {
+        var listFilter = function (item) {
             var s = false;
             for (var i=0; i<activeFilters.length; i++) {
                 if (activeFilters[i](item) == true) s = true;
             }
             return s;
-        }
+        };
         
         function submitButton(groupName, ou, action){
         	var confirm = false;
@@ -123,9 +126,9 @@
                 }
 
                 var owners = '';
-                for (var j=0; j<data[i]['owners'].length; j++) {
-                	if (j>0) owners += ',&ensp;';
-                    owners += data[i]['owners'][j]['cn'] + '<a href="mailto:' + data[i]['owners'][j]['mail'] + '"><i class="icon-mail font-icon">&#xe802;</i></a>';
+                for (var k=0; k<data[i]['owners'].length; k++) {
+                	if (k>0) owners += ',&ensp;';
+                    owners += data[i]['owners'][k]['cn'] + '<a href="mailto:' + data[i]['owners'][k]['mail'] + '"><i class="icon-mail font-icon">&#xe802;</i></a>';
                 }
                 
                 controlList.add({group_name: data[i]['name'], owner: owners, actions: buttons, is_owner: owner, is_member: member, is_pending: pending});
