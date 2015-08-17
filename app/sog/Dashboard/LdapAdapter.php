@@ -376,7 +376,7 @@ class LdapAdapter extends Ldap
      * Returns the dn of the first user with the given uid
      *
      * @param string $uid The uid of the user
-     * @return dn of the first user with the given uid
+     * @return string dn of the first user with the given uid
      * @throws LdapException
      */
     public function findUserDN($uid)
