@@ -143,8 +143,10 @@
                 if (pending) {
                 	buttons += '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'rm-request\')" class="pure-button button-warning"><i class="icon-paper-plane font-icon">&#xe824;</i>&ensp;Anfrage ignorieren</button>';
                 }
-                
-                controlList.add({name: data[i]['name'], email: data[i]['email'], actions: buttons, is_owner: owner, is_member: member, is_pending: pending});
+
+                var email = '<a href="mailto:' + data[i]['email'] + '">' + data[i]['email'] + '<i class="icon-mail font-icon">&#xe802;</i></a>';
+
+                controlList.add({name: data[i]['name'], email: email, actions: buttons, is_owner: owner, is_member: member, is_pending: pending});
             }
 
             // execute filters now, as the control list has been fully setup
