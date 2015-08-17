@@ -60,7 +60,7 @@ class SogDashboardApi
     /**
      * Create a new user in the LDAP tree. Send notifications to the user and its group admin.
      * The account will be inactive by default. Memberships for the general group and the given $group
-     * are also requested. 
+     * are also requested.
      *
      * @param string $firstName
      * @param string $lastName
@@ -73,7 +73,9 @@ class SogDashboardApi
         $username = $this->generateUsername($firstName, $lastName);
         $password = $this->app['random']();
 
-        $this->app['ldap']->createMember($username, $password, $firstName, $lastName, $email);
+        $data = $this->app['ldap']->createMember($username, $password, $firstName, $lastName, $email);
+
+        $this->createSieveForwarding($data['mail'][0], $email);
 
         $this->requestGroupMembership($username, $group);
         $this->requestGroupMembership($username, "allgemein");
@@ -124,6 +126,33 @@ class SogDashboardApi
     }
 
     /**
+     * Shells out to a bash script to generate a sieve script for initial email forwarding.
+     * This could be improved, for sure. Note that the apache user needs the NOPASSWD: tag in sudoers(5)
+     *
+     * @param string $from The mail address for the new member
+     * @param string $to The personal mail address to forward messages to
+     */
+    private function createSieveForwarding($from, $to)
+    {
+        $cmd = 'sudo %s/create_sieve_forwarding.sh %s %s';
+        $cmd2 = sprintf($cmd, __DIR__ . '/../..', escapeshellarg($from), escapeshellarg($to));
+        var_dump($cmd2);
+        var_dump(shell_exec($cmd2));
+    }
+
+    /**
+     * Request membership in the given group for a user.
+     *
+     * @param string $uid The generated unique username for the member
+     * @param string $group The CN of the group for which to request the membership
+     * @return true, if there isn't already an active request from the user for the group; false otherwise
+     */
+    public function requestGroupMembership($uid, $group)
+    {
+        return $this->app['ldap']->requestGroupMembership($uid, $group);
+    }
+
+    /**
      * Send a mail to the user.
      * This is send only for OpenAtrium account details, a welcome mail is send through CiviCRM!
      *
@@ -160,18 +189,6 @@ Das SOG-IT-Team
             ->setTo([$email => $firstName])
             ->setBody($text, 'text/html');
         return $this->app['mailer']->send($message);
-    }
-
-    /**
-     * Request membership in the given group for a user.
-     *
-     * @param string $uid The generated unique username for the member
-     * @param string $group The CN of the group for which to request the membership
-     * @return true, if there isn't already an active request from the user for the group; false otherwise
-     */
-    public function requestGroupMembership($uid, $group)
-    {
-        return $this->app['ldap']->requestGroupMembership($uid, $group);
     }
 
     /**
