@@ -218,4 +218,16 @@ Hier die Daten des neuen Mitglieds:<br>";
             ->setBody($text, 'text/html');
         return $this->app['mailer']->send($message);
     }
+
+    /**
+     * Update the mail-alternative field for the given UID
+     *
+     * @param string $uid The user id for which to update
+     * @param string $email The new alternative mail address
+     */
+    public function updateAlternativeMail($uid, $email)
+    {
+        $dn = $this->app['ldap']->findUserDN($uid);
+        $this->app['ldap']->updateEmail($dn, $email);
+    }
 }
