@@ -134,10 +134,9 @@ class SogDashboardApi
      */
     private function createSieveForwarding($from, $to)
     {
-        $cmd = 'sudo %s/create_sieve_forwarding.sh %s %s';
-        $cmd2 = sprintf($cmd, __DIR__ . '/../..', escapeshellarg($from), escapeshellarg($to));
-        var_dump($cmd2);
-        var_dump(shell_exec($cmd2));
+        $cmd_tpl = 'sudo %s/create_sieve_forwarding.sh %s %s';
+        $cmd = sprintf($cmd_tpl, __DIR__ . '/../..', escapeshellarg($from), escapeshellarg($to));
+        shell_exec($cmd);
     }
 
     /**
