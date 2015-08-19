@@ -31,3 +31,13 @@
 .icon-lifebuoy:before { content: '\e81d'; } /* '' */
 .icon-flag:before { content: '\e81e'; } /* '' */
 .icon-bug:before { content: '\e81f'; } /* '' */
+.icon-plus:before { content: '\e820'; } /* '' */
+.icon-minus:before { content: '\e821'; } /* '' */
+.icon-ok:before { content: '\e822'; } /* '' */
+.icon-trash:before { content: '\e823'; } /* '' */
+.icon-paper-plane:before { content: '\e824'; } /* '' */
+.icon-comment:before { content: '\e825'; } /* '' */
+.icon-attention-alt:before { content: '\e826'; } /* '' */
+.icon-eye:before { content: '\e827'; } /* '' */
+.icon-eye-off:before { content: '\e828'; } /* '' */
+.icon-book:before { content: '\e829'; } /* '' */

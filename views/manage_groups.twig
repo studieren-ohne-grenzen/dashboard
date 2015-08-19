@@ -1,120 +1,139 @@
 {% extends 'base.twig' %}
 
 {% block content %}
-    <h1>Willkommen, {{ app.user.attribute('givenname', 0) }}</h1>
-    <div class="group-chooser">
-        <form class="pure-form">
-            <fieldset>
-                <label for="group">Deine Gruppe&nbsp;</label>
-                <select name="group" id="group" onchange="this.form.submit()">
-				{% for i in ownedGroups|keys %}
-					<option {% if ownedGroups[i]['ou'][0] == group %}selected {% endif %}value="{{ ownedGroups[i]['ou'][0] }}">{{ ownedGroups[i]['cn'][0] }}</option>
-				{% endfor %}
-                </select>
-            </fieldset>
-        </form>
-    </div>
-    <div class="pure-g">
-        <div class="pure-u-1 pure-u-md-1-3">
+    <h1>Verwalte deine Gruppenmitgliedschaften</h1>
+            <div id="group-list">
             <form class="pure-form bold-legend">
                 <fieldset>
                     <legend>Suchen nach...</legend>
                     <i class="icon-search font-icon">&#xe816;</i>
-                    <input type="text" class="search" placeholder="Name, Email...">
-                </fieldset>
-                <fieldset>
+                    <input type="text" class="search" placeholder="Gruppe, Koordinator...">
                     <i class="icon-filter font-icon">&#xe817;</i>
-                    <label for="filter-by-new">
-                        <input id="filter-by-new" type="checkbox" name="filter" value="new">
-                        Neue Mitglieder
+                    <label for="filter-by-membership">
+                        <input id="filter-by-membership" type="checkbox" name="filter" onclick="setFilter(this, fMemberships)">
+                        Mitgliedschaften
                     </label>
-                    <label for="filter-by-group">
-                        <input id="filter-by-group" type="checkbox" name="filter" onclick ="filterGroup(this)" checked value="group">
-                        Meine Gruppe
+                    <label for="filter-by-pending">
+                        <input id="filter-by-pending" type="checkbox" name="filter" onclick="setFilter(this, fRequests)">
+                        Anfragen
                     </label>
                 </fieldset>
             </form>
-        </div>
-        <div class="pure-u-1 pure-u-md-7-12">
-            <p>Hier kannst du neue Mitglieder deiner Gruppe freischalten und dein Passwort ändern. Über das Suchfeld
-                kannst du auch andere Mitglieder finden und deiner Gruppe hinzufügen.</p>
-        </div>
-    </div>
-    <div>
         <table class="full-width pure-table pure-table-bordered">
             <thead>
             <tr>
-                <th class="sort asc" data-sort="name">Name</th>
-                <th class="sort" data-sort="email">E-Mail-Adresse</th>
-                <th class="sort" data-sort="isMember">Aktion</th>
+                <th class="sort asc" data-sort="group_name">Gruppenname</th>
+                <th class="sort" data-sort="owner">Gruppenkoordinator</th>
+                <th class="sort" data-sort="is_member">Aktion</th>
             </tr>
             </thead>
             <tbody class="list">
-            {% for person in result %}
-                {% if person['displayname'][0] is defined %}
-                {% set isMember = false %}
-                {% if person['dn'] in members[0]['member'] %}{% set isMember = true %}{% endif %}
-                    <tr>
-                        <td class="name">{{ person['displayname'][0] }}</td>
-                        <td class="email">{% if person['mail'] is defined %}{{ person['mail'][0] }}{% endif %}</td>
-                        <td><button onclick="submitButton('{{ person['displayname'][0] }}', '{{ person['dn'] }}', '{% if isMember %}rm')" class="pure-button button-warning"><i class="icon-user-times font-icon">&#xe804;</i>&ensp;entfernen{% else %}add')" class="pure-button button-success"><i class="icon-user-plus font-icon">&#xe803;</i>&ensp;hinzuf&uuml;gen{% endif %}</button>
-                        </td>
-                        <td class="isMember hidden">{% if isMember %}1{% else %}0{% endif %}</td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
+            <tr id="list-item" class="table-row">
+                <td class="group_name"></td>
+                <td class="owner"></td>
+                <td class="actions"></td>
+                <td class="is_owner hidden"></td>
+                <td class="is_member hidden"></td>
+                <td class="is_pending hidden"></td>
+            </tr>
             </tbody>
         </table>
         <ul class="pagination"></ul>
     </div>
-    <form method="POST" id="send-action"><input type="hidden" name="selected-group" id="selected-group" value="{{ group }}" /><input type="hidden" name="selected-member" id="selected-member" /><input type="hidden" name="action" id="action" /><input type="hidden" name="member-name" id="member-name" /><input type="hidden" name="group-name" id="group-name" /></form>
+   <form method="POST" id="send-action">
+       <input type="hidden" name="ou" id="ou" />
+       <input type="hidden" name="action" id="action" />
+   </form>
 {% endblock %}
 
 {% block scripts %}
     {{ parent() }}
     <script>
         var options = {
-            valueNames: ['name', 'email', 'isMember'],
-            page: 20,
-            plugins: [
-                ListPagination({})
-            ]
+            valueNames: ['group_name', 'owner', 'actions', 'is_owner', 'is_member', 'is_pending']
         };
 
-        var memberList = new List('members', options);
-
-        var memberFilter = function (item) {return (item.values().isMember == '1')};
-        memberList.filter(memberFilter);
-
-        function filterGroup(cb) {
-            if (cb.checked){
-            	memberList.filter(memberFilter);
-            }else{
-            	memberList.filter();
-            }
-            return true;
-        }
+        var controlList = new List('group-list', options);
+        var data = {{ groupList|json_encode|raw }};
+        var activeFilters = [];
         
-        function submitButton(name, mbr, action){
+        var fMemberships = function (item) {return (item.values().is_member == true)};
+        var fRequests = function (item) {return (item.values().is_pending == true)};
 
-        	var gc = document.getElementById("group");
-        	var groupName = gc.options[gc.selectedIndex].text;
+        createList();
 
+        function setFilter(cb, filter) {
+            if (cb.checked){
+            	activeFilters.push(filter);
+            }else{
+            	activeFilters.splice(activeFilters.indexOf(filter), 1);
+            }
+            if (activeFilters.length > 0) {
+                controlList.filter(listFilter);
+            } else {
+            	controlList.filter();
+            }
+        }
+
+        var listFilter = function (item) {
+            var s = false;
+            for (var i=0; i<activeFilters.length; i++) {
+                if (activeFilters[i](item) == true) s = true;
+            }
+            return s;
+        };
+        
+        function submitButton(groupName, ou, action){
         	var confirm = false;
         	
-            if (action === 'add'){
-        		confirm = window.confirm("Sicher, dass " + name + " zu " + groupName + " hinzugef\u00fcgt werden soll?");
-            } else {
-            	confirm = window.confirm("Sicher, dass " + name + " aus " + groupName + " entfernt werden soll?");
+            if (action === 'quit') {
+        		confirm = window.confirm('Sicher, dass Du nicht mehr Mitglied in der Gruppe "' + groupName + '" sein möchtest?');
+            } else if (action == 'drop-request') {
+            	confirm = window.confirm('Sicher, dass Du die Mitgliedschaftsanfrage bei der Gruppe "' + groupName + '" abbrechen möchtest?');
+            } else if (action == 'start-request') {
+            	confirm = true;
             }
             if(confirm) {
         		var submitForm = document.getElementById('send-action');
-        		document.getElementById('selected-member').value = mbr;
+        		document.getElementById('ou').value = ou;
         		document.getElementById('action').value = action;
-        		document.getElementById('member-name').value = name;
-        		document.getElementById('group-name').value = groupName;
         		submitForm.submit();
             }
          }
+
+        function createList() {
+        	controlList.clear();
+            for (var i=0; i<data.length; i++) {
+                var owner = false;
+                var member = false;
+                var pending = false;
+                
+                for (var j=0; j<data[i]['userRoles'].length; j++) {
+                    switch (data[i]['userRoles'][j]) {
+                    case 'owner': owner = true; break;
+                    case 'member': member = true; break;
+                    case 'pending': pending = true;
+                    }
+                }
+
+                var buttons = '';
+                if (pending) {
+                	buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['ou'] + '\', \'drop-request\')" class="pure-button button-warning"><i class="icon-cancel font-icon">&#xe815;</i>&ensp;Anfrage abbrechen</button>';
+                } else if (member) {
+                	buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['ou'] + '\', \'quit\')" class="pure-button button-error"><i class="icon-minus font-icon">&#xe821;</i>&ensp;Mitgliedschaft beenden</button>';
+                } else {
+                	buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['ou'] + '\', \'start-request\')" class="pure-button button-success"><i class="icon-help font-icon">&#xe81b;</i>&ensp;Mitgliedschaft anfragen</button>';
+                }
+
+                var owners = '';
+                for (var k=0; k<data[i]['owners'].length; k++) {
+                	if (k>0) owners += ',&ensp;';
+                    owners += data[i]['owners'][k]['cn'] + '<a href="mailto:' + data[i]['owners'][k]['mail'] + '"><i class="icon-mail font-icon">&#xe802;</i></a>';
+                }
+                
+                controlList.add({group_name: data[i]['name'], owner: owners, actions: buttons, is_owner: owner, is_member: member, is_pending: pending});
+            }
+        }
+        
     </script>
 {% endblock %}

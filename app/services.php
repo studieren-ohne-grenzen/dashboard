@@ -21,13 +21,16 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
 
 // ldap
 $app->register(new SOG\Dashboard\ZendLdapServiceProvider(), [
-    'ldap.options' => $config['ldap.options']
+    'ldap.options' => $dashboard_config['ldap.options']
 ]);
+
+// convenience: random strings for passwords, token etc.
+$app->register(new SOG\Dashboard\RandomStringServiceProvider());
 
 // mailing
 $app->register(new Silex\Provider\SwiftmailerServiceProvider());
-$app['mailer.from'] = $config['mailer.from'];
-$app['swiftmailer.options'] = $config['swiftmailer.options'];
+$app['mailer.from'] = $dashboard_config['mailer.from'];
+$app['swiftmailer.options'] = $dashboard_config['swiftmailer.options'];
 
 $app->register(new Silex\Provider\SessionServiceProvider());
 
@@ -50,7 +53,7 @@ $app->register(new Silex\Provider\SecurityServiceProvider(), [
             'users' => function () use ($app) {
                 return $app['security.ldap.user_provider']($app['ldap']);
             },
-            'remember_me' => $config['remember_me']
+            'remember_me' => $dashboard_config['remember_me']
         ]
     ],
     'security.role_hierarchy' => [

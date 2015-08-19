@@ -1,0 +1,171 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+    <h1>Verwalte die Mitglieder deiner Gruppen</h1>
+    <div class="group-chooser">
+        <form class="pure-form">
+            <fieldset>
+                <label for="group">Deine Gruppe&nbsp;</label>
+                <select name="ou" id="group" onchange="this.form.submit()">
+				{% for i in ownedGroups|keys %}
+					<option {% if ownedGroups[i]['ou'][0] == selectedGroup %}selected {% endif %}value="{{ ownedGroups[i]['ou'][0] }}">{{ ownedGroups[i]['cn'][0] }}</option>
+				{% endfor %}
+                </select>
+            </fieldset>
+        </form>
+    </div>
+    <div id="member-list">
+            <form class="pure-form bold-legend">
+                <fieldset>
+                    <legend>Suchen nach...</legend>
+                    <i class="icon-search font-icon">&#xe816;</i>
+                    <input type="text" class="search" placeholder="Name, Email...">
+                    <i class="icon-filter font-icon">&#xe817;</i>
+                    <label for="filter-by-new">
+                        <input id="filter-by-new" type="checkbox" name="filter" onclick="setFilter(this, fNew)" checked>
+                        Neue Mitglieder
+                    </label>
+                    <label for="filter-by-member">
+                        <input id="filter-by-member" type="checkbox" name="filter" onclick="setFilter(this, fMember)" checked>
+                        Meine Gruppe
+                    </label>
+                </fieldset>
+            </form>
+        <table class="full-width pure-table pure-table-bordered">
+            <thead>
+            <tr>
+                <th class="sort asc" data-sort="name">Name</th>
+                <th class="sort" data-sort="email">E-Mail-Adresse</th>
+                <th class="sort" data-sort="is_pending">Aktion</th>
+            </tr>
+            </thead>
+            <tbody class="list">
+            <tr id="list-item" class="table-row">
+                <td class="name"></td>
+                <td class="email"></td>
+                <td class="actions"></td>
+                <td class="is_owner hidden"></td>
+                <td class="is_member hidden"></td>
+                <td class="is_pending hidden"></td>
+            </tr>
+            </tbody>
+        </table>
+        <ul class="pagination"></ul>
+    </div>
+    <form method="POST" id="send-action">
+        <input type="hidden" name="ou" id="ou" value="{{ selectedGroup }}" />
+        <input type="hidden" name="uid" id="uid" />
+        <input type="hidden" name="action" id="action" />
+    </form>
+{% endblock %}
+
+{% block scripts %}
+    {{ parent() }}
+    <script>
+        var options = {
+            valueNames: ['name', 'email', 'actions', 'is_owner', 'is_member', 'is_pending'],
+            page: 20,
+            plugins: [
+                ListPagination({})
+            ]
+        };
+
+        var controlList = new List('member-list', options);
+        var data = {{ memberList|json_encode|raw }};
+        var activeFilters = [];
+        
+
+        var fMember = function (item) {return (item.values().is_member == true)};
+        var fNew = function (item) {return (item.values().is_pending == true)};
+
+        createList();
+        
+        function setFilter(cb, filter) {
+            if (cb.checked){
+            	activeFilters.push(filter);
+            }else{
+            	activeFilters.splice(activeFilters.indexOf(filter), 1);
+            }
+            if (activeFilters.length > 0) {
+                controlList.filter(listFilter);
+            } else {
+            	controlList.filter();
+            }
+        }
+
+        var listFilter = function (item) {
+            var s = false;
+            for (var i=0; i<activeFilters.length; i++) {
+                if (activeFilters[i](item) == true) s = true;
+            }
+            return s;
+        };
+        
+        function submitButton(name, uid, action){
+        	var gc = document.getElementById('group');
+        	var groupName = gc.options[gc.selectedIndex].text;
+
+        	var confirm = false;
+        	
+            if (action === 'add'){
+        		confirm = window.confirm("Sicher, dass " + name + " zu " + groupName + " hinzugefügt werden soll?");
+            } else if (action === 'activate') {
+            	confirm = window.confirm(name + " ist ein neues Mitglied und hat noch keinen Zugriff auf den SOG-Account. " +
+                        "Wenn dir das Mitglied bekannt ist, kannst du es nun aktivieren und anschließend für deine Gruppe freischalten. " +
+                        "Diese Überprüfung erfolgt aus Gründen des Datenschutzes.");
+            } else {
+                confirm = window.confirm("Sicher, dass " + name + " aus " + groupName + " entfernt werden soll?");
+            }
+            if (confirm) {
+        		var submitForm = document.getElementById('send-action');
+        		document.getElementById('uid').value = uid;
+        		document.getElementById('action').value = action;
+        		submitForm.submit();
+            }
+         }
+
+        function createList() {
+        	controlList.clear();
+            for (var i=0; i<data.length; i++) {
+                var owner = false;
+                var member = false;
+                var pending = false;
+                var inactive = false;
+
+                for (var j=0; j<data[i]['userRoles'].length; j++) {
+                    switch (data[i]['userRoles'][j]) {
+                        case 'owner': owner = true; break;
+                        case 'inactive': inactive = true; break;
+                        case 'member': member = true; break;
+                        case 'pending': pending = true;
+                    }
+                }
+
+                var email = '<a href="mailto:' + data[i]['email'] + '">' + data[i]['email'] + '<i class="icon-mail font-icon">&#xe802;</i></a>';
+                var name = data[i]['name'];
+
+                var buttons = '';
+
+                if (inactive) {
+                    name += '<span class="pure-button button-success inactive-badge">inaktiv</span>';
+                    buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'activate\')" class="pure-button button-warning"><i class="icon-user-ok font-icon">&#xe822;</i>&ensp;freischalten</button>';
+                } else {
+                    if (member) {
+                        buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'rm\')" class="pure-button button-error"><i class="icon-user-times font-icon">&#xe804;</i>&ensp;entfernen</button>';
+                    } else {
+                        buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'add\')" class="pure-button button-success"><i class="icon-user-plus font-icon">&#xe803;</i>&ensp;hinzuf&uuml;gen</button>';
+                    }
+                    if (pending) {
+                        buttons += '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'rm-request\')" class="pure-button button-warning"><i class="icon-paper-plane font-icon">&#xe824;</i>&ensp;Anfrage ignorieren</button>';
+                    }
+                }
+
+                controlList.add({name: name, email: email, actions: buttons, is_owner: owner, is_member: member, is_pending: pending});
+            }
+
+            // execute filters now, as the control list has been fully setup
+            setFilter(document.getElementById('filter-by-new'), fNew);
+            setFilter(document.getElementById('filter-by-member'), fMember);
+        }
+    </script>
+{% endblock %}
