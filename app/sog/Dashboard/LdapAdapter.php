@@ -205,6 +205,20 @@ class LdapAdapter extends Ldap
         }
     }
 
+    /**
+     * Force a password update using the privileged user, this is used by the password reset process.
+     *
+     * @param string $dn
+     * @param string $new_password
+     * @throws LdapException
+     */
+    public function forceUpdatePassword($dn, $new_password)
+    {
+        $attributes = [];
+        Attribute::setPassword($attributes, $new_password, $this->password_algorithm);
+        $this->update($dn, $attributes);
+    }
+
 
     /**
      * Adds a new object with the given parameters to the ou=inactive subtree.

@@ -26,6 +26,10 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
      */
     private $token_length = 32;
     /**
+     * @var int The minimum length for a new user password
+     */
+    private $password_min_length = 8;
+    /**
      * @var string Name of the route for reset, used with the UrlGenerator
      */
     private $reset_route = 'POST_GET_password_reset_token';
@@ -48,6 +52,7 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
         /** @var ControllerCollection $controllers */
         $controllers = $app['controllers_factory'];
 
+        // handle the password reset form (display and saving)
         $controllers->match('/reset/{token}', function (Application $app, Request $request, $token) {
             $this->cleanupRequests();
 
@@ -60,11 +65,17 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
                 } elseif ($request->isMethod('POST')) {
                     // TODO: validate password and password_repeat
                     $password = $request->get('password');
-                    $details = $this->getRecoveryRequest($token);
-                    $this->updatePassword($details['uid'], $password);
-                    $this->closeRequest($token);
-                    $app['session']->getFlashBag()
-                        ->add('success', 'Dein Passwort wurde erfolgreich zurückgesetzt, du kannst dich jetzt einloggen.');
+                    $password_repeat = $request->get('password_repeat');
+                    if ($this->validateNewPassword($password, $password_repeat) === false) {
+                        $app['session']->getFlashBag()
+                            ->add('error', 'Fehler beim Zurücksetzen des Passworts. Bitte versuche es noch einmal oder benachrichtige das IT-Team.');
+                    } else {
+                        $details = $this->getRecoveryRequest($token);
+                        $this->updatePassword($details['uid'], $password);
+                        $this->closeRequest($token);
+                        $app['session']->getFlashBag()
+                            ->add('success', 'Dein Passwort wurde erfolgreich zurückgesetzt, du kannst dich jetzt einloggen.');
+                    }
                 }
             } else {
                 $app['session']->getFlashBag()
@@ -73,6 +84,7 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
             return $app->redirect('/login');
         })->method('POST|GET');
 
+        // handle the password request form to initiate a reset process
         $controllers->match('/request', function (Application $app, Request $request) {
             if ($request->isMethod('GET')) {
                 return $app['twig']->render('request_reset_password.twig', [
@@ -120,8 +132,27 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
             return true;
         } else {
             // TODO: log error?
+            // $this->app['monolog']->error(??);
             return false;
         }
+    }
+
+    /**
+     * Validates the given password.
+     *
+     * @param string $password
+     * @param string $password_repeat
+     * @return bool True on success, false otherwise.
+     */
+    private function validateNewPassword($password, $password_repeat)
+    {
+        if ($password !== $password_repeat) {
+            return false;
+        }
+        if (strlen($password) < $this->password_min_length) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -144,9 +175,8 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
     private function updatePassword($uid, $password)
     {
         $dn = sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid);
-        // TODO: how to update password for user, LDAP dashboard user doesn't have privileges
-        $old = 'unknown';
-        //$this->app['ldap']->updatePassword($dn, $old, $password);
+        // force the password update
+        $this->app['ldap']->forceUpdatePassword($dn, $password);
     }
 
     /**
@@ -169,7 +199,7 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
     private function mailIsKnown($email)
     {
         return (1 === $this->app['ldap']->count(
-                sprintf('(&(objectClass=inetOrgPerson)(mail=%s))', $email),
+                sprintf('(&(objectClass=inetOrgPerson)(mail-alternative=%s))', $email),
                 'ou=active,ou=people,o=sog-de,dc=sog'
             ));
     }
@@ -185,10 +215,9 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
     {
         // delete all existing requests first
         $this->app['db']->delete('password_requests', ['email' => $email]);
-        // TODO: use random token generator, needs merge of `api` branch
-        // $token = $this->app['random']($this->token_length);
-        $token = str_shuffle('TOjCr85kakxgdrI7oJC25uKaCZk');
+        $token = $this->app['random']($this->token_length);
         // TODO: use real UID - do we need it?
+        // TODO: DECIDE: work on uid or email? Which makes more sense for the reset process
         $this->app['db']->insert('password_requests',
             ['email' => $email, 'token' => $token, 'uid' => 'leonhard.melzer', 'created' => time()]
         );
@@ -204,9 +233,6 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
      */
     private function sendRecoveryMail($email, $token)
     {
-        // TODO: manual override, remove me
-        $email = 'leonhard.melzer@gmail.com';
-
         $text = sprintf('Passwort hier zurücksetzen: %s',
             $this->app['url_generator']->generate($this->reset_route, ['token' => $token], UrlGenerator::ABSOLUTE_URL)
         );
