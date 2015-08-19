@@ -357,42 +357,54 @@ th.sort.desc::after {
       font-weight: normal;
       font-style: normal;
     }
-    
+
 .font-icon
     {
       font-family: "sog_dashboard-font";
       font-style: normal;
       font-weight: normal;
       speak: none;
-     
+
       display: inline-block;
       text-decoration: inherit;
       width: 1em;
       margin-right: .2em;
       text-align: center;
       /* opacity: .8; */
-     
+
       /* For safety - reset parent styles, that can break glyph codes*/
       font-variant: normal;
       text-transform: none;
-     
+
       /* fix buttons height, for twitter bootstrap */
       line-height: 1em;
-     
+
       /* Animation center compensation - margins should be symmetric */
       /* remove if not needed */
       margin-left: .2em;
-     
+
       /* You can be more comfortable with increased icons size */
       /* font-size: 140%; */
-     
+
       /* Font smoothing. That was taken from TWBS */
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-     
+
       /* Uncomment for 3D effect */
       /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
     }
+
+@media (max-width: 25em) {
+    .login-form {
+        width: 100%;
+        padding: 0 2em;
+    }
+
+    .pure-menu ul {
+        white-space: normal;
+        padding-left: 0;
+    }
+}
 
 /* large website */
 @media (min-width: 48em) {
@@ -426,7 +438,7 @@ th.sort.desc::after {
         right: 3em;
         border-radius: 0 0 10px 10px;
     }
-    
+
     .table-row:hover {
 		background-color: #efefef;
 	}
