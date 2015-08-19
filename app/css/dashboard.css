@@ -155,6 +155,7 @@ h3 {
     padding: 1em;
     line-height: 1.5;
 }
+
 .faq-item:target {
     background-color: #efefef;
 }
@@ -313,8 +314,8 @@ table.full-width {
 }
 
 .pass-strength {
-	font-size: 85%;
-	font-style: italic;
+    font-size: 85%;
+    font-style: italic;
 }
 
 /* pagination */
@@ -348,51 +349,50 @@ th.sort.desc::after {
 }
 
 @font-face {
-      font-family: 'sog_dashboard-font';
-      src: url('../fontello-4b29a36a/font/sog_dashboard-font.eot?97642325');
-      src: url('../fontello-4b29a36a/font/sog_dashboard-font.eot?97642325#iefix') format('embedded-opentype'),
-           url('../fontello-4b29a36a/font/sog_dashboard-font.woff?97642325') format('woff'),
-           url('../fontello-4b29a36a/font/sog_dashboard-font.ttf?97642325') format('truetype'),
-           url('../fontello-4b29a36a/font/sog_dashboard-font.svg?97642325#sog_dashboard-font') format('svg');
-      font-weight: normal;
-      font-style: normal;
-    }
+    font-family: 'sog_dashboard-font';
+    src: url('../fontello-4b29a36a/font/sog_dashboard-font.eot?97642325');
+    src: url('../fontello-4b29a36a/font/sog_dashboard-font.eot?97642325#iefix') format('embedded-opentype'),
+    url('../fontello-4b29a36a/font/sog_dashboard-font.woff?97642325') format('woff'),
+    url('../fontello-4b29a36a/font/sog_dashboard-font.ttf?97642325') format('truetype'),
+    url('../fontello-4b29a36a/font/sog_dashboard-font.svg?97642325#sog_dashboard-font') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
 
-.font-icon
-    {
-      font-family: "sog_dashboard-font";
-      font-style: normal;
-      font-weight: normal;
-      speak: none;
+.font-icon {
+    font-family: "sog_dashboard-font";
+    font-style: normal;
+    font-weight: normal;
+    speak: none;
 
-      display: inline-block;
-      text-decoration: inherit;
-      width: 1em;
-      margin-right: .2em;
-      text-align: center;
-      /* opacity: .8; */
+    display: inline-block;
+    text-decoration: inherit;
+    width: 1em;
+    margin-right: .2em;
+    text-align: center;
+    /* opacity: .8; */
 
-      /* For safety - reset parent styles, that can break glyph codes*/
-      font-variant: normal;
-      text-transform: none;
+    /* For safety - reset parent styles, that can break glyph codes*/
+    font-variant: normal;
+    text-transform: none;
 
-      /* fix buttons height, for twitter bootstrap */
-      line-height: 1em;
+    /* fix buttons height, for twitter bootstrap */
+    line-height: 1em;
 
-      /* Animation center compensation - margins should be symmetric */
-      /* remove if not needed */
-      margin-left: .2em;
+    /* Animation center compensation - margins should be symmetric */
+    /* remove if not needed */
+    margin-left: .2em;
 
-      /* You can be more comfortable with increased icons size */
-      /* font-size: 140%; */
+    /* You can be more comfortable with increased icons size */
+    /* font-size: 140%; */
 
-      /* Font smoothing. That was taken from TWBS */
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+    /* Font smoothing. That was taken from TWBS */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 
-      /* Uncomment for 3D effect */
-      /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
-    }
+    /* Uncomment for 3D effect */
+    /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+}
 
 @media (max-width: 25em) {
     .login-form {
@@ -440,6 +440,6 @@ th.sort.desc::after {
     }
 
     .table-row:hover {
-		background-color: #efefef;
-	}
+        background-color: #efefef;
+    }
 }
