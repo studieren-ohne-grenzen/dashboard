@@ -164,8 +164,15 @@
             }
 
             // execute filters now, as the control list has been fully setup
-            setFilter(document.getElementById('filter-by-new'), fNew);
-            setFilter(document.getElementById('filter-by-member'), fMember);
+                loadFilters();
         }
+
+        function loadFilters() {
+                setTimeout(function(){
+                	setFilter(document.getElementById('filter-by-new'), fNew);
+                    setFilter(document.getElementById('filter-by-member'), fMember);
+                    if (!controlList.filtered) loadFilters();
+                    }, 50);
+            }
     </script>
 {% endblock %}
