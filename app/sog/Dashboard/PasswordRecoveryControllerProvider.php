@@ -63,12 +63,11 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
                         'token' => $token
                     ]);
                 } elseif ($request->isMethod('POST')) {
-                    // TODO: validate password and password_repeat
-                    $password = $request->get('password');
-                    $password_repeat = $request->get('password_repeat');
+                    $password = $request->request->get('password');
+                    $password_repeat = $request->request->get('password_repeat');
                     if ($this->validateNewPassword($password, $password_repeat) === false) {
                         $app['session']->getFlashBag()
-                            ->add('error', 'Fehler beim Zurücksetzen des Passworts. Bitte versuche es noch einmal oder benachrichtige das IT-Team.');
+                            ->add('error', 'Fehler beim Zurücksetzen des Passworts. Bitte versuche es noch einmal, oder benachrichtige das IT-Team.');
                     } else {
                         $details = $this->getRecoveryRequest($token);
                         $this->updatePassword($details['uid'], $password);
@@ -79,7 +78,7 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
                 }
             } else {
                 $app['session']->getFlashBag()
-                    ->add('error', 'Fehler beim Zurücksetzen des Passworts. Bitte versuche es noch einmal oder benachrichtige das IT-Team.');
+                    ->add('error', 'Fehler beim Zurücksetzen des Passworts. Bitte versuche es noch einmal, oder benachrichtige das IT-Team.');
             }
             return $app->redirect('/login');
         })->method('POST|GET');
