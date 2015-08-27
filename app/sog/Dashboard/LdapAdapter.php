@@ -89,6 +89,24 @@ class LdapAdapter extends Ldap
     }
 
     /**
+     * Checks whether the given user is member of the given group.
+     *
+     * @param string $dnOfUser
+     * @param string $dnOfGroup
+     * @return bool True if user is member of group, false otherwise
+     * @throws LdapException
+     */
+    public function isMemberOfGroup($dnOfUser, $dnOfGroup)
+    {
+        return (
+            $this->search(
+                sprintf('member=%s', $dnOfUser),
+                $dnOfGroup,
+                self::SEARCH_SCOPE_BASE
+            )->count() > 0);
+    }
+
+    /**
      * Retrieves all memberships for the given DN
      *
      * @param string $user_dn The DN for which to get the memberships
@@ -129,6 +147,29 @@ class LdapAdapter extends Ldap
         return $results;
     }
 
+    /**
+     * Attempts to retrieve the member or guest (DN) with the given mail address.
+     *
+     * @param string $mail The given mail address
+     * @param string $attribute The name of the mail attribute to check
+     * @return bool|string False if the search returned no results, the DN of the user otherwise.
+     * @throws LdapException
+     */
+    public function getMemberByMail($mail, $attribute = 'mail-alternative')
+    {
+        $results = $this->search(
+            sprintf('(&(objectClass=inetOrgPerson)(%s=%s))', $attribute, $mail),
+            'ou=people,o=sog-de,dc=sog',
+            self::SEARCH_SCOPE_SUB,
+            ['dn'],
+            'dn'
+        );
+        if ($results->count() > 0)
+            return $results->getFirst()['dn'];
+        else
+            return false;
+    }
+
 
     /**
      * This method can be used to assign the ROLE_GROUP_ADMIN role to a user. It checks if the given DN is a owner
@@ -140,7 +181,6 @@ class LdapAdapter extends Ldap
      */
     public function isOwner($user_dn)
     {
-
         $result = $this->getOwnedGroups($user_dn);
         // we don't care about specifics, we only want to know if the user is owner of any group
         return ($result != null && $result->count() > 0);
@@ -271,6 +311,79 @@ class LdapAdapter extends Ldap
 
         $this->add($dn, $info);
         return $info;
+    }
+
+    /**
+     * Create a guest user, reserved for non-members who should receive messages to a mailing list.
+     *
+     * @param string $name The name of the guest
+     * @param string $mail The guests' email address
+     * @return array The LDAP attributes for the guest
+     * @throws LdapException If adding the DN wasn't successful
+     */
+    public function createGuest($name, $mail)
+    {
+        $username = $this->generateUsername($name);
+        $dn = sprintf('uid=%s,ou=guests,ou=people,o=sog-de,dc=sog', $username);
+        $info = [];
+
+        // core data
+        Attribute::setAttribute($info, 'dn', $dn);
+        Attribute::setAttribute($info, 'uid', $username);
+        Attribute::setAttribute($info, 'cn', $name);
+        Attribute::setAttribute($info, 'displayName', $name);
+        Attribute::setAttribute($info, 'sn', $name);
+        Attribute::setAttribute($info, 'cn', $name);
+
+        // meta data
+        Attribute::setAttribute($info, 'mail', $mail);
+        Attribute::setAttribute($info, 'objectClass', [
+            'inetOrgPerson',
+            'top'
+        ]);
+
+        $this->add($dn, $info);
+        return $info;
+    }
+
+    /**
+     * Generates a unique username by replacing some special characters, converting to lowercase and then
+     * appending an optional number if the username already exists.
+     *
+     * @param string $name The given name for the member
+     * @return string The generated unique UID
+     */
+    public function generateUsername($name)
+    {
+        $username = strtolower($name);
+        // normalize special chars in username
+        $username = str_replace(
+            ['ä', 'ö', 'ü', 'ß', ' '],
+            ['ae', 'oe', 'ue', 'ss', '.'],
+            $username
+        );
+
+        $suffix = 2;
+        $check = $username;
+        while ($this->usernameExists($check) === true) {
+            $check = $username . $suffix;
+            $suffix++;
+        }
+
+        return $check;
+    }
+
+    /**
+     * Checks if the given username is already taken, looks in the active and inactive subtree
+     *
+     * @param string $uid Does this username already exist?
+     * @return bool True if member exists, false otherwise.
+     */
+    public function usernameExists($uid)
+    {
+        return ($this->exists(sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid)) ||
+            $this->exists(sprintf('uid=%s,ou=inactive,ou=people,o=sog-de,dc=sog', $uid)) ||
+            $this->exists(sprintf('uid=%s,ou=guests,ou=people,o=sog-de,dc=sog', $uid)));
     }
 
     /**
@@ -416,17 +529,5 @@ class LdapAdapter extends Ldap
         $active = sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid);
         $inactive = sprintf('uid=%s,ou=inactive,ou=people,o=sog-de,dc=sog', $uid);
         $this->move($active, $inactive);
-    }
-
-    /**
-     * Checks if the given username is already taken, looks in the active and inactive subtree
-     *
-     * @param string $uid Does this username already exist?
-     * @return bool True if member exists, false otherwise.
-     */
-    public function usernameExists($uid)
-    {
-        return ($this->exists(sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid)) ||
-            $this->exists(sprintf('uid=%s,ou=inactive,ou=people,o=sog-de,dc=sog', $uid)));
     }
 }

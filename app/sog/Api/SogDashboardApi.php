@@ -31,6 +31,10 @@ class SogDashboardApi
      * @var string Full URL to the Dashboard application
      */
     private $dashboard_url = 'https://studieren-ohne-grenzen.org/dashboard';
+    /**
+     * @var int The default length for a random user password
+     */
+    private $password_length = 8;
 
     /**
      * Instantiates a new LdapAdapter for creating and updating relevant entities.
@@ -71,7 +75,7 @@ class SogDashboardApi
     public function createUser($firstName, $lastName, $email, $group)
     {
         $username = $this->generateUsername($firstName, $lastName);
-        $password = $this->app['random']();
+        $password = $this->app['random']($this->password_length);
 
         $data = $this->app['ldap']->createMember($username, $password, $firstName, $lastName, $email);
 
@@ -87,42 +91,16 @@ class SogDashboardApi
     }
 
     /**
-     * Generate a unique username.
-     * Tests whether the username is already taken. If so, appends
-     * an increasing number until the username does not already exist
+     * Generate a unique username by passing it to the LDAP adapter
+     * which executes additional transformations and checks.
      *
-     * @param $firstName
-     * @param $lastName
+     * @param string $firstName
+     * @param string $lastName
      * @return string The unique username
      */
     private function generateUsername($firstName, $lastName)
     {
-        $username = strtolower(trim($firstName) . "." . trim($lastName));
-        // normalize special chars in username
-        $username = str_replace(
-            ['ä', 'ö', 'ü', 'ß', ' '],
-            ['ae', 'oe', 'ue', 'ss', '.'],
-            $username
-        );
-
-        $foundUsername = false;
-        $i = 0;
-        while (!$foundUsername) {
-            if ($i === 0) {
-                $check = $username;
-            } else {
-                $check = $username . $i;
-            }
-            if ($this->app['ldap']->usernameExists($check)) {
-                ++$i;
-            } else {
-                $foundUsername = true;
-                if ($i !== 0)
-                    $username = $username . $i;
-            }
-        }
-
-        return $username;
+        return $this->app['ldap']->generateUsername(trim($firstName) . " " . trim($lastName));
     }
 
     /**
