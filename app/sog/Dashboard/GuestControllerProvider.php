@@ -126,6 +126,6 @@ class GuestControllerProvider implements ControllerProviderInterface
      */
     private function retrieveGuestByMail($mail)
     {
-        return $this->app['ldap']->getMemberByMail($mail, 'mail');
+        return $this->app['ldap']->getMemberByMail($mail, 'mail')['dn'];
     }
 }

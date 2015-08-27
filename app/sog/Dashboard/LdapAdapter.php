@@ -152,7 +152,7 @@ class LdapAdapter extends Ldap
      *
      * @param string $mail The given mail address
      * @param string $attribute The name of the mail attribute to check
-     * @return bool|string False if the search returned no results, the DN of the user otherwise.
+     * @return bool|string False if the search returned no results, the users' attributes otherwise.
      * @throws LdapException
      */
     public function getMemberByMail($mail, $attribute = 'mail-alternative')
@@ -161,11 +161,11 @@ class LdapAdapter extends Ldap
             sprintf('(&(objectClass=inetOrgPerson)(%s=%s))', $attribute, $mail),
             'ou=people,o=sog-de,dc=sog',
             self::SEARCH_SCOPE_SUB,
-            ['dn'],
+            ['dn', 'uid', 'cn'],
             'dn'
         );
         if ($results->count() > 0)
-            return $results->getFirst()['dn'];
+            return $results->getFirst();
         else
             return false;
     }
