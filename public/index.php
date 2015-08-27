@@ -6,10 +6,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 $app = new Silex\Application();
 
-// should be disabled on production
-$app['debug'] = true;
-
 require_once __DIR__ . '/../app/config.php';
+$app['debug'] = $dashboard_config['debug'];
 require_once __DIR__ . '/../app/services.php';
 
 // now, let's set up the routes
@@ -17,7 +15,7 @@ require_once __DIR__ . '/../app/services.php';
 
 // (unprotected) index route
 $app->get('/', function () use ($app) {
-    return $app->redirect($app["url_generator"]->generate("/members/manage-account"));
+    return $app->redirect($app['url_generator']->generate('/members/manage-account'));
 });
 
 $app->match('/members/Benutzerdaten', function (Request $request) use ($app) {
