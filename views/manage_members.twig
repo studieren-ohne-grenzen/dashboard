@@ -7,30 +7,34 @@
             <fieldset>
                 <label for="group">Deine Gruppe&nbsp;</label>
                 <select name="ou" id="group" onchange="this.form.submit()">
-				{% for i in ownedGroups|keys %}
-					<option {% if ownedGroups[i]['ou'][0] == selectedGroup %}selected {% endif %}value="{{ ownedGroups[i]['ou'][0] }}">{{ ownedGroups[i]['cn'][0] }}</option>
-				{% endfor %}
+                    {% for i in ownedGroups|keys %}
+                        <option {% if ownedGroups[i]['ou'][0] == selectedGroup %}selected
+                                {% endif %}value="{{ ownedGroups[i]['ou'][0] }}">{{ ownedGroups[i]['cn'][0] }}</option>
+                    {% endfor %}
                 </select>
             </fieldset>
         </form>
     </div>
+    <p>Als KoordinatorIn einer Gruppe kannst du hier die Mitglieder verwalten. Falls du für mehrere Gruppen
+        verantwortlich bist, kannst du die entsprechende oben rechts auswählen.</p>
     <div id="member-list">
-            <form class="pure-form bold-legend">
-                <fieldset>
-                    <legend>Suchen nach...</legend>
-                    <i class="icon-search font-icon">&#xe816;</i>
-                    <input type="text" class="search" placeholder="Name, Email...">
-                    <i class="icon-filter font-icon">&#xe817;</i>
-                    <label for="filter-by-new">
-                        <input id="filter-by-new" type="checkbox" name="filter" onclick="setFilter(this, fNew)" checked>
-                        Neue Mitglieder
-                    </label>
-                    <label for="filter-by-member">
-                        <input id="filter-by-member" type="checkbox" name="filter" onclick="setFilter(this, fMember)" checked>
-                        Meine Gruppe
-                    </label>
-                </fieldset>
-            </form>
+        <form class="pure-form bold-legend">
+            <fieldset>
+                <legend>Suchen nach...</legend>
+                <i class="icon-search font-icon">&#xe816;</i>
+                <input type="text" class="search" placeholder="Name, Email...">
+                <i class="icon-filter font-icon">&#xe817;</i>
+                <label for="filter-by-new">
+                    <input id="filter-by-new" type="checkbox" name="filter" onclick="setFilter(this, fNew)" checked>
+                    Neue Mitglieder
+                </label>
+                <label for="filter-by-member">
+                    <input id="filter-by-member" type="checkbox" name="filter" onclick="setFilter(this, fMember)"
+                           checked>
+                    Meine Gruppe
+                </label>
+            </fieldset>
+        </form>
         <table class="full-width pure-table pure-table-bordered">
             <thead>
             <tr>
@@ -53,9 +57,9 @@
         <ul class="pagination"></ul>
     </div>
     <form method="POST" id="send-action">
-        <input type="hidden" name="ou" id="ou" value="{{ selectedGroup }}" />
-        <input type="hidden" name="uid" id="uid" />
-        <input type="hidden" name="action" id="action" />
+        <input type="hidden" name="ou" id="ou" value="{{ selectedGroup }}"/>
+        <input type="hidden" name="uid" id="uid"/>
+        <input type="hidden" name="action" id="action"/>
     </form>
 {% endblock %}
 
@@ -73,71 +77,82 @@
         var controlList = new List('member-list', options);
         var data = {{ memberList|json_encode|raw }};
         var activeFilters = [];
-        
 
-        var fMember = function (item) {return (item.values().is_member == true)};
-        var fNew = function (item) {return (item.values().is_pending == true)};
+
+        var fMember = function (item) {
+            return (item.values().is_member == true)
+        };
+        var fNew = function (item) {
+            return (item.values().is_pending == true)
+        };
 
         createList();
-        
+
         function setFilter(cb, filter) {
-            if (cb.checked){
-            	activeFilters.push(filter);
-            }else{
-            	activeFilters.splice(activeFilters.indexOf(filter), 1);
+            if (cb.checked) {
+                activeFilters.push(filter);
+            } else {
+                activeFilters.splice(activeFilters.indexOf(filter), 1);
             }
             if (activeFilters.length > 0) {
                 controlList.filter(listFilter);
             } else {
-            	controlList.filter();
+                controlList.filter();
             }
         }
 
         var listFilter = function (item) {
             var s = false;
-            for (var i=0; i<activeFilters.length; i++) {
+            for (var i = 0; i < activeFilters.length; i++) {
                 if (activeFilters[i](item) == true) s = true;
             }
             return s;
         };
-        
-        function submitButton(name, uid, action){
-        	var gc = document.getElementById('group');
-        	var groupName = gc.options[gc.selectedIndex].text;
 
-        	var confirm = false;
-        	
-            if (action === 'add'){
-        		confirm = window.confirm("Sicher, dass " + name + " zu " + groupName + " hinzugefügt werden soll?");
+        function submitButton(name, uid, action) {
+            var gc = document.getElementById('group');
+            var groupName = gc.options[gc.selectedIndex].text;
+
+            var confirm = false;
+
+            if (action === 'add') {
+                confirm = window.confirm("Sicher, dass " + name + " zu " + groupName + " hinzugefügt werden soll?");
             } else if (action === 'activate') {
-            	confirm = window.confirm(name + " ist ein neues Mitglied und hat noch keinen Zugriff auf den SOG-Account. " +
+                confirm = window.confirm(name + " ist ein neues Mitglied und hat noch keinen Zugriff auf den SOG-Account. " +
                         "Wenn dir das Mitglied bekannt ist, kannst du es nun aktivieren und anschließend für deine Gruppe freischalten. " +
                         "Diese Überprüfung erfolgt aus Gründen des Datenschutzes.");
             } else {
                 confirm = window.confirm("Sicher, dass " + name + " aus " + groupName + " entfernt werden soll?");
             }
             if (confirm) {
-        		var submitForm = document.getElementById('send-action');
-        		document.getElementById('uid').value = uid;
-        		document.getElementById('action').value = action;
-        		submitForm.submit();
+                var submitForm = document.getElementById('send-action');
+                document.getElementById('uid').value = uid;
+                document.getElementById('action').value = action;
+                submitForm.submit();
             }
-         }
+        }
 
         function createList() {
-        	controlList.clear();
-            for (var i=0; i<data.length; i++) {
+            controlList.clear();
+            for (var i = 0; i < data.length; i++) {
                 var owner = false;
                 var member = false;
                 var pending = false;
                 var inactive = false;
 
-                for (var j=0; j<data[i]['userRoles'].length; j++) {
+                for (var j = 0; j < data[i]['userRoles'].length; j++) {
                     switch (data[i]['userRoles'][j]) {
-                        case 'owner': owner = true; break;
-                        case 'inactive': inactive = true; break;
-                        case 'member': member = true; break;
-                        case 'pending': pending = true;
+                        case 'owner':
+                            owner = true;
+                            break;
+                        case 'inactive':
+                            inactive = true;
+                            break;
+                        case 'member':
+                            member = true;
+                            break;
+                        case 'pending':
+                            pending = true;
                     }
                 }
 
@@ -160,7 +175,14 @@
                     }
                 }
 
-                controlList.add({name: name, email: email, actions: buttons, is_owner: owner, is_member: member, is_pending: pending});
+                controlList.add({
+                    name: name,
+                    email: email,
+                    actions: buttons,
+                    is_owner: owner,
+                    is_member: member,
+                    is_pending: pending
+                });
             }
 
             // execute filters now, as the control list has been fully setup
