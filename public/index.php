@@ -54,97 +54,97 @@ $app->match('/members/Benutzerdaten', function (Request $request) use ($app) {
 $app->match('/members/meine-Gruppen', function (Request $request) use ($app) {
     /** @var \Symfony\Component\Security\Core\Authentication\Token\TokenInterface $token */
     $token = $app['security.token_storage']->getToken();
-    
+
     if (null !== $token) {
         $user = $token->getUser();
         $userDN = $user->getAttributes()['dn'];
         $action = $request->request->get('action');
-        
+
         if (isset($action)) {
             $userUID = $user->getAttributes()['uid'][0];
-            
+
             $groupOU = $request->request->get('ou');
             $groupDN = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $groupOU);
             $groupAttr = $app['ldap']->getEntry($groupDN, ['cn', 'owner']);
-            
-                switch ($action){
-                    case 'quit':
-                            try {
-                                if (in_array($userDN, $groupAttr['owner'])) {
-                                    $app['session']->getFlashBag()->add('error', 'Nicht möglich! Du bist Koordinator der Gruppe "' . $groupAttr['cn'][0] . '". Zum Beenden deiner Mitgliedschaft wende dich bitte an das Ressort IT.');
-                                } else {
-                                    $app['ldap']->removeFromGroup($userDN , $groupDN);
-                                    $app['session']->getFlashBag()->add('success', 'Deine Mitgliedschaft in der Gruppe "' . $groupAttr['cn'][0] . '" wurde beendet.');
-                                }
-                            } catch (LdapException $ex) {
-                                $app['session']->getFlashBag()->add('error', 'Fehler beim Beenden der Mitgliedschaft in der Gruppe ' . $groupAttr['cn'][0] . '": ' . $ex->getMessage());
-                            }
-                            break;
-                    case 'drop-request':
-                            try {
-                                $app['ldap']->dropMembershipRequest($userUID, $groupOU);
-                                $app['session']->getFlashBag()->add('success', 'Deine Mitgliedschaftsanfrage für die Gruppe "' . $groupAttr['cn'][0] . '" wurde abgebrochen.');
-                            } catch (LdapException $ex) {
-                                $app['session']->getFlashBag()->add('error', 'Fehler beim Abbrechen der Mitgliedschaftsanfrage für die Gruppe "' . $groupAttr['cn'][0] . '": ' . $ex->getMessage());
-                            }
-                            break;
-                    case 'start-request':
-                            try {
-                                $app['ldap']->requestGroupMembership($userUID, $groupOU);
-                                $app['session']->getFlashBag()->add('success', 'Es wurde eine neue Mitgliedschaftsanfrage für die Gruppe "' . $groupAttr['cn'][0] . '" erstellt.');
-                            } catch (LdapException $ex) {
-                                $app['session']->getFlashBag()->add('error', 'Fehler beim Erstellen einer Mitgliedschaftsanfrage für die Gruppe "' . $groupAttr['cn'][0] . '": ' . $ex->getMessage());
-                            }
-                            break;
-                    default:
-                            $app['session']->getFlashBag()->add('error', 'Fehler: Der gesendete Befehl wird nicht unterstützt.');
-                }
+
+            switch ($action) {
+                case 'quit':
+                    try {
+                        if (in_array($userDN, $groupAttr['owner'])) {
+                            $app['session']->getFlashBag()->add('error', 'Nicht möglich! Du bist Koordinator der Gruppe "' . $groupAttr['cn'][0] . '". Zum Beenden deiner Mitgliedschaft wende dich bitte an das Ressort IT.');
+                        } else {
+                            $app['ldap']->removeFromGroup($userDN, $groupDN);
+                            $app['session']->getFlashBag()->add('success', 'Deine Mitgliedschaft in der Gruppe "' . $groupAttr['cn'][0] . '" wurde beendet.');
+                        }
+                    } catch (LdapException $ex) {
+                        $app['session']->getFlashBag()->add('error', 'Fehler beim Beenden der Mitgliedschaft in der Gruppe ' . $groupAttr['cn'][0] . '": ' . $ex->getMessage());
+                    }
+                    break;
+                case 'drop-request':
+                    try {
+                        $app['ldap']->dropMembershipRequest($userUID, $groupOU);
+                        $app['session']->getFlashBag()->add('success', 'Deine Mitgliedschaftsanfrage für die Gruppe "' . $groupAttr['cn'][0] . '" wurde abgebrochen.');
+                    } catch (LdapException $ex) {
+                        $app['session']->getFlashBag()->add('error', 'Fehler beim Abbrechen der Mitgliedschaftsanfrage für die Gruppe "' . $groupAttr['cn'][0] . '": ' . $ex->getMessage());
+                    }
+                    break;
+                case 'start-request':
+                    try {
+                        $app['ldap']->requestGroupMembership($userUID, $groupOU);
+                        $app['session']->getFlashBag()->add('success', 'Es wurde eine neue Mitgliedschaftsanfrage für die Gruppe "' . $groupAttr['cn'][0] . '" erstellt.');
+                    } catch (LdapException $ex) {
+                        $app['session']->getFlashBag()->add('error', 'Fehler beim Erstellen einer Mitgliedschaftsanfrage für die Gruppe "' . $groupAttr['cn'][0] . '": ' . $ex->getMessage());
+                    }
+                    break;
+                default:
+                    $app['session']->getFlashBag()->add('error', 'Fehler: Der gesendete Befehl wird nicht unterstützt.');
+            }
         }
-        
+
         $groups = $app['ldap']->getGroups(['cn', 'ou', 'owner', 'member', 'pending'])->toArray();
         $groupList = [];
         foreach ($groups as $g) {
             $roles = [];
-            if (isset($g['owner']) && in_array($userDN , $g['owner'])) $roles[] = 'owner';
-            if (isset($g['member']) && in_array($userDN , $g['member'])) $roles[] = 'member';
-            if (isset($g['pending']) && in_array($userDN , $g['pending'])) $roles[] = 'pending';
-            
+            if (isset($g['owner']) && in_array($userDN, $g['owner'])) $roles[] = 'owner';
+            if (isset($g['member']) && in_array($userDN, $g['member'])) $roles[] = 'member';
+            if (isset($g['pending']) && in_array($userDN, $g['pending'])) $roles[] = 'pending';
+
             $owners = [];
             if (isset($g['owner'])) {
                 for ($j = 0; $j < count($g['owner']); $j++) {
                     $o = $app['ldap']->getEntry($g['owner'][$j], ['cn', 'mail']);
-                    if(isset($o)) $owners[] = $o;
+                    if (isset($o)) $owners[] = $o;
                 }
             }
-            
+
             $listentry = array(
                 'name' => $g['cn'][0],
                 'ou' => $g['ou'][0],
                 'userRoles' => $roles,
                 'owners' => $owners
             );
-            
+
             $groupList[] = $listentry;
         }
-        
+
         return $app['twig']->render('manage_groups.twig', ['groupList' => $groupList]);
     }
 })
-->method('GET|POST')
-->bind('/members/manage-groups');
+    ->method('GET|POST')
+    ->bind('/members/manage-groups');
 
 $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($app) {
     /** @var \Symfony\Component\Security\Core\Authentication\Token\TokenInterface $token */
     $token = $app['security.token_storage']->getToken();
-    
+
     if (null !== $token) {
         $user = $token->getUser();
         $ownedGroups = $app['ldap']->getOwnedGroups($user->getAttributes()['dn'])->toArray();
-        
+
         $selGroup = $request->query->get('ou');
         if (!isset($selGroup)) $selGroup = $ownedGroups[0]['ou'][0];
         $selGroupDN = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $selGroup);
-        
+
         $action = $request->request->get('action');
 
         if (isset($action)) {
@@ -162,10 +162,10 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
                 $userID = $request->request->get('uid');
                 $userDN = $app['ldap']->findUserDN($userID);
                 $userAttr = $app['ldap']->getEntry($userDN, ['cn']);
-                
+
                 $groupAttr = $app['ldap']->getEntry($selGroupDN, ['owner']);
-                
-                switch ($action){
+
+                switch ($action) {
                     case 'activate':
                         try {
                             $app['ldap']->activateMember($userID);
@@ -188,8 +188,8 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
                             if (in_array($userDN, $groupAttr['owner'])) {
                                 $app['session']->getFlashBag()->add('error', 'Nicht möglich! "' . $userAttr['cn'][0] . '" ist Koordinator der Gruppe "' . $selGroupName . '". Zum Beenden deiner Mitgliedschaft wende dich bitte an das Ressort IT.');
                             } else {
-                            $app['ldap']->removeFromGroup($userDN, $selGroupDN);
-                            $app['session']->getFlashBag()->add('success', $userAttr['cn'][0] . ' wurde von der Gruppe "' . $selGroupName . '" entfernt!');
+                                $app['ldap']->removeFromGroup($userDN, $selGroupDN);
+                                $app['session']->getFlashBag()->add('success', $userAttr['cn'][0] . ' wurde von der Gruppe "' . $selGroupName . '" entfernt!');
                             }
                         } catch (LdapException $ex) {
                             $app['session']->getFlashBag()->add('error', 'Fehler beim Entfernen von ' . $userAttr['cn'][0] . ' aus der Gruppe "' . $selGroupName . '": ' . $ex->getMessage());
@@ -205,8 +205,8 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
                         break;
                     default:
                         $app['session']->getFlashBag()->add('error', 'Fehler: Der gesendete Befehl wird nicht unterstützt.');
-                    }
-                    
+                }
+
             } else {
                 $app['session']->getFlashBag()->add('error', 'Keine Berechtigung für die gewählte Gruppe');
             }
@@ -214,13 +214,13 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
 
         $allUsers = $app['ldap']->getAllUsers()->toArray();
         $groupAttr = $app['ldap']->getEntry($selGroupDN, ['owner', 'member', 'pending']);
-        
+
         $memberList = [];
         foreach ($allUsers as $u) {
             $roles = [];
-            if (isset($groupAttr['owner']) && in_array($u['dn'] , $groupAttr['owner'])) $roles[] = 'owner';
-            if (isset($groupAttr['member']) && in_array($u['dn'] , $groupAttr['member'])) $roles[] = 'member';
-            if (isset($groupAttr['pending']) && in_array($u['dn'] , $groupAttr['pending'])) $roles[] = 'pending';
+            if (isset($groupAttr['owner']) && in_array($u['dn'], $groupAttr['owner'])) $roles[] = 'owner';
+            if (isset($groupAttr['member']) && in_array($u['dn'], $groupAttr['member'])) $roles[] = 'member';
+            if (isset($groupAttr['pending']) && in_array($u['dn'], $groupAttr['pending'])) $roles[] = 'pending';
             // we handle inactive members like the other cases, the UI is just so similar
             if (strstr($u['dn'], 'ou=inactive')) $roles[] = 'inactive';
 
@@ -230,10 +230,10 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
                 'email' => $u['mail'][0],
                 'userRoles' => $roles
             );
-            
+
             $memberList[] = $listentry;
         }
-        
+
         return $app['twig']->render('manage_members.twig', [
             'memberList' => $memberList,
             'ownedGroups' => $ownedGroups,
