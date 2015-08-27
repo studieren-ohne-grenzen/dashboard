@@ -1,4 +1,5 @@
 .DS_Store
+app/dashboard.db
 vendor/*/*/tests
 vendor/*/*/Tests
 vendor/*/*/test
