@@ -6,7 +6,8 @@
         "monolog/monolog": "^1.13",
         "zendframework/zend-ldap": "^2.5",
         "symfony/twig-bridge": "^2.7",
-        "swiftmailer/swiftmailer": "^5.4"
+        "swiftmailer/swiftmailer": "^5.4",
+        "doctrine/dbal": "^2.5.1"
     },
     "autoload": {
         "psr-4": {"SOG\\": "app/sog"}

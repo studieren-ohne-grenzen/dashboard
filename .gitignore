@@ -24,5 +24,6 @@ public/js
 public/fontello*
 
 app/config.php
+app/dashboard.db
 
 doc/generated

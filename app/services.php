@@ -10,6 +10,15 @@ $app->register(new Silex\Provider\MonologServiceProvider(), [
     'monolog.name' => 'dashboard'
 ]);
 
+// database
+$app->register(new Silex\Provider\DoctrineServiceProvider(), array(
+    'db.options' => array(
+        'user' => null,
+        'driver' => 'pdo_sqlite',
+        'path' => __DIR__ . '/dashboard.db',
+    ),
+));
+
 // ldap
 $app->register(new SOG\Dashboard\ZendLdapServiceProvider(), [
     'ldap.options' => $dashboard_config['ldap.options']
@@ -55,4 +64,8 @@ $app->register(new Silex\Provider\SecurityServiceProvider(), [
 
 $app->register(new Silex\Provider\RememberMeServiceProvider());
 
+// password recovery
+$app->mount('/password', new SOG\Dashboard\PasswordRecoveryControllerProvider());
+
+// signing up guests for mailing lists
 $app->mount('/members/guests', new SOG\Dashboard\GuestControllerProvider());
