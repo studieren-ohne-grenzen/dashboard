@@ -56,10 +56,28 @@
         </table>
         <ul class="pagination"></ul>
     </div>
+
     <form method="POST" id="send-action">
         <input type="hidden" name="ou" id="ou" value="{{ selectedGroup }}"/>
         <input type="hidden" name="uid" id="uid"/>
         <input type="hidden" name="action" id="action"/>
+    </form>
+    <hr style="margin: 2em 0">
+    <form action="{{ path('POST_members_guests_subscribe') }}" method="POST" class="pure-form" id="setup-guest">
+        <fieldset>
+            <legend>Gäste</legend>
+            <p>
+                Du möchtest einen externen Gast dem Verteiler hinzufügen? Dann trage ihn hier mit Namen und Mail Adresse
+                ein:
+            </p>
+            <input type="hidden" name="ou" id="ou" value="{{ selectedGroup }}"/>
+            <input type="text" name="name" id="guest-name" placeholder="Name" required/>
+            <input type="email" name="mail" id="guest-mail" placeholder="Mail" required/>
+
+            <button type="submit" class="pure-button pure-button-primary" value="Login">
+                <i class="icon-login font-icon">&#xe80e;</i>&ensp;Eintragen
+            </button>
+        </fieldset>
     </form>
 {% endblock %}
 

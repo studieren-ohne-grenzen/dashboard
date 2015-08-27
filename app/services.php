@@ -54,3 +54,5 @@ $app->register(new Silex\Provider\SecurityServiceProvider(), [
 ]);
 
 $app->register(new Silex\Provider\RememberMeServiceProvider());
+
+$app->mount('/members/guests', new SOG\Dashboard\GuestControllerProvider());
