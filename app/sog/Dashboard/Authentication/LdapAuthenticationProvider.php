@@ -68,7 +68,6 @@ class LdapAuthenticationProvider implements AuthenticationProviderInterface
         try {
             $this->ldap->bind($user, $password);
             $success = true;
-
         } catch (LdapException $ex) {
             $success = false;
         } finally {
