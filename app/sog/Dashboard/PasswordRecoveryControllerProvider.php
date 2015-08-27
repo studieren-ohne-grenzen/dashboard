@@ -91,8 +91,9 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
                 ]);
             }
             $email = $request->request->get('email');
-            if ($this->mailIsKnown($email)) {
-                $token = $this->registerRequest($email);
+            $member = $app['ldap']->getMemberByMail($email);
+            if ($member !== false) {
+                $token = $this->registerRequest($member['uid'][0], $email);
                 $this->sendRecoveryMail($email, $token);
                 $app['session']->getFlashBag()
                     ->add('success', 'Wir haben dir einen Link zum Zurücksetzen deines Passworts zugeschickt. Bitte klicke auf diesen Link.');
@@ -127,13 +128,7 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
     private function validateRequest($token)
     {
         $result = $this->app['db']->fetchAll('SELECT * FROM `password_requests` WHERE `token` = ?', [$token]);
-        if (count($result) === 1) {
-            return true;
-        } else {
-            // TODO: log error?
-            // $this->app['monolog']->error(??);
-            return false;
-        }
+        return (count($result) === 1);
     }
 
     /**
@@ -189,36 +184,20 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
     }
 
     /**
-     * Checks if the given $email is known in the system. Also only returns true
-     * iff the mail is unique (e.g. count > 1 fails).
-     *
-     * @param string $email
-     * @return bool True if the email is known, false otherwise.
-     */
-    private function mailIsKnown($email)
-    {
-        return (1 === $this->app['ldap']->count(
-                sprintf('(&(objectClass=inetOrgPerson)(mail-alternative=%s))', $email),
-                'ou=active,ou=people,o=sog-de,dc=sog'
-            ));
-    }
-
-    /**
      * Registers the given $email by storing it in the database. The method
      * also generates and returns a random token associated with this request.
      *
+     * @param string $uid
      * @param string $email
      * @return string The token associated with this request.
      */
-    private function registerRequest($email)
+    private function registerRequest($uid, $email)
     {
         // delete all existing requests first
         $this->app['db']->delete('password_requests', ['email' => $email]);
         $token = $this->app['random']($this->token_length);
-        // TODO: use real UID - do we need it?
-        // TODO: DECIDE: work on uid or email? Which makes more sense for the reset process
         $this->app['db']->insert('password_requests',
-            ['email' => $email, 'token' => $token, 'uid' => 'leonhard.melzer', 'created' => time()]
+            ['email' => $email, 'token' => $token, 'uid' => $uid, 'created' => time()]
         );
         return $token;
     }
@@ -232,7 +211,7 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
      */
     private function sendRecoveryMail($email, $token)
     {
-        $text = sprintf('Passwort hier zurücksetzen: %s',
+        $text = sprintf("Hallo!\nDu hast über das SOG Dashboard das Zurücksetzen des Passworts für deinen SOG Account angefordert. Falls du diesen Vorgang nicht von dir aus gestartet hast, musst du nichts unternehmen.\nDas Passwort kannst du hier zurücksetzen: %s",
             $this->app['url_generator']->generate($this->reset_route, ['token' => $token], UrlGenerator::ABSOLUTE_URL)
         );
         $message = \Swift_Message::newInstance()
