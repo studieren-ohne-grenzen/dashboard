@@ -1,7 +1,8 @@
 <?php
-$config = [];
+$dashboard_config = [];
+$dashboard_config['debug'] = true; // should be false on production
 // see http://framework.zend.com/manual/current/en/modules/zend.ldap.api.html
-$config['ldap.options'] = [
+$dashboard_config['ldap.options'] = [
     'host' => 'host',
     'useStartTls' => true, // you may have to add "TLS_REQCERT never" in your *local* ldap.conf for this to work
     'username' => 'uid=someuser,ou=someou,dc=somedc for initial bind',
@@ -10,9 +11,9 @@ $config['ldap.options'] = [
     'accountFilterFormat' => 'sprintf-style LDAP filter',
     'baseDn' => 'ou=someou,o=someo,dc=somedc'
 ];
-$config['mailer.from'] = 'sender@example.com';
+$dashboard_config['mailer.from'] = 'sender@example.com';
 // http://silex.sensiolabs.org/doc/providers/swiftmailer.html
-$config['swiftmailer.options'] = [
+$dashboard_config['swiftmailer.options'] = [
     'host' => 'yourmx.example.com',
     'port' => 'could be 25',
     'username' => 'username',
@@ -21,7 +22,7 @@ $config['swiftmailer.options'] = [
     'auth_mode' => 'see doc'
 ];
 // http://silex.sensiolabs.org/doc/providers/remember_me.html
-$config['remember_me'] = [
+$dashboard_config['remember_me'] = [
     'key' => 'some random key',
     'httponly' => true,
     'secure' => false, /* should be true when we serve via SSL */
