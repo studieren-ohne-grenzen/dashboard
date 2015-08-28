@@ -8,11 +8,8 @@
 * The comments should follow the phpDoc standards ([see here](http://www.phpdoc.org/docs/latest/index.html))
 
 ### Used Libraries
-* Adldap2
-  * [https://github.com/Adldap2/Adldap2/tree/master/docs]
-  * [http://adldap.sourceforge.net/wiki/doku.php?id=documentation&do=index]
-  * [https://github.com/adldap/adLDAP/wiki]
-* Silex
+* [Silex](https://github.com/silexphp/Silex/)
+* [Zend_Ldap](http://framework.zend.com/manual/current/en/modules/zend.ldap.introduction.html)
 
 ### Other recommendations
-* Editor: [PHPStorm by Jetbrains](https://www.jetbrains.com/phpstorm/)
+* Editor: [PHPStorm by Jetbrains](https://www.jetbrains.com/phpstorm/) which supports easy-to-use code formatting
