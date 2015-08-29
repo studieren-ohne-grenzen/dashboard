@@ -67,7 +67,8 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
                     $password_repeat = $request->request->get('password_repeat');
                     if ($this->validateNewPassword($password, $password_repeat) === false) {
                         $app['session']->getFlashBag()
-                            ->add('error', 'Fehler beim Zurücksetzen des Passworts. Bitte versuche es noch einmal, oder benachrichtige das IT-Team.');
+                            ->add('error', sprintf('Fehler beim Zurücksetzen des Passworts. Das gewählte Passwort muss aus mindestens %s Zeichen (Buchstaben *und* Ziffern) bestehen.', $this->password_min_length));
+                        return $app->redirect($app['url_generator']->generate($this->reset_route, ['token' => $token]));
                     } else {
                         $details = $this->getRecoveryRequest($token);
                         $this->updatePassword($details['uid'], $password);
@@ -144,6 +145,11 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
             return false;
         }
         if (strlen($password) < $this->password_min_length) {
+            return false;
+        }
+        // see https://github.com/studieren-ohne-grenzen/dashboard/blob/develop/public/index.php#L30
+        // TODO: could be refactored, maybe Symfony\Security supports some kind of `password policy checker`
+        if (preg_match('/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/', $password) === false) {
             return false;
         }
         return true;
