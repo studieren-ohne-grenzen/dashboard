@@ -78,7 +78,10 @@
                     <button type="submit" class="pure-button pure-button-primary" value="Login">
                         <i class="icon-login font-icon">&#xe80e;</i>&ensp;Login
                     </button>
-                    <p><small><a href="{{ path('POST_GET_password_request') }}">Ich habe mein Passwort vergessen</a></small></p>
+                    <p>
+                        <small><a href="{{ path('POST_GET_password_request') }}">Ich habe mein Passwort vergessen.</a>
+                        </small>
+                    </p>
                 </div>
             </form>
         {% endblock %}
@@ -99,6 +102,9 @@
                         <li class="pure-menu-item"><a href="https://webmail.studieren-ohne-grenzen.org"
                                                       class="pure-menu-link"><i class="icon-mail font-icon">
                                     &#xe802;</i>Webmail</a></li>
+                        <li class="pure-menu-item"><a href="mailto:it@studieren-ohne-grenzen.org"
+                                                      class="pure-menu-link"><i
+                                        class="icon-lifebuoy font-icon">&#xe81d;</i>Support</a></li>
                     </ul>
                 </div>
             </div>
