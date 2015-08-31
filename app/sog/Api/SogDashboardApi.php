@@ -145,16 +145,16 @@ class SogDashboardApi
 Hallo ' . $firstName . ',<br />
 Wir freuen uns sehr, dich als neues Mitglied bei Studieren Ohne Grenzen begrüßen zu dürfen.<br />
 <br />
-Damit du direkt einsteigen und mitarbeiten kannst, haben wir dir automatisch einen Zugang für unsere Onlineplattform OpenAtrium erstellt. Über diese Plattform tauschen wir wichtige Nachrichten, Informationen und Dateien aus und diskutieren fleißig.<br />
-Dein Account wird freigeschaltet, sobald dein Lokalkoordinator bestätigt hat, dass du tatsächlich bei Studieren Ohne Grenzen aktiv bist.
-<br /><br />
-Um dich bei OpenAtrium einzuloggen, klicke entweder ganz unten in der Fußzeile unserer Webseite auf "OpenAtrium" oder folge diesem Link: <a href="https://www.studieren-ohne-grenzen.org/atrium">https://www.studieren-ohne-grenzen.org/atrium</a><br />
+Damit du direkt einsteigen und mitarbeiten kannst, haben wir dir automatisch einen Zugang für unsere Online-Plattform erstellt. Über diese Plattform tauschen wir wichtige Nachrichten, Informationen und Dateien aus und diskutieren auch Lokalgruppen-übergreifend.<br />
 <br />
-Du kannst dich dann mit folgenden Daten einloggen:<br />
-
 Benutzername: ' . $username . '<br />
 Passwort:     ' . $password . '<br />
 <br />
+Dein Account wird freigeschaltet, sobald dein Lokalkoordinator bestätigt hat, dass du tatsächlich bei Studieren Ohne Grenzen aktiv bist.<br />
+<br />
+Mit diesen Zugangsdaten kannst du dich auf allen SOG-Systeme einloggen. Insbesondere auf OpenAtrium, unsere wiki-ähnliche Online-Plattform mit allen Informationen und Dokumenten: https://atrium.studieren-ohne-grenzen.org<br />
+<br />
+Eine Übersicht deiner Daten und Gruppen gibt dir das Dashboard: https://dashboard.laufen-ohne-grenzen.de<br />
 Viele Grüße,<br />
 Das SOG-IT-Team
 </body>
