@@ -53,7 +53,7 @@ class LdapUserProvider implements UserProviderInterface
             return new LdapUser($username, null, $attributes, $roles, $groups);
             
         } catch (LdapException $ex) {
-            throw new UsernameNotFoundException($ex->getMessage());
+            throw new UsernameNotFoundException('Der Login war nicht erfolgreich, bitte überprüfe deinen Benutzernamen und Passwort.');
         }
     }
 
