@@ -18,20 +18,27 @@
     <p>Als KoordinatorIn einer Gruppe kannst du hier die Mitglieder verwalten. Falls du für mehrere Gruppen
         verantwortlich bist, kannst du die entsprechende oben rechts auswählen.</p>
     <div id="member-list">
-        <form class="pure-form bold-legend">
-            <fieldset>
+        <form class="pure-form bold-legend pure-g">
+            <fieldset class="pure-u-1 pure-u-md-1-2">
                 <legend>Suchen nach...</legend>
                 <i class="icon-search font-icon">&#xe816;</i>
-                <input type="text" class="search" placeholder="Name, Email...">
+                <input type="text" class="search pure-input-1-2" placeholder="Name, Email...">
+            </fieldset>
+            <fieldset class="pure-u-1 pure-u-md-1-2 inline-block-labels">
+                <legend>Anzeigen...</legend>
                 <i class="icon-filter font-icon">&#xe817;</i>
+                <label for="filter-by-none">
+                    <input id="filter-by-none" type="radio" name="filter" onclick="setFilter(this, null)">
+                    Alle
+                </label>
                 <label for="filter-by-new">
-                    <input id="filter-by-new" type="checkbox" name="filter" onclick="setFilter(this, fNew)" checked>
-                    Neue Mitglieder
+                    <input id="filter-by-new" type="radio" name="filter" onclick="setFilter(this, fNew)">
+                    Neue Anfragen
                 </label>
                 <label for="filter-by-member">
-                    <input id="filter-by-member" type="checkbox" name="filter" onclick="setFilter(this, fMember)"
+                    <input id="filter-by-member" type="radio" name="filter" onclick="setFilter(this, fMember)"
                            checked>
-                    Meine Gruppe
+                    Gruppen-Mitglieder
                 </label>
             </fieldset>
         </form>
@@ -62,7 +69,7 @@
         <input type="hidden" name="uid" id="uid"/>
         <input type="hidden" name="action" id="action"/>
     </form>
-    <hr style="margin: 2em 0">
+    <hr class="spacer">
     <form action="{{ path('POST_members_guests_subscribe') }}" method="POST" class="pure-form" id="setup-guest">
         <fieldset>
             <legend>Gäste</legend>
@@ -107,10 +114,15 @@
         createList();
 
         function setFilter(cb, filter) {
-            if (cb.checked) {
-                activeFilters.push(filter);
+            if (filter) {
+                if (cb.checked) {
+                    activeFilters = [filter];
+                } else {
+                    activeFilters.splice(activeFilters.indexOf(filter), 1);
+                }
             } else {
-                activeFilters.splice(activeFilters.indexOf(filter), 1);
+                // https://stackoverflow.com/questions/1232040/how-to-empty-an-array-in-javascript
+                activeFilters.length = 0;
             }
             if (activeFilters.length > 0) {
                 controlList.filter(listFilter);
@@ -204,15 +216,14 @@
             }
 
             // execute filters now, as the control list has been fully setup
-                loadFilters();
+            loadFilters();
         }
 
         function loadFilters() {
-                setTimeout(function(){
-                	setFilter(document.getElementById('filter-by-new'), fNew);
-                    setFilter(document.getElementById('filter-by-member'), fMember);
-                    if (!controlList.filtered) loadFilters();
-                    }, 50);
-            }
+            setTimeout(function () {
+                setFilter(document.getElementById('filter-by-member'), fMember);
+                if (!controlList.filtered) loadFilters();
+            }, 50);
+        }
     </script>
 {% endblock %}

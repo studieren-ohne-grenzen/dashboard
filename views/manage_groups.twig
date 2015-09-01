@@ -6,22 +6,31 @@
         Gruppe interessiert bist, kannst du über den Button "Mitgliedschaft beantragen" den KoordinatorIn der jeweiligen
         Gruppe benachrichtigen. Dieser wird dann deinen Antrag freischalten. Zur Mitgliedschaft in einer Gruppe gehört
         u.a. der Zugang zur jeweiligen OwnCloud und der Erhalt der Mails des Verteilers.</p>
-    <p>Falls du KoordinatorIn einer Gruppe bist und hier noch nicht gelistet wirst, wende dich bitte an das <a href="mailto:it@studieren-ohne-grenzen.org">IT-Ressort</a>.</p>
+    <p>Falls du KoordinatorIn einer Gruppe bist und hier noch nicht gelistet wirst, wende dich bitte an das <a
+                href="mailto:it@studieren-ohne-grenzen.org">IT-Ressort</a>.</p>
     <div id="group-list">
-        <form class="pure-form bold-legend">
-            <fieldset>
+        <form class="pure-form bold-legend pure-g">
+            <fieldset class="pure-u-1 pure-u-md-1-2">
                 <legend>Suchen nach...</legend>
                 <i class="icon-search font-icon">&#xe816;</i>
-                <input type="text" class="search" placeholder="Gruppe, KoordinatorIn...">
+                <input type="text" class="pure-input-1-2 search" placeholder="Gruppe, KoordinatorIn...">
+            </fieldset>
+            <fieldset class="pure-u-1 pure-u-md-1-2 inline-block-labels">
+                <legend>Anzeigen...</legend>
                 <i class="icon-filter font-icon">&#xe817;</i>
+                <label for="filter-by-none">
+                    <input id="filter-by-none" type="radio" name="filter"
+                           onclick="setFilter(this, null)" checked>
+                    Alle
+                </label>
                 <label for="filter-by-membership">
-                    <input id="filter-by-membership" type="checkbox" name="filter"
+                    <input id="filter-by-membership" type="radio" name="filter"
                            onclick="setFilter(this, fMemberships)">
-                    Mitgliedschaften
+                    Meine Mitgliedschaften
                 </label>
                 <label for="filter-by-pending">
-                    <input id="filter-by-pending" type="checkbox" name="filter" onclick="setFilter(this, fRequests)">
-                    Anfragen
+                    <input id="filter-by-pending" type="radio" name="filter" onclick="setFilter(this, fRequests)">
+                    Meine Anfragen
                 </label>
             </fieldset>
         </form>
@@ -73,10 +82,15 @@
         createList();
 
         function setFilter(cb, filter) {
-            if (cb.checked) {
-                activeFilters.push(filter);
+            if (filter) {
+                if (cb.checked) {
+                    activeFilters = [filter];
+                } else {
+                    activeFilters.splice(activeFilters.indexOf(filter), 1);
+                }
             } else {
-                activeFilters.splice(activeFilters.indexOf(filter), 1);
+                // https://stackoverflow.com/questions/1232040/how-to-empty-an-array-in-javascript
+                activeFilters.length = 0;
             }
             if (activeFilters.length > 0) {
                 controlList.filter(listFilter);
