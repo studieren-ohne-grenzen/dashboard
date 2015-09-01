@@ -19,6 +19,10 @@ h3 {
 }
 
 /* LAYOUT CSS */
+hr.spacer {
+    margin: 2em 0;
+}
+
 .pure-img-responsive {
     max-width: 100%;
     height: auto;
@@ -295,6 +299,10 @@ table.full-width {
     border: 0;
     margin: 0;
     font-weight: bold;
+}
+
+.inline-block-labels label {
+    display: inline-block;
 }
 
 .hidden-elem {
