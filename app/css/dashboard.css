@@ -190,6 +190,7 @@ hr.spacer {
 }
 
 .message-box.login-layout {
+    width: 50%;
     margin: 0 auto 3em auto;
 }
 
@@ -434,10 +435,6 @@ th.sort.desc::after {
         position: fixed;
         top: 0;
         bottom: 0;
-    }
-
-    .message-box {
-        width: 50%;
     }
 
     .logout-box {
