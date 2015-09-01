@@ -31,7 +31,7 @@ class SogDashboardApi
     /**
      * @var string Full URL to the Dashboard application
      */
-    private $dashboard_url = 'https://studieren-ohne-grenzen.org/dashboard';
+    private $dashboard_url = 'https://dashboard.studieren-ohne-grenzen.org';
     /**
      * @var int The default length for a random user password
      */
