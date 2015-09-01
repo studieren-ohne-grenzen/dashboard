@@ -95,7 +95,7 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
             $member = $app['ldap']->getMemberByMail($email);
             if ($member !== false) {
                 $token = $this->registerRequest($member['uid'][0], $email);
-                $this->sendRecoveryMail($email, $token);
+                $this->sendRecoveryMail($member, $token);
                 $app['session']->getFlashBag()
                     ->add('success', 'Wir haben dir einen Link zum Zurücksetzen deines Passworts zugeschickt. Bitte klicke auf diesen Link.');
             } else {
@@ -211,20 +211,28 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
     /**
      * Sends the recovery email containing a link with the $token to $email.
      *
-     * @param string $email
-     * @param string $token
+     * @param array $member Array of attributes for the member as returned by \Zend\Ldap
+     * @param string $token The random token which is passed to the reset URL for validation
      * @return int The number of successful mail deliveries.
      */
-    private function sendRecoveryMail($email, $token)
+    private function sendRecoveryMail($member, $token)
     {
-        $text = sprintf("Hallo!\nDu hast über das SOG Dashboard das Zurücksetzen des Passworts für deinen SOG Account angefordert. Falls du diesen Vorgang nicht von dir aus gestartet hast, musst du nichts unternehmen.\nDas Passwort kannst du hier zurücksetzen: %s",
-            $this->app['url_generator']->generate($this->reset_route, ['token' => $token], UrlGenerator::ABSOLUTE_URL)
+        $text = "<p>Hallo %s!</p>\n
+        <p>Du hast über das SOG Dashboard das Zurücksetzen des Passworts für deinen SOG Account angefordert. Falls du diesen Vorgang nicht von dir aus gestartet hast, musst du nichts unternehmen.</p>\n
+        <p>Das Passwort kannst du hier zurücksetzen: %s</p>\n
+        <p>Dein Benutzername lautet: %s</p>\n
+        <p>Bei Problemen kannst du einfach auf diese Mail antworten.</p>\n
+        <p>Mit freundlichen Grüßen, dein SOG IT-Ressort</p>";
+        $text = sprintf($text,
+            $member['displayname'][0],
+            $this->app['url_generator']->generate($this->reset_route, ['token' => $token], UrlGenerator::ABSOLUTE_URL),
+            $member['uid'][0]
         );
         $message = \Swift_Message::newInstance()
-            ->addTo($email)
+            ->addTo($member['mail-alternative'][0], $member['displayName'][0])
             ->addFrom($this->app['mailer.from'])
             ->setSubject('[SOG Dashboard] Passwort zurücksetzen')
-            ->setBody($text);
+            ->setBody($text, 'text/html');
         return $this->app['mailer']->send($message);
     }
 }

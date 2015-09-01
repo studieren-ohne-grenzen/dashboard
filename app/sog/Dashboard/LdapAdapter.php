@@ -161,7 +161,7 @@ class LdapAdapter extends Ldap
             sprintf('(&(objectClass=inetOrgPerson)(%s=%s))', $attribute, $mail),
             'ou=people,o=sog-de,dc=sog',
             self::SEARCH_SCOPE_SUB,
-            ['dn', 'uid', 'cn'],
+            ['dn', 'uid', 'cn', 'displayName', $attribute],
             'dn'
         );
         if ($results->count() > 0)
