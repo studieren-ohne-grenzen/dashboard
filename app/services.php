@@ -64,6 +64,8 @@ $app->register(new Silex\Provider\SecurityServiceProvider(), [
 
 $app->register(new Silex\Provider\RememberMeServiceProvider());
 
+$app->register(new \SOG\Dashboard\DataUtilityServiceProvider());
+
 // password recovery
 $app->mount('/password', new SOG\Dashboard\PasswordRecoveryControllerProvider());
 

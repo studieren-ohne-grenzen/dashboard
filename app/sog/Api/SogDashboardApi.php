@@ -3,6 +3,7 @@ namespace SOG\Api;
 
 use Silex\Application;
 use Silex\Provider\SwiftmailerServiceProvider;
+use SOG\Dashboard\DataUtilityServiceProvider;
 use SOG\Dashboard\RandomStringServiceProvider;
 use SOG\Dashboard\ZendLdapServiceProvider;
 
@@ -58,6 +59,8 @@ class SogDashboardApi
 
         // can be used for passwords etc, by calling $this->app['random']($length = 8)
         $this->app->register(new RandomStringServiceProvider());
+
+        $this->app->register(new DataUtilityServiceProvider());
     }
 
 
@@ -192,7 +195,7 @@ Hier die Daten des neuen Mitglieds:<br>";
         $message = \Swift_Message::newInstance()
             ->setSubject('[Studieren Ohne Grenzen] Neuanmeldung in deiner Lokalgruppe')
             ->setFrom([$this->app['mailer.from']])
-            ->setTo([strtolower($group) . '@studieren-ohne-grenzen.org'])
+            ->setTo([$this->app['get_mail_from_ou']($group) . '@studieren-ohne-grenzen.org'])
             ->setBody($text, 'text/html');
         return $this->app['mailer']->send($message);
     }

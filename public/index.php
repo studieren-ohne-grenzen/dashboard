@@ -28,7 +28,7 @@ $app->match('/members/Benutzerdaten', function (Request $request) use ($app) {
 
         if ($request->request->has('change-password')) {
             $newpwd = $request->request->get('new-password');
-            if (preg_match('/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/', $newpwd) && strlen($newpwd) >= 8) {
+            if ($app['check_password_policy']($newpwd)) {
                 try {
                     $app['ldap']->updatePassword($user->getAttributes()['dn'], $request->request->get('old-password'), $request->request->get('new-password'));
                     $app['session']->getFlashBag()
@@ -91,7 +91,7 @@ $app->match('/members/meine-Gruppen', function (Request $request) use ($app) {
                     try {
                         $app['ldap']->requestGroupMembership($userUID, $groupOU);
                         $text = "<p>Hallo,</p>\n
-                            <p>%s hat eine neue Anfrage für die Mitgliedschaft in deiner Gruppe beantragt. Du kannst die Anfrage im Dashboard unter <i>Neue Anfragen</i> auf %s beantworten.</p>\n
+                            <a>%s hat eine neue Anfrage für die Mitgliedschaft in deiner Gruppe beantragt. Du kannst die Anfrage <a href='%s'>im Dashboard unter 'Neue Anfragen'</a> beantworten.</p>\n
                             <p>Mit freundlichen Grüßen, dein SOG IT-Ressort</p>\n";
                         $text = sprintf($text,
                             $userUID,
@@ -100,7 +100,7 @@ $app->match('/members/meine-Gruppen', function (Request $request) use ($app) {
                         $message = \Swift_Message::newInstance()
                             ->setSubject('[Studieren Ohne Grenzen] Anfrage zur Mitgliedschaft in deiner Gruppe')
                             ->setFrom([$app['mailer.from']])
-                            ->setTo([strtolower($groupOU) . '@studieren-ohne-grenzen.org'])
+                            ->setTo([$app['get_mail_from_ou']($groupOU) . '@studieren-ohne-grenzen.org'])
                             ->setBody($text, 'text/html');
                         $app['mailer']->send($message);
                         $app['session']->getFlashBag()->add('success', 'Es wurde eine neue Mitgliedschaftsanfrage für die Gruppe "' . $groupAttr['cn'][0] . '" erstellt.');

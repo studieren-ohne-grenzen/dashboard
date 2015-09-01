@@ -144,15 +144,7 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
         if ($password !== $password_repeat) {
             return false;
         }
-        if (strlen($password) < $this->password_min_length) {
-            return false;
-        }
-        // see https://github.com/studieren-ohne-grenzen/dashboard/blob/develop/public/index.php#L30
-        // TODO: could be refactored, maybe Symfony\Security supports some kind of `password policy checker`
-        if (preg_match('/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/', $password) === false) {
-            return false;
-        }
-        return true;
+        return $this->app['check_password_policy']($password);
     }
 
     /**
