@@ -6,6 +6,8 @@ use Silex\Application;
 use Silex\ServiceProviderInterface;
 
 /**
+ * Provides simple static methods which work on strings.
+ *
  * Class DataUtilityServiceProvider
  * @package SOG\Dashboard
  */

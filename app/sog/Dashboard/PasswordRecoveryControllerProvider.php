@@ -8,6 +8,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 
 /**
+ * Implements password request/reset functionality, depends on Doctrine/DBAL with the sqlite interface for storing
+ * and validating requests.
+ *
  * Class PasswordRecoveryControllerProvider
  * @package SOG\Dashboard
  */

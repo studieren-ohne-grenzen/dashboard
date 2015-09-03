@@ -6,6 +6,12 @@ use Silex\Application;
 use Silex\ServiceProviderInterface;
 use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
 
+/**
+ * Easy access to random strings of any length, can be used for tokens, passwords etc.
+ *
+ * Class RandomStringServiceProvider
+ * @package SOG\Dashboard
+ */
 class RandomStringServiceProvider implements ServiceProviderInterface
 {
 

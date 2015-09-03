@@ -51,7 +51,7 @@ class LdapUserProvider implements UserProviderInterface
             // assign the user's roles
             $roles = $this->getRoles($dn);
             return new LdapUser($username, null, $attributes, $roles, $groups);
-            
+
         } catch (LdapException $ex) {
             throw new UsernameNotFoundException('Der Login war nicht erfolgreich, bitte überprüfe deinen Benutzernamen und Passwort.');
         }
