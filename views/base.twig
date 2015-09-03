@@ -27,10 +27,10 @@
                 <nav class="nav">
                     <ul class="nav-list">
                         {% if app.user and is_granted('ROLE_GROUP_ADMIN') %}
-                        <li class="nav-item">
-                            <a class="pure-button" href="{{ path('/members/manage-members') }}">Mitglieder verwalten&ensp;<i
-                                        class="icon-user-plus font-icon">&#xe803;</i></a>
-                        </li>
+                            <li class="nav-item">
+                                <a class="pure-button" href="{{ path('/members/manage-members') }}">Mitglieder verwalten&ensp;<i
+                                            class="icon-user-plus font-icon">&#xe803;</i></a>
+                            </li>
                         {% endif %}
                         <li class="nav-item">
                             <a class="pure-button" href="{{ path('/members/manage-groups') }}">Meine Gruppen&ensp;<i
@@ -132,15 +132,20 @@
         var _paq = _paq || [];
         _paq.push(['trackPageView']);
         _paq.push(['enableLinkTracking']);
-        (function() {
-            var u="//studieren-ohne-grenzen.org/piwik/";
-            _paq.push(['setTrackerUrl', u+'piwik.php']);
+        (function () {
+            var u = "//studieren-ohne-grenzen.org/piwik/";
+            _paq.push(['setTrackerUrl', u + 'piwik.php']);
             _paq.push(['setSiteId', 3]);
-            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-            g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+            var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+            g.type = 'text/javascript';
+            g.async = true;
+            g.defer = true;
+            g.src = u + 'piwik.js';
+            s.parentNode.insertBefore(g, s);
         })();
     </script>
-    <noscript><p><img src="//studieren-ohne-grenzen.org/piwik/piwik.php?idsite=3" style="border:0;" alt="" /></p></noscript>
+    <noscript><p><img src="//studieren-ohne-grenzen.org/piwik/piwik.php?idsite=3" style="border:0;" alt=""/></p>
+    </noscript>
     <!-- End Piwik Code -->
 {% endblock %}
 

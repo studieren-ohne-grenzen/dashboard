@@ -8,7 +8,7 @@
                 <td class="icon"><i class="icon-mail font-icon">&#xe802;</i></td>
                 <td class="label">E-Mail</td>
                 <td class="value">
-                    {{ app.user.attribute('mail', 0) }}<br />
+                    {{ app.user.attribute('mail', 0) }}<br/>
                 </td>
             </tr>
             <tr>
@@ -17,7 +17,8 @@
                 <td class="value">
                     <div id="view-password" class="shown-elem"> **********
                         <button class="pure-button button-small"
-                                onclick="showEdit('view-password', 'edit-password');"><i class="icon-edit font-icon">&#xe809;</i>&Auml;ndern
+                                onclick="showEdit('view-password', 'edit-password');"><i class="icon-edit font-icon">
+                                &#xe809;</i>&Auml;ndern
                         </button>
                     </div>
                     <div id="edit-password" class="hidden-elem">
@@ -31,11 +32,11 @@
                             </fieldset>
                             <fieldset class="pure-group">
                                 <label for="new-password">Neues Passwort:
-                                <input type="password" id="new-password"
-                                       name="new-password"
-                                       onkeyup="passStrength(this)"
-                                       placeholder="neues Passwort"
-                                       required><span id="strengthmeter" class="pass-strength"></span></label>
+                                    <input type="password" id="new-password"
+                                           name="new-password"
+                                           onkeyup="passStrength(this)"
+                                           placeholder="neues Passwort"
+                                           required><span id="strengthmeter" class="pass-strength"></span></label>
                                 <label for="confirm-password"><input type="password"
                                                                      id="confirm-password"
                                                                      name="confirm-password"
@@ -49,7 +50,8 @@
                                         name="change-password"><i class="icon-ok-circled2 font-icon">&#xe807;</i>&ensp;Speichern
                                 </button>
                                 <span class="pure-button"
-                                        onclick="hideEdit('view-password', 'edit-password');"><i class="icon-cancel-circled2 font-icon">&#xe808;</i>&ensp;Abbrechen
+                                      onclick="hideEdit('view-password', 'edit-password');"><i
+                                            class="icon-cancel-circled2 font-icon">&#xe808;</i>&ensp;Abbrechen
                                 </span>
                             </fieldset>
                         </form>
@@ -67,8 +69,12 @@
             </tr>
             </tbody>
         </table>
-        <p>Unter <a href="{{ path('/members/manage-groups') }}">Meine Gruppen</a> kannst du deine Mitgliedschaften in den einzelnen Gruppen verwalten.</p>
-        <p>In CiviCRM kannst du deine Stammdaten wie Adresse und Email-Adresse anpassen: <a href="https://civicrm.studieren-ohne-grenzen.org/user">Mein Profil auf CiviCRM</a> (siehe <em>Kontaktinformationen bearbeiten</em>).</p>
+        <p>Unter <a href="{{ path('/members/manage-groups') }}">Meine Gruppen</a> kannst du deine Mitgliedschaften in
+            den einzelnen Gruppen verwalten.</p>
+
+        <p>In CiviCRM kannst du deine Stammdaten wie Adresse und Email-Adresse anpassen: <a
+                    href="https://civicrm.studieren-ohne-grenzen.org/user">Mein Profil auf CiviCRM</a> (siehe <em>Kontaktinformationen
+                bearbeiten</em>).</p>
     </div>
 {% endblock %}
 {% block scripts %} {{ parent() }}
@@ -122,21 +128,26 @@
             }
         }
 
-        function passStrength(input){
-        	var result = zxcvbn(input.value);
-        	var text = '';
-        	switch (result.score){
-        		case 0: text='sehr schwach';
-        			break;
-        		case 1: text='schwach';
-    				break;
-        		case 2: text='naja';
-        			break;
-        		case 3: text='ganz okay';
-        			break;
-        		case 4: text='sicheres Passwort gew&auml;hlt!';
-        	}
-        	document.getElementById('strengthmeter').innerHTML = text;
+        function passStrength(input) {
+            var result = zxcvbn(input.value);
+            var text = '';
+            switch (result.score) {
+                case 0:
+                    text = 'sehr schwach';
+                    break;
+                case 1:
+                    text = 'schwach';
+                    break;
+                case 2:
+                    text = 'naja';
+                    break;
+                case 3:
+                    text = 'ganz okay';
+                    break;
+                case 4:
+                    text = 'sicheres Passwort gew&auml;hlt!';
+            }
+            document.getElementById('strengthmeter').innerHTML = text;
         }
     </script>
 {% endblock %}
