@@ -1,4 +1,5 @@
 <?php
+/** @var $app Silex\Application */
 // templating
 $app->register(new Silex\Provider\TwigServiceProvider(), [
     'twig.path' => __DIR__ . '/../views'

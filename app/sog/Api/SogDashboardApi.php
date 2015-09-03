@@ -129,7 +129,7 @@ class SogDashboardApi
      *
      * @param string $uid The generated unique username for the member
      * @param string $group The CN of the group for which to request the membership
-     * @return true, if there isn't already an active request from the user for the group; false otherwise
+     * @return boolean True, if there isn't already an active request from the user for the group; false otherwise
      */
     public function requestGroupMembership($uid, $group)
     {

@@ -20,7 +20,6 @@ $app->get('/', function () use ($app) {
 });
 
 $app->match('/members/Benutzerdaten', function (Request $request) use ($app) {
-    $user = null;
     /** @var \Symfony\Component\Security\Core\Authentication\Token\TokenInterface $token */
     $token = $app['security.token_storage']->getToken();
     if (null !== $token) {

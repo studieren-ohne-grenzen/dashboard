@@ -34,7 +34,7 @@ class LdapAuthenticationProvider implements AuthenticationProviderInterface
      * @param Ldap $ldap
      * @param UserProviderInterface $user_provider
      */
-    function __construct(Ldap $ldap, UserProviderInterface $user_provider)
+    public function __construct(Ldap $ldap, UserProviderInterface $user_provider)
     {
         $this->ldap = $ldap;
         $this->user_provider = $user_provider;

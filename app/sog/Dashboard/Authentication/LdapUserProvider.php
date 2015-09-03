@@ -18,11 +18,11 @@ use Zend\Ldap\Ldap;
 class LdapUserProvider implements UserProviderInterface
 {
     /**
-     * @var Ldap The LDAP resource
+     * @var LdapAdapter The LDAP resource
      */
     private $ldap;
 
-    function __construct(LdapAdapter $ldap)
+    public function __construct(LdapAdapter $ldap)
     {
         $this->ldap = $ldap;
     }

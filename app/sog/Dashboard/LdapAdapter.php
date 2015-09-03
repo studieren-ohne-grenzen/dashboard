@@ -16,7 +16,7 @@ use Zend\Ldap\Ldap;
 class LdapAdapter extends Ldap
 {
     /**
-     * @var Attribute The algorithm used for password generation.
+     * @var string The algorithm used for password generation.
      */
     private $password_algorithm = Attribute::PASSWORD_HASH_SSHA;
 
@@ -333,7 +333,7 @@ class LdapAdapter extends Ldap
         Attribute::setAttribute($info, 'mailAlias', $sog_mail_alias);
         Attribute::setAttribute($info, 'mailHomeDirectory', sprintf('/srv/vmail/%s', $sog_mail));
         Attribute::setAttribute($info, 'mailStorageDirectory', sprintf('maildir:/srv/vmail/%s/Maildir', $sog_mail));
-        Attribute::setAttribute($info, 'mailEnabled', true);
+        Attribute::setAttribute($info, 'mailEnabled', 'TRUE');
         Attribute::setAttribute($info, 'mailGidNumber', 5000);
         Attribute::setAttribute($info, 'mailUidNumber', 5000);
         Attribute::setAttribute($info, 'objectClass', [
@@ -512,7 +512,7 @@ class LdapAdapter extends Ldap
      * @param string $uid The username of the user who has done the request
      * @param string $group The group for which the request shall be removed, we expect the `ou` value
      * @throws LdapException
-     * @return true, if pending contained $user and the entry has been deleted; false otherwise
+     * @return boolean True, if pending contained $user and the entry has been deleted; false otherwise
      */
     public function dropMembershipRequest($uid, $group)
     {
@@ -537,7 +537,7 @@ class LdapAdapter extends Ldap
      * @param string $uid The username for which to request the membership in $group
      * @param string $group The group for which the membership of $user is requested, we expect the `ou` value
      * @throws LdapException
-     * @return true, if pending didn't already contain $user; false otherwise
+     * @return boolean True, if pending didn't already contain $user; false otherwise
      */
     public function requestGroupMembership($uid, $group)
     {
