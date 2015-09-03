@@ -126,6 +126,43 @@ class LdapAdapter extends Ldap
         return $results;
     }
 
+    /**
+     * Retrieve the members of the given group with their requested details
+     *
+     * @param string $group_ou OU of the group
+     * @param array $details Attributes to fetch
+     * @return array The details of all owners indexed by their `uid`
+     */
+    public function getOwnerDetails($group_ou, $details = ['mail'])
+    {
+        $owners = $this->getOwners($group_ou)->toArray();
+        // make sure to include uid, as we want to index the returned array by it
+        $details = array_merge($details, ['uid']);
+        $result = [];
+        if (empty($owners) === false) {
+            foreach ($owners[0]['owner'] as $owner) {
+                try {
+                    // retrieve details and add to result array
+                    $entry = $this->getEntry($owner, $details, true);
+                    $result[Attribute::getAttribute($entry, 'uid', 0)] = $entry;
+                } catch (LdapException $ex) {
+                    // it's ok.
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Retrieve the members of the given group
+     *
+     * @param string $group_ou OU of the group
+     * @return bool|Collection
+     */
+    public function getOwners($group_ou)
+    {
+        return $this->getMembers($group_ou, ['owner']);
+    }
 
     /**
      * Retrieves all members for the given group CN
@@ -142,7 +179,7 @@ class LdapAdapter extends Ldap
             'ou=groups,o=sog-de,dc=sog',
             self::SEARCH_SCOPE_ONE,
             $fields,
-            'member'
+            $fields[0]
         );
         return $results;
     }
