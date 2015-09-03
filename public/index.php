@@ -97,12 +97,7 @@ $app->match('/members/meine-Gruppen', function (Request $request) use ($app) {
                             $userUID,
                             $app['url_generator']->generate('/members/manage-groups', [], UrlGenerator::ABSOLUTE_URL)
                         );
-                        $message = \Swift_Message::newInstance()
-                            ->setSubject('[Studieren Ohne Grenzen] Anfrage zur Mitgliedschaft in deiner Gruppe')
-                            ->setFrom([$app['mailer.from']])
-                            ->setTo([$app['get_mail_from_ou']($groupOU) . '@studieren-ohne-grenzen.org'])
-                            ->setBody($text, 'text/html');
-                        $app['mailer']->send($message);
+                        $app['notify_owners']($groupOU, '[Studieren Ohne Grenzen] Anfrage zur Mitgliedschaft in deiner Gruppe', $text);
                         $app['session']->getFlashBag()->add('success', 'Es wurde eine neue Mitgliedschaftsanfrage für die Gruppe "' . $groupAttr['cn'][0] . '" erstellt.');
                     } catch (LdapException $ex) {
                         $app['session']->getFlashBag()->add('error', 'Fehler beim Erstellen einer Mitgliedschaftsanfrage für die Gruppe "' . $groupAttr['cn'][0] . '": ' . $ex->getMessage());

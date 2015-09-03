@@ -4,6 +4,7 @@ namespace SOG\Api;
 use Silex\Application;
 use Silex\Provider\SwiftmailerServiceProvider;
 use SOG\Dashboard\DataUtilityServiceProvider;
+use SOG\Dashboard\GroupControllerProvider;
 use SOG\Dashboard\RandomStringServiceProvider;
 use SOG\Dashboard\ZendLdapServiceProvider;
 
@@ -61,6 +62,9 @@ class SogDashboardApi
         $this->app->register(new RandomStringServiceProvider());
 
         $this->app->register(new DataUtilityServiceProvider());
+
+        // used to notify group owners
+        $this->app->mount('/groups', new GroupControllerProvider());
     }
 
 
@@ -85,7 +89,7 @@ class SogDashboardApi
         $this->createSieveForwarding($data['mail'][0], $email);
 
         $this->requestGroupMembership($username, $group);
-        $this->requestGroupMembership($username, "allgemein");
+        $this->requestGroupMembership($username, 'allgemein');
 
         $this->notifyNewUser($firstName, $username, $email, $password);
         $this->notifyNewUserAdmin($firstName, $lastName, $email, $group);
@@ -184,7 +188,7 @@ Das SOG-IT-Team
     {
         $text = "Soeben hat sich ein neues Mitglied fuer Deine Lokalgruppe angemeldet.<br>
 Das neue Mitglied ist schon auf dem Lokalgruppen-Verteiler eingetragen und hat einen OpenAtrium-Account erhalten.<br><br>
-<b>Achtung:</b> Der OA-Account des Mitglieds muss erst von dir aktiviert werden. Bitte bestätige am Besten jetzt <a href='" . $this->dashboard_url . "'>direkt im Dashboard</a>, dass " . $firstName . " " . $lastName . " tatsächlich in eurer LG aktiv ist!
+<b>Achtung:</b> Der SOG-Account des Mitglieds muss erst von dir aktiviert werden. Bitte bestätige am Besten jetzt <a href='" . $this->dashboard_url . "'>direkt im Dashboard</a>, dass " . $firstName . " " . $lastName . " tatsächlich in eurer LG aktiv ist!
 <br><br>
 Hier die Daten des neuen Mitglieds:<br>";
         $text .= "Vorname: " . $firstName . "<br>";
@@ -192,12 +196,7 @@ Hier die Daten des neuen Mitglieds:<br>";
         $text .= "Mail: " . $email . "<br>";
         $text .= "Standort: " . $group . "<br>";
 
-        $message = \Swift_Message::newInstance()
-            ->setSubject('[Studieren Ohne Grenzen] Neuanmeldung in deiner Lokalgruppe')
-            ->setFrom([$this->app['mailer.from']])
-            ->setTo([$this->app['get_mail_from_ou']($group) . '@studieren-ohne-grenzen.org'])
-            ->setBody($text, 'text/html');
-        return $this->app['mailer']->send($message);
+        return $this->app['notify_owners']($group, '[Studieren Ohne Grenzen] Neuanmeldung in deiner Lokalgruppe', $text);
     }
 
     /**

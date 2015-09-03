@@ -71,3 +71,6 @@ $app->mount('/password', new SOG\Dashboard\PasswordRecoveryControllerProvider())
 
 // signing up guests for mailing lists
 $app->mount('/members/guests', new SOG\Dashboard\GuestControllerProvider());
+
+// group management functionality
+$app->mount('/members/groups', new \SOG\Dashboard\GroupControllerProvider());
