@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdoc>
+    <title>SOG: Dashboard</title>
+    <parser>
+        <target>doc/generated</target>
+    </parser>
+    <transformer>
+        <target>doc/generated</target>
+    </transformer>
+    <files>
+        <directory>app/sog/Dashboard</directory>
+    </files>
+</phpdoc>

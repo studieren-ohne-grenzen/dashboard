@@ -1,0 +1,153 @@
+{% extends 'base.twig' %}
+{% block content %}
+    <h1>Willkommen, {{ app.user.attribute('givenname', 0) }}</h1>
+    <div>
+        <table class="pure-table-horizontal user-data">
+            <tbody class="list">
+            <tr>
+                <td class="icon"><i class="icon-mail font-icon">&#xe802;</i></td>
+                <td class="label">E-Mail</td>
+                <td class="value">
+                    {{ app.user.attribute('mail', 0) }}<br/>
+                </td>
+            </tr>
+            <tr>
+                <td class="icon"><i class="icon-key font-icon">&#xe80d;</i></td>
+                <td class="label">Passwort</td>
+                <td class="value">
+                    <div id="view-password" class="shown-elem"> **********
+                        <button class="pure-button button-small"
+                                onclick="showEdit('view-password', 'edit-password');"><i class="icon-edit font-icon">
+                                &#xe809;</i>&Auml;ndern
+                        </button>
+                    </div>
+                    <div id="edit-password" class="hidden-elem">
+                        <form class="pure-form pure-form-stacked" method="POST">
+                            <fieldset>
+                                <label for="old-password">Altes Passwort:</label>
+                                <input type="password"
+                                       class="pure-input-rounded"
+                                       id="old-password" name="old-password"
+                                       placeholder="altes Passwort" required>
+                            </fieldset>
+                            <fieldset class="pure-group">
+                                <label for="new-password">Neues Passwort:
+                                    <input type="password" id="new-password"
+                                           name="new-password"
+                                           onkeyup="passStrength(this)"
+                                           placeholder="neues Passwort"
+                                           required><span id="strengthmeter" class="pass-strength"></span></label>
+                                <label for="confirm-password"><input type="password"
+                                                                     id="confirm-password"
+                                                                     name="confirm-password"
+                                                                     onkeyup="validatePass()"
+                                                                     placeholder="neues Passwort wiederholen"
+                                                                     required>
+                                </label><span id="validation"></span>
+                            </fieldset>
+                            <fieldset>
+                                <button type="submit" class="pure-button pure-button-primary" id="change-password"
+                                        name="change-password"><i class="icon-ok-circled2 font-icon">&#xe807;</i>&ensp;Speichern
+                                </button>
+                                <span class="pure-button"
+                                      onclick="hideEdit('view-password', 'edit-password');"><i
+                                            class="icon-cancel-circled2 font-icon">&#xe808;</i>&ensp;Abbrechen
+                                </span>
+                            </fieldset>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="icon"><i class="icon-users font-icon">&#xe806;</i></td>
+                <td class="label">Gruppen</td>
+                <td class="value">
+                    {% for i in app.user.groups|keys %}
+                        {{ app.user.groupAttribute(i, 'cn', 0) }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <p>Unter <a href="{{ path('/members/manage-groups') }}">Meine Gruppen</a> kannst du deine Mitgliedschaften in
+            den einzelnen Gruppen verwalten.</p>
+
+        <p>In CiviCRM kannst du deine Stammdaten wie Adresse und Email-Adresse anpassen: <a
+                    href="https://civicrm.studieren-ohne-grenzen.org/user">Mein Profil auf CiviCRM</a> (siehe <em>Kontaktinformationen
+                bearbeiten</em>).</p>
+    </div>
+{% endblock %}
+{% block scripts %} {{ parent() }}
+    <script>
+        function showEdit(shownElem, hiddenElem) {
+            hideAll();
+            resetForms();
+            document.getElementById(shownElem).style.display = 'none';
+            document.getElementById(hiddenElem).style.display = 'inline';
+        }
+        function hideEdit(shownElem, hiddenElem) {
+            document.getElementById(shownElem).style.display = 'inline';
+            document.getElementById(hiddenElem).style.display = 'none';
+        }
+        function hideAll() {
+            var e = document.getElementsByClassName('hidden-elem');
+            var i;
+            for (i = 0; i < e.length; ++i) {
+                e[i].style.display = 'none';
+            }
+            e = document.getElementsByClassName('shown-elem');
+            for (i = 0; i < e.length; ++i) {
+                e[i].style.display = 'inline';
+            }
+        }
+        function resetForms() {
+            var e = document.getElementsByClassName('pure-form');
+            for (var i = 0; i < e.length; ++i) {
+                e[i].reset();
+            }
+            var confPass = document.getElementById('confirm-password');
+            var message = document.getElementById('validation');
+            confPass.style.backgroundColor = null;
+            message.innerHTML = '';
+        }
+        function validatePass() {
+            var pass = document.getElementById('new-password');
+            var confPass = document.getElementById('confirm-password');
+            var message = document.getElementById('validation');
+            var colorOK = '#66cc66';
+            var colorWrong = '#ff6666';
+
+            if (pass.value == confPass.value) {
+                confPass.style.backgroundColor = colorOK;
+                message.style.color = colorOK;
+                message.innerHTML = '';
+            } else {
+                confPass.style.backgroundColor = colorWrong;
+                message.style.color = colorWrong;
+                message.innerHTML = 'Passw&ouml;rter stimmen nicht &uuml;berein';
+            }
+        }
+
+        function passStrength(input) {
+            var result = zxcvbn(input.value);
+            var text = '';
+            switch (result.score) {
+                case 0:
+                    text = 'sehr schwach';
+                    break;
+                case 1:
+                    text = 'schwach';
+                    break;
+                case 2:
+                    text = 'naja';
+                    break;
+                case 3:
+                    text = 'ganz okay';
+                    break;
+                case 4:
+                    text = 'sicheres Passwort gew&auml;hlt!';
+            }
+            document.getElementById('strengthmeter').innerHTML = text;
+        }
+    </script>
+{% endblock %}

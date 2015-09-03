@@ -1,0 +1,175 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+    <h1>Verwalte deine Gruppenmitgliedschaften</h1>
+    <p>Hier kannst du komfortabel deine Mitgliedschaften in den verschiedenen Gruppen verwalten. Falls du an einer neuen
+        Gruppe interessiert bist, kannst du über den Button "Mitgliedschaft beantragen" den KoordinatorIn der jeweiligen
+        Gruppe benachrichtigen. Dieser wird dann deinen Antrag freischalten. Zur Mitgliedschaft in einer Gruppe gehört
+        u.a. der Zugang zur jeweiligen OwnCloud und der Erhalt der Mails des Verteilers.</p>
+    <p>Falls du KoordinatorIn einer Gruppe bist und hier noch nicht gelistet wirst, wende dich bitte an das <a
+                href="mailto:it@studieren-ohne-grenzen.org">IT-Ressort</a>.</p>
+    <div id="group-list">
+        <form class="pure-form bold-legend pure-g">
+            <fieldset class="pure-u-1 pure-u-md-1-2 inline-block-labels">
+                <legend>Anzeigen...</legend>
+                <i class="icon-filter font-icon">&#xe817;</i>
+                <label for="filter-by-none">
+                    <input id="filter-by-none" type="radio" name="filter"
+                           onclick="setFilter(this, null)" checked>
+                    Alle
+                </label>
+                <label for="filter-by-membership">
+                    <input id="filter-by-membership" type="radio" name="filter"
+                           onclick="setFilter(this, fMemberships)">
+                    Meine Mitgliedschaften
+                </label>
+                <label for="filter-by-pending">
+                    <input id="filter-by-pending" type="radio" name="filter" onclick="setFilter(this, fRequests)">
+                    Meine Anfragen
+                </label>
+            </fieldset>
+            <fieldset class="pure-u-1 pure-u-md-1-2">
+                <legend>Suchen nach...</legend>
+                <i class="icon-search font-icon">&#xe816;</i>
+                <input type="text" class="pure-input-1-2 search" placeholder="Gruppe, KoordinatorIn...">
+            </fieldset>
+        </form>
+        <table class="full-width pure-table pure-table-bordered">
+            <thead>
+            <tr>
+                <th class="sort asc" data-sort="group_name">Gruppenname</th>
+                <th class="sort" data-sort="owner">GruppenkoordinatorInnen</th>
+                <th class="sort" data-sort="is_member">Aktion</th>
+            </tr>
+            </thead>
+            <tbody class="list">
+            <tr id="list-item" class="table-row">
+                <td class="group_name"></td>
+                <td class="owner"></td>
+                <td class="actions"></td>
+                <td class="is_owner hidden"></td>
+                <td class="is_member hidden"></td>
+                <td class="is_pending hidden"></td>
+            </tr>
+            </tbody>
+        </table>
+        <ul class="pagination"></ul>
+    </div>
+    <form method="POST" id="send-action">
+        <input type="hidden" name="ou" id="ou"/>
+        <input type="hidden" name="action" id="action"/>
+    </form>
+{% endblock %}
+
+{% block scripts %}
+    {{ parent() }}
+    <script>
+        var options = {
+            valueNames: ['group_name', 'owner', 'actions', 'is_owner', 'is_member', 'is_pending']
+        };
+
+        var controlList = new List('group-list', options);
+        var data = {{ groupList|json_encode|raw }};
+        var activeFilters = [];
+
+        var fMemberships = function (item) {
+            return (item.values().is_member == true)
+        };
+        var fRequests = function (item) {
+            return (item.values().is_pending == true)
+        };
+
+        createList();
+
+        function setFilter(cb, filter) {
+            if (filter) {
+                if (cb.checked) {
+                    activeFilters = [filter];
+                } else {
+                    activeFilters.splice(activeFilters.indexOf(filter), 1);
+                }
+            } else {
+                // https://stackoverflow.com/questions/1232040/how-to-empty-an-array-in-javascript
+                activeFilters.length = 0;
+            }
+            if (activeFilters.length > 0) {
+                controlList.filter(listFilter);
+            } else {
+                controlList.filter();
+            }
+        }
+
+        var listFilter = function (item) {
+            var s = false;
+            for (var i = 0; i < activeFilters.length; i++) {
+                if (activeFilters[i](item) == true) s = true;
+            }
+            return s;
+        };
+
+        function submitButton(groupName, ou, action) {
+            var confirm = false;
+
+            if (action === 'quit') {
+                confirm = window.confirm('Sicher, dass Du nicht mehr Mitglied in der Gruppe "' + groupName + '" sein möchtest?');
+            } else if (action == 'drop-request') {
+                confirm = window.confirm('Sicher, dass Du die Mitgliedschaftsanfrage bei der Gruppe "' + groupName + '" abbrechen möchtest?');
+            } else if (action == 'start-request') {
+                confirm = true;
+            }
+            if (confirm) {
+                var submitForm = document.getElementById('send-action');
+                document.getElementById('ou').value = ou;
+                document.getElementById('action').value = action;
+                submitForm.submit();
+            }
+        }
+
+        function createList() {
+            controlList.clear();
+            for (var i = 0; i < data.length; i++) {
+                var owner = false;
+                var member = false;
+                var pending = false;
+
+                for (var j = 0; j < data[i]['userRoles'].length; j++) {
+                    switch (data[i]['userRoles'][j]) {
+                        case 'owner':
+                            owner = true;
+                            break;
+                        case 'member':
+                            member = true;
+                            break;
+                        case 'pending':
+                            pending = true;
+                    }
+                }
+
+                var buttons = '';
+                if (pending) {
+                    buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['ou'] + '\', \'drop-request\')" class="pure-button button-warning"><i class="icon-cancel font-icon">&#xe815;</i>&ensp;Anfrage abbrechen</button>';
+                } else if (member) {
+                    buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['ou'] + '\', \'quit\')" class="pure-button button-error"><i class="icon-minus font-icon">&#xe821;</i>&ensp;Mitgliedschaft beenden</button>';
+                } else {
+                    buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['ou'] + '\', \'start-request\')" class="pure-button button-success"><i class="icon-help font-icon">&#xe81b;</i>&ensp;Mitgliedschaft anfragen</button>';
+                }
+
+                var owners = '';
+                for (var k = 0; k < data[i]['owners'].length; k++) {
+                    if (k > 0) owners += ',&ensp;';
+                    owners += data[i]['owners'][k]['cn'] + '<a href="mailto:' + data[i]['owners'][k]['mail'] + '"><i class="icon-mail font-icon">&#xe802;</i></a>';
+                }
+
+                controlList.add({
+                    group_name: data[i]['name'],
+                    owner: owners,
+                    actions: buttons,
+                    is_owner: owner,
+                    is_member: member,
+                    is_pending: pending
+                });
+            }
+        }
+
+    </script>
+{% endblock %}
