@@ -43,23 +43,30 @@ Here is a general overview of the directory structure:
     | assets/                         Static assets, such as images
     | css/                            Our custom CSS files
     | js/                             Our custom JS files
+    | setup/                          Scripts to setup the environment, such as creating the sqlite database
     | sog/                            PSR-0 namespaced application files, autoloaded using Composer
-    | services.php                    Service definitions for Silex application
     | config.php.sample               Rename the sample file to config.php for usage
+    | create_sieve_forwardings.sh     Bash script to create the necessary files for initial sieve forwarding, needs sudo
+    | dashboard.db (not in git)       The sqlite database.
+    | services.php                    Service definitions for Silex application
 | bower_components/ (not in git)      Bower files
 | doc/                                Documentation
 | logs/ (not in git)                  Used by Monolog
 | node_modules/ (not in git)          NPM files
 | public/                             This is the document root for the webserver, Brunch will compile and copy all assets (images, CSS, JS...) is folder
-    | .htaccess                       mod_rewrite for nicer URLs
+    | .htaccess-dist                  mod_rewrite for nicer URLs and more, should be setup directly in the vhost file
     | index.php                       The main runtime for the application
-    | <everything else>               All other folders are copied here by Brunch upon building, they should nt be changed, rather edit the fil *app*
+    | <everything else>               All other folders are copied here by Brunch upon building, changes made to files here will be lost 
 | vendor/ (not in git)                Composer files
 | views/                              Twig templates
 | bower.json                          Frontend dependencies, such as List.js and PureCSS
-| composer.json                       PHP dependencies, such as Silex
-| composer.lock                       A snapshot of the currently used version numbers of the composesr dependencies
-| deploy.sh                           Script for easy deployment
-| package.json                        Development dependencies, such as plugins for Brunch
 | brunch-config.coffee                Brunch config file
+| composer.json                       PHP dependencies, such as Silex
+| composer.lock                       A snapshot of the currently used version numbers of the composer dependencies
+| deploy.sh                           Script for easy deployment
+| deploy_ignore.txt                   Lists files (with globbing) which should not be deployed with rsync 
+| LICENSE                             Go ahead, read it. It's not long.
+| package.json                        Development dependencies, such as plugins for Brunch
+| phpdoc.dist.xml                     Settings some defaults for phpdoc, such as target and project title
+| README.md                           Hi, it's me!
 ```
