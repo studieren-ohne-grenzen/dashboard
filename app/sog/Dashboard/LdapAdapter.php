@@ -502,12 +502,11 @@ class LdapAdapter extends Ldap
      *
      * @param string $uid The username of the user who has done the request
      * @param string $group The group for which the request shall be removed, we expect the `ou` value
-     * @throws LdapException
+     * @throws LdapException If group can't be found or update wasn't successful
      * @return boolean True, if pending contained $user and the entry has been deleted; false otherwise
      */
     public function dropMembershipRequest($uid, $group)
     {
-
         $dnOfGroup = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $group);
         $entry = $this->getEntry($dnOfGroup);
         if (is_null($entry)) {
@@ -527,8 +526,8 @@ class LdapAdapter extends Ldap
      *
      * @param string $uid The username for which to request the membership in $group
      * @param string $group The group for which the membership of $user is requested, we expect the `ou` value
-     * @throws LdapException
-     * @return boolean True, if pending didn't already contain $user; false otherwise
+     * @throws LdapException If group can't be found or update wasn't successful
+     * @return boolean True, if pending didn't already contain $user; false otherwise (also when already a member)
      */
     public function requestGroupMembership($uid, $group)
     {
@@ -538,7 +537,7 @@ class LdapAdapter extends Ldap
             throw new LdapException($this, sprintf('Can\'t find group %s', $group));
         }
         $dnOfUser = $this->findUserDN($uid);
-        if (Attribute::attributeHasValue($entry, 'pending', $dnOfUser)) {
+        if (Attribute::attributeHasValue($entry, 'member', $dnOfUser) || Attribute::attributeHasValue($entry, 'pending', $dnOfUser)) {
             return false;
         }
         Attribute::setAttribute($entry, 'pending', $dnOfUser, true);
