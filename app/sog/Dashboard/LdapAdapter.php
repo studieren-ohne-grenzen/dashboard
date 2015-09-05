@@ -107,26 +107,6 @@ class LdapAdapter extends Ldap
     }
 
     /**
-     * Retrieves all memberships for the given DN
-     *
-     * @param string $user_dn The DN for which to get the memberships
-     * @param array $fields A list of fields we want to return from the search
-     * @return bool|\Zend\Ldap\Collection
-     * @throws LdapException
-     */
-    public function getMemberships($user_dn, $fields = ['cn'])
-    {
-        $results = $this->search(
-            sprintf('(&(objectClass=groupOfNames)(member=%s))', $user_dn),
-            'ou=groups,o=sog-de,dc=sog',
-            self::SEARCH_SCOPE_ONE,
-            $fields,
-            'cn'
-        );
-        return $results;
-    }
-
-    /**
      * Retrieve the members of the given group with their requested details
      *
      * @param string $group_ou OU of the group
@@ -207,7 +187,6 @@ class LdapAdapter extends Ldap
             return false;
     }
 
-
     /**
      * This method can be used to assign the ROLE_GROUP_ADMIN role to a user. It checks if the given DN is a owner
      * of any group. Further checks should be done somewhere else.
@@ -227,19 +206,31 @@ class LdapAdapter extends Ldap
      * Returns the groups owned by the user with the given dn
      *
      * @param string $user_dn The user DN for which we want to check
-     * @return Collection The groups owned by the user
-     * @throws LdapException
+     * @return bool|Collection The groups owned by the user
      */
     public function getOwnedGroups($user_dn)
     {
+        return $this->getMemberships($user_dn, ['cn', 'ou'], 'owner');
+    }
+
+    /**
+     * Retrieves all memberships for the given DN
+     *
+     * @param string $user_dn The DN for which to get the memberships
+     * @param array $fields A list of fields we want to return from the search
+     * @param string $attribute The attribute which we use for filtering
+     * @return bool|\Zend\Ldap\Collection
+     * @throws LdapException
+     */
+    public function getMemberships($user_dn, $fields = ['cn'], $attribute = 'member')
+    {
         $results = $this->search(
-            sprintf('(&(objectClass=groupOfNames)(owner=%s))', $user_dn),
+            sprintf('(&(objectClass=groupOfNames)(%s=%s))', $attribute, $user_dn),
             'ou=groups,o=sog-de,dc=sog',
             self::SEARCH_SCOPE_ONE,
-            ['cn', 'ou'],
+            $fields,
             'cn'
         );
-
         return $results;
     }
 
