@@ -35,7 +35,7 @@ hr.spacer {
 .header {
     text-align: center;
     top: auto;
-    margin: 3em auto;
+    margin: 1em auto;
 }
 
 .sidebar {
@@ -257,9 +257,6 @@ table.full-width {
 }
 
 .group-chooser {
-    position: relative;
-    top: 0;
-    right: 0;
     background-color: rgb(61, 146, 201);
     padding: 10px 20px 5px;
     margin-bottom: 30px;
@@ -270,8 +267,8 @@ table.full-width {
 }
 
 .logo {
-    width: 18em;
-    height: 18em;
+    width: 6em;
+    height: 6em;
     background-image: url(../img/logo.jpg);
     background-position: center center;
     background-repeat: no-repeat;
@@ -281,7 +278,7 @@ table.full-width {
 
 .sidebar .logo {
     max-width: 100%;
-    margin: 0 auto 3em;
+    margin: 0 auto 1em;
 }
 
 .circular {
@@ -405,7 +402,7 @@ th.sort.desc::after {
     /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 }
 
-@media (max-width: 25em) {
+@media screen and (max-width: 25em) {
     .login-form {
         width: 100%;
         padding: 0 2em;
@@ -418,14 +415,14 @@ th.sort.desc::after {
 }
 
 /* large website */
-@media (min-width: 48em) {
+@media screen and (min-width: 48em) {
     .content {
         padding: 2em 3em 0;
         margin-left: 25%;
     }
 
     .header {
-        margin: 20% 2em 0;
+        margin: 10% 2em 0;
         text-align: right;
     }
 
@@ -442,5 +439,13 @@ th.sort.desc::after {
 
     .table-row:hover {
         background-color: #efefef;
+    }
+}
+
+@media screen and (min-width: 100em) {
+    .sidebar .logo {
+        width: 18em;
+        height: 18em;
+        margin-bottom: 3em;
     }
 }

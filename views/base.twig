@@ -16,7 +16,7 @@
 <body>
 <div id="layout" class="pure-g">
     {% block sidebar %}
-        <div class="sidebar pure-u-1 pure-u-xl-1-5">
+        <div class="sidebar pure-u-1 pure-u-md-1-4">
             <div class="header">
                 <div class="pure-img-responsive logo circular"></div>
 
@@ -59,7 +59,7 @@
         </div>
     {% endblock %}
 
-    <div class="content pure-u-1 pure-u-xl-4-5" id="members">
+    <div class="content pure-u-1 pure-u-md-3-4" id="members">
         <div class="message-box">
             {% for message in app.session.getFlashBag.get('error') %}
                 <div class="message-error">
@@ -133,7 +133,7 @@
         _paq.push(['trackPageView']);
         _paq.push(['enableLinkTracking']);
         (function () {
-            var u = "//admin.studieren-ohne-grenzen.org/piwik/";
+            var u = "//www.studieren-ohne-grenzen.org/piwik/";
             _paq.push(['setTrackerUrl', u + 'piwik.php']);
             _paq.push(['setSiteId', 3]);
             var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
@@ -144,7 +144,7 @@
             s.parentNode.insertBefore(g, s);
         })();
     </script>
-    <noscript><p><img src="//admin.studieren-ohne-grenzen.org/piwik/piwik.php?idsite=3" style="border:0;" alt=""/></p>
+    <noscript><p><img src="//www..studieren-ohne-grenzen.org/piwik/piwik.php?idsite=3" style="border:0;" alt=""/></p>
     </noscript>
     <!-- End Piwik Code -->
 {% endblock %}

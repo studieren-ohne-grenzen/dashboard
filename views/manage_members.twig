@@ -17,6 +17,11 @@
     </div>
     <p>Als KoordinatorIn einer Gruppe kannst du hier die Mitglieder verwalten. Falls du für mehrere Gruppen
         verantwortlich bist, kannst du die entsprechende oben rechts auswählen.</p>
+    <p>Zum <a href="#" class="button-success pure-button button-small" id="trigger-filter-none">Hinzufügen von
+            Mitgliedern</a>, wähle unter "Anzeigen" <em>Alle</em> aus
+        und suche dann nach dem jeweiligen Mitglied - dann musst du nur noch auf den Button <em>hinzufügen</em> klicken.
+        Fertig!
+    </p>
     <div id="member-list">
         <form class="pure-form bold-legend pure-g">
             <fieldset class="pure-u-1 pure-u-md-1-2 inline-block-labels">
@@ -112,6 +117,12 @@
         };
 
         createList();
+
+        document.getElementById('trigger-filter-none').onclick = function (e) {
+            e.preventDefault();
+            document.getElementById('filter-by-none').checked = 'checked';
+            setFilter();
+        };
 
         function setFilter(cb, filter) {
             if (filter) {
