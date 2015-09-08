@@ -106,6 +106,10 @@ $app->match('/members/meine-Gruppen', function (Request $request) use ($app) {
                 default:
                     $app['session']->getFlashBag()->add('error', 'Fehler: Der gesendete Befehl wird nicht unterstützt.');
             }
+
+            if ($request->isXmlHttpRequest()) {
+                return $app->json(['messages' => $app['session']->getFlashBag()->all()]);
+            }
         }
 
         $groups = $app['ldap']->getGroups(['cn', 'ou', 'owner', 'member', 'pending'])->toArray();
@@ -216,6 +220,10 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
 
             } else {
                 $app['session']->getFlashBag()->add('error', 'Keine Berechtigung für die gewählte Gruppe');
+            }
+
+            if ($request->isXmlHttpRequest()) {
+                return $app->json(['messages' => $app['session']->getFlashBag()->all()]);
             }
         }
 
