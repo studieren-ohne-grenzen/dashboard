@@ -122,7 +122,10 @@
 
 {% block scripts %}
     <script src="{{ app.request.basepath }}/js/vendor.js"></script>
+    <script src="{{ app.request.basepath }}/js/app.js"></script>
     <script>
+        require('js/zepto.min');
+
         function removeParent(element) {
             element.parentElement.parentElement.removeChild(element.parentElement);
         }
