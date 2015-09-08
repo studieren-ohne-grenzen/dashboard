@@ -118,10 +118,11 @@
                 confirm = true;
             }
             if (confirm) {
-                var submitForm = document.getElementById('send-action');
                 document.getElementById('ou').value = ou;
                 document.getElementById('action').value = action;
-                submitForm.submit();
+                $.post('/members/meine-Gruppen', $('#send-action').serialize(), function(response){
+                    console.log(response);
+                });
             }
         }
 

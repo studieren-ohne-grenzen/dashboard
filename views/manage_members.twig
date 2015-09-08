@@ -166,10 +166,11 @@
                 confirm = window.confirm("Sicher, dass " + name + " aus " + groupName + " entfernt werden soll?");
             }
             if (confirm) {
-                var submitForm = document.getElementById('send-action');
                 document.getElementById('uid').value = uid;
                 document.getElementById('action').value = action;
-                submitForm.submit();
+                $.post('/members/Mitglieder-verwalten', $('#send-action').serialize(), function(response){
+                    console.log(response);
+                });
             }
         }
 
