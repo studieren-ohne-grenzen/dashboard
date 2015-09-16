@@ -1,5 +1,6 @@
 # The Dashboard
 Simple dashboard for different management tasks, works on our LDAP tree
+
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/studieren-ohne-grenzen/dashboard/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/studieren-ohne-grenzen/dashboard/?branch=master)
 
 # Getting started
