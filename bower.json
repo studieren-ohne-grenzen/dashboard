@@ -13,12 +13,19 @@
     "tests"
   ],
   "dependencies": {
+    "basicModal": "~3.1.2",
     "list.js": "~1.1.1",
     "list.pagination.js": "~0.1.1",
     "pure": "~0.6.0",
     "zxcvbn": "*"
   },
   "overrides": {
+    "basicModal" : {
+      "main": [
+        "dist/basicModal.min.js",
+        "dist/basicModal.min.css"
+      ]
+    },
     "pure": {
       "main": [
         "pure.css",

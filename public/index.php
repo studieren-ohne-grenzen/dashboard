@@ -108,7 +108,7 @@ $app->match('/members/meine-Gruppen', function (Request $request) use ($app) {
             }
         }
 
-        $groups = $app['ldap']->getGroups(['cn', 'ou', 'owner', 'member', 'pending'])->toArray();
+        $groups = $app['ldap']->getGroups(['cn', 'mailinglistId', 'ou', 'owner', 'member', 'pending'])->toArray();
         $groupList = [];
         foreach ($groups as $g) {
             $roles = [];
@@ -127,6 +127,7 @@ $app->match('/members/meine-Gruppen', function (Request $request) use ($app) {
             $listentry = array(
                 'name' => $g['cn'][0],
                 'ou' => $g['ou'][0],
+                'mailinglistId' => $g['mailinglistid'][0],
                 'userRoles' => $roles,
                 'owners' => $owners
             );
