@@ -96,7 +96,7 @@ class GroupControllerProvider implements ControllerProviderInterface
         /** @var \Symfony\Component\Security\Core\Authentication\Token\TokenInterface $token */
         $token = $this->app['security.token_storage']->getToken();
         $user = $token->getUser();
-        if ($user->getAttributes()['uid'] === $this->uid) {
+        if ($user->getAttributes()['uid'][0] === $this->uid) {
             $this->app['session']->getFlashBag()
                 ->add('error', 'Du kannst dich nicht selbst bearbeiten.');
             return new RefererRedirectResponse($request);
