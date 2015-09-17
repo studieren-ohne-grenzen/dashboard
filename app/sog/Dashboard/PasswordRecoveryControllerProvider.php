@@ -106,7 +106,7 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
                     ->add('error', 'Diese Email-Adresse ist nicht vergeben.');
             }
             return $app->redirect('/login');
-        })->method('POST|GET');;
+        })->method('POST|GET');
 
         return $controllers;
     }
