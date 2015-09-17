@@ -20,7 +20,7 @@ class RefererRedirectResponse extends RedirectResponse
     /**
      * @var string The default redirect route if the referer is empty
      */
-    private $default_route = '/members/manage-members';
+    private $default_route = '/members/Mitglieder-verwalten';
 
     /**
      * Call the parent constructor to redirect appropriately
