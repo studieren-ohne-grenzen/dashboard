@@ -72,7 +72,7 @@
     <form method="POST" id="send-action">
         <input type="hidden" name="ou" id="ou" value="{{ selectedGroup }}"/>
         <input type="hidden" name="uid" id="uid"/>
-        <input type="hidden" name="action" id="action"/>
+        <input type="hidden" name="manage-action" id="manage-action"/>
     </form>
     <hr class="spacer">
     <form action="{{ path('POST_members_guests_subscribe') }}" method="POST" class="pure-form" id="setup-guest">
@@ -168,7 +168,7 @@
             if (confirm) {
                 var submitForm = document.getElementById('send-action');
                 document.getElementById('uid').value = uid;
-                document.getElementById('action').value = action;
+                document.getElementById('manage-action').value = action;
                 submitForm.submit();
             }
         }

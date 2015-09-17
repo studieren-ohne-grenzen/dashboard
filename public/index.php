@@ -148,7 +148,6 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
     if (null !== $token) {
         $user = $token->getUser();
         $ownedGroups = $app['ldap']->getOwnedGroups($user->getAttributes()['dn'])->toArray();
-
         $selGroup = $request->query->get('ou');
 
         if (count($ownedGroups) === 0 || in_array($selGroup, $user->getOwnerships()) === false) {
@@ -159,7 +158,7 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
         if (!isset($selGroup)) $selGroup = $ownedGroups[0]['ou'][0];
         $selGroupDN = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $selGroup);
 
-        $action = $request->request->get('action');
+        $action = $request->request->get('manage-action');
 
         if (isset($action)) {
             $ownerPermission = false;
