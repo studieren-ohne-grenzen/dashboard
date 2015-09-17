@@ -150,6 +150,12 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
         $ownedGroups = $app['ldap']->getOwnedGroups($user->getAttributes()['dn'])->toArray();
 
         $selGroup = $request->query->get('ou');
+
+        if (count($ownedGroups) === 0 || in_array($selGroup, $user->getOwnerships()) === false) {
+            $app['session']->getFlashBag()->add('error', 'Keine Berechtigung.');
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/members/Benutzerdaten');
+        }
+
         if (!isset($selGroup)) $selGroup = $ownedGroups[0]['ou'][0];
         $selGroupDN = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $selGroup);
 
