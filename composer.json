@@ -1,4 +1,7 @@
 {
+    "name" : "studieren-ohne-grenzen/dashboard",
+    "description" : "Simple dashboard for different management tasks, works on our LDAP tree",
+    "license" : "MIT",
     "require": {
         "silex/silex": "^1.3",
         "twig/twig": "^1.18",
