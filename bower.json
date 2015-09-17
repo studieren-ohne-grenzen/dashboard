@@ -17,10 +17,10 @@
     "list.js": "~1.1.1",
     "list.pagination.js": "~0.1.1",
     "pure": "~0.6.0",
-    "zxcvbn": "*"
+    "zxcvbn": "~3.5.0"
   },
   "overrides": {
-    "basicModal" : {
+    "basicModal": {
       "main": [
         "dist/basicModal.min.js",
         "dist/basicModal.min.css"
