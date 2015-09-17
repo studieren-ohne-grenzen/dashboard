@@ -47,11 +47,12 @@ class LdapUserProvider implements UserProviderInterface
             // then get all associated attributes
             $attributes = $this->ldap->getEntry($dn);
             // also get the groups the user is member of
-            $groups = $this->ldap->getMemberships($dn, ['cn', 'ou'])->toArray();
+            $memberships = $this->ldap->getMemberships($dn, ['cn', 'ou'])->toArray();
+            // and maybe the owned groups
+            $ownerships = $this->ldap->getOwnedGroups($dn)->toArray();
             // assign the user's roles
-            $roles = $this->getRoles($dn);
-            return new LdapUser($username, null, $attributes, $roles, $groups);
-
+            $roles = $this->getRoles($dn, $ownerships);
+            return new LdapUser($username, null, $attributes, $roles, $memberships, $ownerships);
         } catch (LdapException $ex) {
             throw new UsernameNotFoundException('Der Login war nicht erfolgreich, bitte überprüfe deinen Benutzernamen und Passwort.');
         }
@@ -62,12 +63,13 @@ class LdapUserProvider implements UserProviderInterface
      * ROLE_ADMIN or other cases
      *
      * @param string $user_dn The user DN for which to infer the rules
+     * @param array $ownerships The owned groups for the user DN
      * @return array The roles of the given user
      */
-    private function getRoles($user_dn)
+    private function getRoles($user_dn, $ownerships)
     {
         $roles = [];
-        if ($this->ldap->isOwner($user_dn)) {
+        if (count($ownerships) > 0) {
             $roles[] = 'ROLE_GROUP_ADMIN';
         } else {
             $roles[] = 'ROLE_USER';
