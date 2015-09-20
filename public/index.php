@@ -150,7 +150,7 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
         $ownedGroups = $app['ldap']->getOwnedGroups($user->getAttributes()['dn'])->toArray();
         $selGroup = $request->query->get('ou');
 
-        if (count($ownedGroups) === 0 || in_array($selGroup, $user->getOwnerships()) === false) {
+        if (count($ownedGroups) === 0) {
             $app['session']->getFlashBag()->add('error', 'Keine Berechtigung.');
             return new \Symfony\Component\HttpFoundation\RedirectResponse('/members/Benutzerdaten');
         }
@@ -199,7 +199,7 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
                     case 'rm':
                         try {
                             if (in_array($userDN, $groupAttr['owner'])) {
-                                $app['session']->getFlashBag()->add('error', 'Nicht möglich! "' . $userAttr['cn'][0] . '" ist Koordinator der Gruppe "' . $selGroupName . '". Zum Beenden deiner Mitgliedschaft wende dich bitte an das Ressort IT.');
+                                $app['session']->getFlashBag()->add('error', 'Nicht möglich! "' . $userAttr['cn'][0] . '" ist Koordinator der Gruppe "' . $selGroupName . '". Bitte entferne ihn zuerst als Koordinator.');
                             } else {
                                 $app['ldap']->removeFromGroup($userDN, $selGroupDN);
                                 $app['session']->getFlashBag()->add('success', $userAttr['cn'][0] . ' wurde von der Gruppe "' . $selGroupName . '" entfernt!');
