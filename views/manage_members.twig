@@ -72,7 +72,7 @@
     <form method="POST" id="send-action">
         <input type="hidden" name="ou" id="ou" value="{{ selectedGroup }}"/>
         <input type="hidden" name="uid" id="uid"/>
-        <input type="hidden" name="action" id="action"/>
+        <input type="hidden" name="manage-action" id="manage-action"/>
     </form>
     <hr class="spacer">
     <form action="{{ path('POST_members_guests_subscribe') }}" method="POST" class="pure-form" id="setup-guest">
@@ -155,8 +155,15 @@
             var groupName = gc.options[gc.selectedIndex].text;
 
             var confirm = false;
+            var routeOverride = false;
 
-            if (action === 'add') {
+            if (action === 'add-owner') {
+                confirm = window.confirm("Sicher, dass " + name + " zu " + groupName + " als Koordinator hinzugefügt werden soll?");
+                routeOverride = '/members/groups/owner/add';
+            } else if (action === 'rm-owner') {
+                confirm = window.confirm("Sicher, dass " + name + " von " + groupName + " als Koordinator entfernt werden soll?");
+                routeOverride = '/members/groups/owner/remove';
+            } else if (action === 'add') {
                 confirm = window.confirm("Sicher, dass " + name + " zu " + groupName + " hinzugefügt werden soll?");
             } else if (action === 'activate') {
                 confirm = window.confirm(name + " ist ein neues Mitglied und hat noch keinen Zugriff auf den SOG-Account. " +
@@ -167,8 +174,11 @@
             }
             if (confirm) {
                 var submitForm = document.getElementById('send-action');
+                if (routeOverride !== false) {
+                    submitForm.action = routeOverride;
+                }
                 document.getElementById('uid').value = uid;
-                document.getElementById('action').value = action;
+                document.getElementById('manage-action').value = action;
                 submitForm.submit();
             }
         }
@@ -213,6 +223,11 @@
                     }
                     if (pending) {
                         buttons += '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'rm-request\')" class="pure-button button-warning"><i class="icon-paper-plane font-icon">&#xe824;</i>&ensp;Anfrage ignorieren</button>';
+                    }
+                    if (owner) {
+                        buttons += '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'rm-owner\')" title="Als Koordinator entfernen" class="pure-button button-info"><i class="icon-star font-icon">&#xe82a;</i>&ensp;</button>';
+                    } else {
+                        buttons += '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'add-owner\')" title="Als Koordinator hinzufügen" class="pure-button button-info"><i class="icon-star-empty font-icon">&#xe82b;</i>&ensp;</button>';
                     }
                 }
 

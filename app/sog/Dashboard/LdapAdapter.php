@@ -65,12 +65,13 @@ class LdapAdapter extends Ldap
      *
      * @param string $dnOfUser dn of the user to add
      * @param string $dnOfGroup dn of the group
+     * @param string $role A groupOfNames attribute, such as owner, pending, member (default)
      * @throws LdapException
      */
-    public function addToGroup($dnOfUser, $dnOfGroup)
+    public function addToGroup($dnOfUser, $dnOfGroup, $role = 'member')
     {
         $entry = $this->getEntry($dnOfGroup);
-        Attribute::setAttribute($entry, 'member', $dnOfUser, true);
+        Attribute::setAttribute($entry, $role, $dnOfUser, true);
         $this->update($dnOfGroup, $entry);
     }
 
@@ -79,12 +80,13 @@ class LdapAdapter extends Ldap
      *
      * @param string $dnOfUser dn of the user to remove
      * @param string $dnOfGroup dn of the group
+     * @param string $role A groupOfNames attribute, such as owner, pending, member (default)
      * @throws LdapException
      */
-    public function removeFromGroup($dnOfUser, $dnOfGroup)
+    public function removeFromGroup($dnOfUser, $dnOfGroup, $role = 'member')
     {
         $entry = $this->getEntry($dnOfGroup);
-        Attribute::removeFromAttribute($entry, 'member', $dnOfUser);
+        Attribute::removeFromAttribute($entry, $role, $dnOfUser);
         $this->update($dnOfGroup, $entry);
     }
 
