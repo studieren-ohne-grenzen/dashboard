@@ -27,3 +27,5 @@ app/config.php
 app/dashboard.db
 
 doc/generated
+
+.vagrant/
