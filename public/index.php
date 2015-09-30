@@ -112,7 +112,7 @@ $app->match('/members/meine-Gruppen', function (Request $request) use ($app) {
             }
         }
 
-        $groups = $app['ldap']->getGroups(['cn', 'ou', 'owner', 'member', 'pending'])->toArray();
+        $groups = $app['ldap']->getGroups(['cn', 'mailinglistId', 'ou', 'owner', 'member', 'pending'])->toArray();
         $groupList = [];
         foreach ($groups as $g) {
             $roles = [];
@@ -131,6 +131,7 @@ $app->match('/members/meine-Gruppen', function (Request $request) use ($app) {
             $listentry = array(
                 'name' => $g['cn'][0],
                 'ou' => $g['ou'][0],
+                'mailinglistId' => $g['mailinglistid'][0],
                 'userRoles' => $roles,
                 'owners' => $owners
             );
@@ -151,12 +152,17 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
     if (null !== $token) {
         $user = $token->getUser();
         $ownedGroups = $app['ldap']->getOwnedGroups($user->getAttributes()['dn'])->toArray();
-
         $selGroup = $request->query->get('ou');
+
+        if (count($ownedGroups) === 0) {
+            $app['session']->getFlashBag()->add('error', 'Keine Berechtigung.');
+            return new \Symfony\Component\HttpFoundation\RedirectResponse('/members/Benutzerdaten');
+        }
+
         if (!isset($selGroup)) $selGroup = $ownedGroups[0]['ou'][0];
         $selGroupDN = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $selGroup);
 
-        $action = $request->request->get('action');
+        $action = $request->request->get('manage-action');
 
         if (isset($action)) {
             $ownerPermission = false;
@@ -197,7 +203,7 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
                     case 'rm':
                         try {
                             if (in_array($userDN, $groupAttr['owner'])) {
-                                $app['session']->getFlashBag()->add('error', 'Nicht möglich! "' . $userAttr['cn'][0] . '" ist Koordinator der Gruppe "' . $selGroupName . '". Zum Beenden deiner Mitgliedschaft wende dich bitte an das Ressort IT.');
+                                $app['session']->getFlashBag()->add('error', 'Nicht möglich! "' . $userAttr['cn'][0] . '" ist Koordinator der Gruppe "' . $selGroupName . '". Bitte entferne ihn zuerst als Koordinator.');
                             } else {
                                 $app['ldap']->removeFromGroup($userDN, $selGroupDN);
                                 $app['session']->getFlashBag()->add('success', $userAttr['cn'][0] . ' wurde von der Gruppe "' . $selGroupName . '" entfernt!');

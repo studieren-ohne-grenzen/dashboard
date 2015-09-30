@@ -32,7 +32,11 @@ class LdapUser implements UserInterface
     /**
      * @var array All groups the user is a member of
      */
-    protected $groups;
+    protected $memberships;
+    /**
+     * @var array All groups the user is an owner of
+     */
+    protected $ownerships;
 
     /**
      * LdapUser constructor, set members.
@@ -41,15 +45,19 @@ class LdapUser implements UserInterface
      * @param string $password
      * @param array $attributes
      * @param array $roles
-     * @param array $groups
+     * @param array $memberships
+     * @param array $ownerships
      */
-    public function __construct($username, $password, array $attributes = [], array $roles = [], array $groups = [])
+    public function __construct($username, $password, array $attributes = [], array $roles = [], array $memberships = [], array $ownerships = [])
     {
         $this->username = $username;
         $this->password = $password;
         $this->attributes = $attributes;
         $this->roles = $roles;
-        $this->groups = $groups;
+        $this->memberships = $memberships;
+        $this->ownerships = array_map(function($group) {
+            return $group['ou'][0];
+        }, $ownerships);
     }
 
     /**
@@ -110,11 +118,21 @@ class LdapUser implements UserInterface
     /**
      * Returns the groups the user is member of.
      *
-     * @return array The groups containing the user
+     * @return array The groups containing the user as member
      */
     public function getGroups()
     {
-        return $this->groups;
+        return $this->memberships;
+    }
+
+    /**
+     * Returns the groups the user is owner of.
+     *
+     * @return array The groups containing the user as owner
+     */
+    public function getOwnerships()
+    {
+        return $this->ownerships;
     }
 
     /**
@@ -127,7 +145,7 @@ class LdapUser implements UserInterface
      */
     public function getGroupAttribute($groupIndex, $attribName, $index = null)
     {
-        return Attribute::getAttribute($this->groups[$groupIndex], $attribName, $index);
+        return Attribute::getAttribute($this->memberships[$groupIndex], $attribName, $index);
     }
 
     /**
