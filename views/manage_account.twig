@@ -77,7 +77,9 @@
                 bearbeiten</em>).</p>
     </div>
 {% endblock %}
-{% block scripts %} {{ parent() }}
+{% block scripts %}
+    <script src="{{ app.request.basepath }}/js/zxcvbn.js" async></script>
+    {{ parent() }}
     <script>
         var showDetails = require('js/group_detail_modal');
         function showEdit(shownElem, hiddenElem) {
