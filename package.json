@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/studieren-ohne-grenzen/dashboard#readme",
   "dependencies": {
+    "after-brunch": "0.0.5",
     "auto-reload-brunch": "^1.8.0",
     "clean-css-brunch": "^1.7.2",
     "css-brunch": "^1.7.0",

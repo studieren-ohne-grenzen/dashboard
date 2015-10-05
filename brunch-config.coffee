@@ -12,8 +12,12 @@ exports.config =
         'css/app.css': /^app\/css/
         'css/vendor.css': /^bower_components/
   conventions:
+    ignored: /zxcvbn\.js$/
     vendor: /(^bower_components|node_modules)[\\/]/
   plugins:
+    afterBrunch: [
+      'cp bower_components/zxcvbn/dist/zxcvbn.js public/js'
+    ]
     uglify:
       mangle: true
       compress:
