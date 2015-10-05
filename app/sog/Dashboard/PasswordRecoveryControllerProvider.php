@@ -224,7 +224,7 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
             $member['uid'][0]
         );
         $message = \Swift_Message::newInstance()
-            ->addTo($member['mail-alternative'][0], $member['displayName'][0])
+            ->addTo($member['mail-alternative'][0], $member['displayname'][0])
             ->addFrom($this->app['mailer.from'])
             ->setSubject('[SOG Dashboard] Passwort zurücksetzen')
             ->setBody($text, 'text/html');
