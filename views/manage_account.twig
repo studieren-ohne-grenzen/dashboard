@@ -82,6 +82,7 @@
     {{ parent() }}
     <script>
         var showDetails = require('js/group_detail_modal');
+        require('js/password_validation')('new-password', 'confirm-password', 'validation', 'strengthmeter');
         function showEdit(shownElem, hiddenElem) {
             hideAll();
             resetForms();
@@ -112,45 +113,6 @@
             var message = document.getElementById('validation');
             confPass.style.backgroundColor = null;
             message.innerHTML = '';
-        }
-        function validatePass() {
-            var pass = document.getElementById('new-password');
-            var confPass = document.getElementById('confirm-password');
-            var message = document.getElementById('validation');
-            var colorOK = '#66cc66';
-            var colorWrong = '#ff6666';
-
-            if (pass.value == confPass.value) {
-                confPass.style.backgroundColor = colorOK;
-                message.style.color = colorOK;
-                message.innerHTML = '';
-            } else {
-                confPass.style.backgroundColor = colorWrong;
-                message.style.color = colorWrong;
-                message.innerHTML = 'Passw&ouml;rter stimmen nicht &uuml;berein';
-            }
-        }
-
-        function passStrength(input) {
-            var result = zxcvbn(input.value);
-            var text = '';
-            switch (result.score) {
-                case 0:
-                    text = 'sehr schwach';
-                    break;
-                case 1:
-                    text = 'schwach';
-                    break;
-                case 2:
-                    text = 'naja';
-                    break;
-                case 3:
-                    text = 'ganz okay';
-                    break;
-                case 4:
-                    text = 'sicheres Passwort gew&auml;hlt!';
-            }
-            document.getElementById('strengthmeter').innerHTML = text;
         }
     </script>
 {% endblock %}

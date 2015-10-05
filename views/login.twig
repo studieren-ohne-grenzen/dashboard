@@ -113,6 +113,7 @@
 </div>
 
 {% block scripts %}
+    <script src="{{ app.request.basepath }}/js/app.js"></script>
     <script>
         function removeParent(element) {
             element.parentElement.parentElement.removeChild(element.parentElement);
