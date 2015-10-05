@@ -63,7 +63,7 @@
                 <td class="label">Gruppen</td>
                 <td class="value">
                     {% for i in app.user.groups|keys %}
-                        {{ app.user.groupAttribute(i, 'cn', 0) }}{% if not loop.last %}, {% endif %}
+                        <button onclick="showDetails('{{ app.user.groupAttribute(i, 'cn', 0) }}', '{{ app.user.groupAttribute(i, 'mailinglistId', 0) }}')" class="pure-button button-info"><i class="icon-info-circled font-icon">&#xe801;</i>&ensp;{{ app.user.groupAttribute(i, 'cn', 0) }}</button>
                     {% endfor %}
                 </td>
             </tr>
@@ -79,6 +79,7 @@
 {% endblock %}
 {% block scripts %} {{ parent() }}
     <script>
+        var showDetails = require('js/group_detail_modal');
         function showEdit(shownElem, hiddenElem) {
             hideAll();
             resetForms();
