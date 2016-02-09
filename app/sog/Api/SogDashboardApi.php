@@ -47,6 +47,9 @@ class SogDashboardApi
     {
         $this->app = new Application();
 
+        // make config available on app instance
+        $this->app['config'] = $config;
+
         // LdapAdapter is now available as $this->app['ldap']
         $this->app->register(new ZendLdapServiceProvider(), [
             'ldap.options' => $config['ldap.options']
