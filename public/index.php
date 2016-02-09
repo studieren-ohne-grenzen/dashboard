@@ -10,6 +10,7 @@ $app = new Silex\Application();
 require_once __DIR__ . '/../app/config.php';
 $app['debug'] = $dashboard_config['debug'];
 require_once __DIR__ . '/../app/services.php';
+$app['config'] = $dashboard_config;
 
 // now, let's set up the routes
 // TODO: organize in controllers?
@@ -62,7 +63,7 @@ $app->match('/members/meine-Gruppen', function (Request $request) use ($app) {
             $userUID = $user->getAttributes()['uid'][0];
 
             $groupOU = $request->request->get('ou');
-            $groupDN = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $groupOU);
+            $groupDN = sprintf('ou=%s,%s', $groupOU, $app['config']['ldap.subtrees']['groups']);
             $groupAttr = $app['ldap']->getEntry($groupDN, ['cn', 'owner']);
 
             switch ($action) {
@@ -156,7 +157,7 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
         }
 
         if (!isset($selGroup)) $selGroup = $ownedGroups[0]['ou'][0];
-        $selGroupDN = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $selGroup);
+        $selGroupDN = sprintf('ou=%s,%s', $selGroup, $app['config']['ldap.subtrees']['groups']);
 
         $action = $request->request->get('manage-action');
 

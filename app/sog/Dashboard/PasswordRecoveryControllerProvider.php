@@ -169,7 +169,7 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
      */
     private function updatePassword($uid, $password)
     {
-        $dn = sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid);
+        $dn = sprintf('uid=%s,ou=active,%s', $uid, $this->app['config']['ldap.subtrees']['members']);
         // force the password update
         $this->app['ldap']->forceUpdatePassword($dn, $password);
     }

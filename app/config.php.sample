@@ -11,6 +11,11 @@ $dashboard_config['ldap.options'] = [
     'accountFilterFormat' => 'sprintf-style LDAP filter',
     'baseDn' => 'ou=someou,o=someo,dc=somedc'
 ];
+// configure subtrees for filtering the respective sub-nodes
+$dashboard_config['ldap.subtrees'] = [
+    'groups' => 'ou=groups,o=someo,dc=somedc',
+    'members' => 'ou=people,o=someo,dc=somedc'
+];
 $dashboard_config['mailer.from'] = 'sender@example.com';
 // http://silex.sensiolabs.org/doc/providers/swiftmailer.html
 $dashboard_config['swiftmailer.options'] = [

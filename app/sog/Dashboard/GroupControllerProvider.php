@@ -167,7 +167,7 @@ class GroupControllerProvider implements ControllerProviderInterface
                 ->add('error', 'Ein Fehler ist aufgetreten.');
             return new RefererRedirectResponse($request);
         }
-        $groupDN = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $this->ou);
+        $groupDN = sprintf('ou=%s,%s', $this->ou, $this->app['config']['ldap.subtrees']['groups']);
 
         try {
             $userDN = $this->app['ldap']->findUserDN($this->uid);

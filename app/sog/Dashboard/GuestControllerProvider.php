@@ -86,7 +86,7 @@ class GuestControllerProvider implements ControllerProviderInterface
 
             $selGroup = $request->request->get('ou');
             if (!isset($selGroup)) $selGroup = $ownedGroups[0]['ou'][0];
-            $selGroupDN = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $selGroup);
+            $selGroupDN = sprintf('ou=%s,%s', $selGroup, $app['config']['ldap.subtrees']['groups']);
 
             foreach ($ownedGroups as $og) {
                 if ($og['dn'] == $selGroupDN) {
@@ -132,7 +132,7 @@ class GuestControllerProvider implements ControllerProviderInterface
             $user_dn = Attribute::getAttribute($info, 'dn', 0);
         }
 
-        $group_dn = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $group);
+        $group_dn = sprintf('ou=%s,%s', $group, $app['config']['ldap.subtrees']['groups']);
         if ($app['ldap']->isMemberOfGroup($user_dn, $group_dn)) {
             $app['session']->getFlashBag()->add('info', 'Der Gast ist bereits auf der Liste eingetragen.');
         } else {

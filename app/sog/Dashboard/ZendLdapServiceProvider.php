@@ -19,7 +19,7 @@ class ZendLdapServiceProvider implements ServiceProviderInterface
     {
         // setup the ldap adapter which extends the LDAP abstraction layer
         $app['ldap'] = $app->share(function ($app) {
-            return new LdapAdapter($app['ldap.options']);
+            return new LdapAdapter($app['ldap.options'], $app['config']['ldap.subtrees']);
         });
     }
 
