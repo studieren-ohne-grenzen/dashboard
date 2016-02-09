@@ -128,7 +128,7 @@ $app->match('/members/meine-Gruppen', function (Request $request) use ($app) {
             $listentry = array(
                 'name' => $g['cn'][0],
                 'ou' => $g['ou'][0],
-                'mailinglistId' => $g['mailinglistid'][0],
+                'mailinglistId' => isset($g['mailinglistid']) ? $g['mailinglistid'][0] : null,
                 'userRoles' => $roles,
                 'owners' => $owners
             );
