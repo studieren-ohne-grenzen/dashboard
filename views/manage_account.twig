@@ -1,6 +1,6 @@
 {% extends 'base.twig' %}
 {% block content %}
-    <h1>Willkommen, {{ app.user.attribute('givenname', 0) }}</h1>
+    <h1>{{ 'Welcome'|trans }}, {{ app.user.attribute('givenname', 0) }}</h1>
     <div>
         <table class="pure-table-horizontal user-data">
             <tbody class="list">
@@ -13,45 +13,45 @@
             </tr>
             <tr>
                 <td class="icon"><i class="icon-key font-icon">&#xe80d;</i></td>
-                <td class="label">Passwort</td>
+                <td class="label">{{ 'Password'|trans }}</td>
                 <td class="value">
                     <div id="view-password" class="shown-elem"> **********
                         <button class="pure-button button-small"
                                 onclick="showEdit('view-password', 'edit-password');"><i class="icon-edit font-icon">
-                                &#xe809;</i>&Auml;ndern
+                                &#xe809;</i>{{ 'change'|trans }}
                         </button>
                     </div>
                     <div id="edit-password" class="hidden-elem">
                         <form class="pure-form pure-form-stacked" method="POST">
                             <fieldset>
-                                <label for="old-password">Altes Passwort:</label>
+                                <label for="old-password">{{ 'Old password'|trans }}:</label>
                                 <input type="password"
                                        class="pure-input-rounded"
                                        id="old-password" name="old-password"
-                                       placeholder="altes Passwort" required>
+                                       placeholder="{{ 'Old password'|trans }}" required>
                             </fieldset>
                             <fieldset class="pure-group">
-                                <label for="new-password">Neues Passwort:
+                                <label for="new-password">{{ 'New password'|trans }}:
                                     <input type="password" id="new-password"
                                            name="new-password"
                                            onkeyup="passStrength(this)"
-                                           placeholder="neues Passwort"
+                                           placeholder="{{ 'New password'|trans }}"
                                            required><span id="strengthmeter" class="pass-strength"></span></label>
                                 <label for="confirm-password"><input type="password"
                                                                      id="confirm-password"
                                                                      name="confirm-password"
                                                                      onkeyup="validatePass()"
-                                                                     placeholder="neues Passwort wiederholen"
+                                                                     placeholder="{{ 'Repeat new password'|trans }}"
                                                                      required>
                                 </label><span id="validation"></span>
                             </fieldset>
                             <fieldset>
                                 <button type="submit" class="pure-button pure-button-primary" id="change-password"
-                                        name="change-password"><i class="icon-ok-circled2 font-icon">&#xe807;</i>&ensp;Speichern
+                                        name="change-password"><i class="icon-ok-circled2 font-icon">&#xe807;</i>&ensp;{{ 'Save'|trans }}
                                 </button>
                                 <span class="pure-button"
                                       onclick="hideEdit('view-password', 'edit-password');"><i
-                                            class="icon-cancel-circled2 font-icon">&#xe808;</i>&ensp;Abbrechen
+                                            class="icon-cancel-circled2 font-icon">&#xe808;</i>&ensp;{{ 'Cancel'|trans }}
                                 </span>
                             </fieldset>
                         </form>
@@ -60,7 +60,7 @@
             </tr>
             <tr>
                 <td class="icon"><i class="icon-users font-icon">&#xe806;</i></td>
-                <td class="label">Gruppen</td>
+                <td class="label">{{ 'Groups'|trans }}</td>
                 <td class="value">
                     {% for i in app.user.groups|keys %}
                         <button onclick="showDetails('{{ app.user.groupAttribute(i, 'cn', 0) }}', '{{ app.user.groupAttribute(i, 'mailinglistId', 0) }}')" class="pure-button button-info"><i class="icon-info-circled font-icon">&#xe801;</i>&ensp;{{ app.user.groupAttribute(i, 'cn', 0) }}</button>

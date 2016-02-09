@@ -1,11 +1,11 @@
 {% extends 'base.twig' %}
 
 {% block content %}
-    <h1>Verwalte die Mitglieder deiner Gruppen</h1>
+    <h1>{{ 'Manage the members of your groups'|trans }}</h1>
     <div class="group-chooser">
         <form class="pure-form">
             <fieldset>
-                <label for="group">Deine Gruppe&nbsp;</label>
+                <label for="group">{{ 'Your group'|trans }}&nbsp;</label>
                 <select name="ou" id="group" onchange="this.form.submit()">
                     {% for i in ownedGroups|keys %}
                         <option {% if ownedGroups[i]['ou'][0] == selectedGroup %}selected
@@ -25,24 +25,24 @@
     <div id="member-list">
         <form class="pure-form bold-legend pure-g">
             <fieldset class="pure-u-1 pure-u-md-1-2 inline-block-labels">
-                <legend>Anzeigen...</legend>
+                <legend>{{ 'Show'|trans }}&hellip;</legend>
                 <i class="icon-filter font-icon">&#xe817;</i>
                 <label for="filter-by-none">
                     <input id="filter-by-none" type="radio" name="filter" onclick="setFilter(this, null)">
-                    Alle
+                    {{ 'All'|trans }}
                 </label>
                 <label for="filter-by-new">
                     <input id="filter-by-new" type="radio" name="filter" onclick="setFilter(this, fNew)">
-                    Neue Anfragen
+                    {{ 'New requests'|trans }}
                 </label>
                 <label for="filter-by-member">
                     <input id="filter-by-member" type="radio" name="filter" onclick="setFilter(this, fMember)"
                            checked>
-                    Gruppen-Mitglieder
+                    {{ 'Group members'|trans }}
                 </label>
             </fieldset>
             <fieldset class="pure-u-1 pure-u-md-1-2">
-                <legend>Suchen nach...</legend>
+                <legend>{{ 'Search for'|trans }}&hellip;</legend>
                 <i class="icon-search font-icon">&#xe816;</i>
                 <input type="text" class="search pure-input-1-2" placeholder="Name, Email...">
             </fieldset>
@@ -51,8 +51,8 @@
             <thead>
             <tr>
                 <th class="sort asc" data-sort="name">Name</th>
-                <th class="sort" data-sort="email">E-Mail-Adresse</th>
-                <th class="sort" data-sort="is_pending">Aktion</th>
+                <th class="sort" data-sort="email">E-Mail</th>
+                <th class="sort" data-sort="is_pending">{{ 'Action'|trans }}</th>
             </tr>
             </thead>
             <tbody class="list">
@@ -77,17 +77,17 @@
     <hr class="spacer">
     <form action="{{ path('POST_members_guests_subscribe') }}" method="POST" class="pure-form" id="setup-guest">
         <fieldset>
-            <legend>Gäste</legend>
+            <legend>{{ 'Guests'|trans }}</legend>
             <p>
                 Du möchtest einen externen Gast dem Verteiler hinzufügen? Dann trage ihn hier mit Namen und Mail Adresse
                 ein:
             </p>
             <input type="hidden" name="ou" id="ou" value="{{ selectedGroup }}"/>
             <input type="text" name="name" id="guest-name" placeholder="Name" required/>
-            <input type="email" name="mail" id="guest-mail" placeholder="Mail" required/>
+            <input type="email" name="mail" id="guest-mail" placeholder="E-Mail" required/>
 
             <button type="submit" class="pure-button pure-button-primary" value="Login">
-                <i class="icon-add font-icon">&#xe820;</i>&ensp;Eintragen
+                <i class="icon-add font-icon">&#xe820;</i>&ensp;{{ 'Add'|trans }}
             </button>
         </fieldset>
     </form>
@@ -213,21 +213,21 @@
                 var buttons = '';
 
                 if (inactive) {
-                    name += '<span class="pure-button button-success inactive-badge">inaktiv</span>';
-                    buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'activate\')" class="pure-button button-warning"><i class="icon-user-ok font-icon">&#xe822;</i>&ensp;freischalten</button>';
+                    name += '<span class="pure-button button-success inactive-badge">{{ 'inactive' }}</span>';
+                    buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'activate\')" class="pure-button button-warning"><i class="icon-user-ok font-icon">&#xe822;</i>&ensp;{{ 'confirm'|trans }}</button>';
                 } else {
                     if (member) {
-                        buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'rm\')" class="pure-button button-error"><i class="icon-user-times font-icon">&#xe804;</i>&ensp;entfernen</button>';
+                        buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'rm\')" class="pure-button button-error"><i class="icon-user-times font-icon">&#xe804;</i>&ensp;{{ 'remove'|trans }}</button>';
                     } else {
-                        buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'add\')" class="pure-button button-success"><i class="icon-user-plus font-icon">&#xe803;</i>&ensp;hinzuf&uuml;gen</button>';
+                        buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'add\')" class="pure-button button-success"><i class="icon-user-plus font-icon">&#xe803;</i>&ensp;{{ 'add'|trans }}</button>';
                     }
                     if (pending) {
-                        buttons += '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'rm-request\')" class="pure-button button-warning"><i class="icon-paper-plane font-icon">&#xe824;</i>&ensp;Anfrage ignorieren</button>';
+                        buttons += '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'rm-request\')" class="pure-button button-warning"><i class="icon-paper-plane font-icon">&#xe824;</i>&ensp;{{ 'ignore'|trans }}</button>';
                     }
                     if (owner) {
-                        buttons += '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'rm-owner\')" title="Als Koordinator entfernen" class="pure-button button-info"><i class="icon-star font-icon">&#xe82a;</i>&ensp;</button>';
+                        buttons += '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'rm-owner\')" title="{{ 'Remove as coordinator'|trans }}" class="pure-button button-info"><i class="icon-star font-icon">&#xe82a;</i>&ensp;</button>';
                     } else {
-                        buttons += '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'add-owner\')" title="Als Koordinator hinzufügen" class="pure-button button-info"><i class="icon-star-empty font-icon">&#xe82b;</i>&ensp;</button>';
+                        buttons += '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'add-owner\')" title="{{ 'Add as coordinator'|trans }}" class="pure-button button-info"><i class="icon-star-empty font-icon">&#xe82b;</i>&ensp;</button>';
                     }
                 }
 

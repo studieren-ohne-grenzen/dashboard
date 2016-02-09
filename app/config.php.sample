@@ -28,3 +28,14 @@ $dashboard_config['remember_me'] = [
     'secure' => false, /* should be true when we serve via SSL */
     'always_remember_me' => true
 ];
+$dashboard_config['url'] = [
+    'host' => 'yourhost.org',
+    'dashboard' => 'https://dashboard.yourhost.org'
+];
+$dashboard_config['theme'] = [
+    'logo' => 'pathToLogoFile.png',
+    'title' => 'Your long title',
+    'short_title' => 'Your short title'
+];
+// default locale for translation component, see /app/locales/de.yml etc.
+$dashboard_config['locale'] = 'en';

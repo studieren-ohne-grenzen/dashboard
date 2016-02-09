@@ -31,15 +31,15 @@ $app->match('/members/Benutzerdaten', function (Request $request) use ($app) {
                 try {
                     $app['ldap']->updatePassword($user->getAttributes()['dn'], $request->request->get('old-password'), $request->request->get('new-password'));
                     $app['session']->getFlashBag()
-                        ->add('success', 'Passwort erfolgreich geändert!');
+                        ->add('success', $app['translator']->trans('Changed password successfully!'));
                     return $app->redirect('/members/Benutzerdaten');
                 } catch (LdapException $ex) {
                     $app['session']->getFlashBag()
-                        ->add('error', 'Fehler beim Ändern des Passworts: ' . $ex->getMessage());
+                        ->add('error', $app['translator']->trans('Could not change password. Error: %error%', ['error' => $ex->getMessage()]));
                 }
             } else {
                 $app['session']->getFlashBag()
-                    ->add('warning', 'Das Passwort muss 8 Zeichen lang sein und mindestens eine Zahl und einen Buchstaben enthalten');
+                    ->add('warning', $app['translator']->trans('The password has to be at least 8 characters long and contain one digit and letter.'));
             }
         }
     }

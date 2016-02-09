@@ -269,7 +269,7 @@ table.full-width {
 .logo {
     width: 6em;
     height: 6em;
-    background-image: url(../img/logo.jpg);
+    /* the background-image is set via app.theme.logo */
     background-position: center center;
     background-repeat: no-repeat;
     background-color: #fff;

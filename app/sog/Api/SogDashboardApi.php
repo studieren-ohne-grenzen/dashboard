@@ -32,7 +32,7 @@ class SogDashboardApi
     /**
      * @var string Full URL to the Dashboard application
      */
-    private $dashboard_url = 'https://dashboard.studieren-ohne-grenzen.org';
+    private $dashboard_url = null;
     /**
      * @var int The default length for a random user password
      */
@@ -57,6 +57,8 @@ class SogDashboardApi
         $this->app['mailer.from'] = $config['mailer.from'];
         $this->app['swiftmailer.options'] = $config['swiftmailer.options'];
         $this->app['swiftmailer.use_spool'] = false;
+
+        $this->dashboard_url = $config['url']['dashboard'];
 
         // can be used for passwords etc, by calling $this->app['random']($length = 8)
         $this->app->register(new RandomStringServiceProvider());

@@ -11,35 +11,35 @@
     <div id="group-list">
         <form class="pure-form bold-legend pure-g">
             <fieldset class="pure-u-1 pure-u-md-1-2 inline-block-labels">
-                <legend>Anzeigen...</legend>
+                <legend>{{ 'Show'|trans }}&hellip;</legend>
                 <i class="icon-filter font-icon">&#xe817;</i>
                 <label for="filter-by-none">
                     <input id="filter-by-none" type="radio" name="filter"
                            onclick="setFilter(this, null)" checked>
-                    Alle
+                    {{ 'All'|trans }}
                 </label>
                 <label for="filter-by-membership">
                     <input id="filter-by-membership" type="radio" name="filter"
                            onclick="setFilter(this, fMemberships)">
-                    Meine Mitgliedschaften
+                    {{ 'My memberships'|trans }}
                 </label>
                 <label for="filter-by-pending">
                     <input id="filter-by-pending" type="radio" name="filter" onclick="setFilter(this, fRequests)">
-                    Meine Anfragen
+                    {{ 'My requests'|trans }}
                 </label>
             </fieldset>
             <fieldset class="pure-u-1 pure-u-md-1-2">
-                <legend>Suchen nach...</legend>
+                <legend>{{ 'Search for'|trans }}&hellip;</legend>
                 <i class="icon-search font-icon">&#xe816;</i>
-                <input type="text" class="pure-input-1-2 search" placeholder="Gruppe, KoordinatorIn...">
+                <input type="text" class="pure-input-1-2 search" placeholder="{{ 'Group, coordinator' }}&hellip;">
             </fieldset>
         </form>
         <table class="full-width pure-table pure-table-bordered">
             <thead>
             <tr>
-                <th class="sort asc" data-sort="group_name">Gruppenname</th>
-                <th class="sort" data-sort="owner">GruppenkoordinatorInnen</th>
-                <th class="sort" data-sort="is_member">Aktion</th>
+                <th class="sort asc" data-sort="group_name">{{ 'Group name'|trans }}</th>
+                <th class="sort" data-sort="owner">{{ 'Group coordinators'|trans }}</th>
+                <th class="sort" data-sort="is_member">{{ 'Action'|trans }}</th>
             </tr>
             </thead>
             <tbody class="list">
@@ -149,11 +149,11 @@
 
                 var buttons = '';
                 if (pending) {
-                    buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['ou'] + '\', \'drop-request\')" class="pure-button button-warning"><i class="icon-cancel font-icon">&#xe815;</i>&ensp;Anfrage abbrechen</button>';
+                    buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['ou'] + '\', \'drop-request\')" class="pure-button button-warning"><i class="icon-cancel font-icon">&#xe815;</i>&ensp;{{ 'Cancel request'|trans }}</button>';
                 } else if (member) {
-                    buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['ou'] + '\', \'quit\')" class="pure-button button-error"><i class="icon-minus font-icon">&#xe821;</i>&ensp;Mitgliedschaft beenden</button>';
+                    buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['ou'] + '\', \'quit\')" class="pure-button button-error"><i class="icon-minus font-icon">&#xe821;</i>&ensp;{{ 'Cancel membership'|trans }}</button>';
                 } else {
-                    buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['ou'] + '\', \'start-request\')" class="pure-button button-success"><i class="icon-help font-icon">&#xe81b;</i>&ensp;Mitgliedschaft anfragen</button>';
+                    buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['ou'] + '\', \'start-request\')" class="pure-button button-success"><i class="icon-help font-icon">&#xe81b;</i>&ensp;{{ 'Request membership'|trans }}</button>';
                 }
 
                 var owners = '';

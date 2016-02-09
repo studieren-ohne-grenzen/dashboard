@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="de">
+<html lang="{{ app.locale }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studieren Ohne Grenzen &mdash; Dashboard</title>
+    <title>{{ app.theme.title }} &mdash; Dashboard</title>
     <link rel="icon" href="/favicon.ico">
     {% block styles %}
         <link rel="stylesheet" href="{{ app.request.basepath }}/css/vendor.css">
@@ -12,7 +12,7 @@
 </head>
 <body>
 <div class="login-bar">
-    <div class="pure-img-responsive logo circular"></div>
+    <div class="pure-img-responsive logo circular" style="background-image: url({{ app.theme.logo }});"></div>
 </div>
 {% block messages %}
     <div class="message-box login-layout">
@@ -54,7 +54,7 @@
 <div id="layout" class="login">
     <div class="login-form">
         {% block content %}
-            <h1 class="brand-title">Willkommen im Dashboard!</h1>
+            <h1 class="brand-title">{{ 'Welcome to the Dashboard!'|trans }}</h1>
 
             <form action="{{ path('members_login_check') }}" class="pure-form pure-form-aligned" method="post">
                 {% if error %}
@@ -62,16 +62,16 @@
                 {% endif %}
 
                 <div class="pure-control-group">
-                    <label for="username">Benutzername</label>
-                    <input type="text" name="_username" id="username" required placeholder="vorname.nachname"
+                    <label for="username">{{ 'Username'|trans }}</label>
+                    <input type="text" name="_username" id="username" required placeholder="{{ 'firstname.lastname'|trans }}"
                            value="{{ last_username }}"/>
                 </div>
                 <div class="pure-control-group">
-                    <label for="password">Passwort</label>
+                    <label for="password">{{ 'Password'|trans }}</label>
                     <input type="password" name="_password" id="password" required value=""/>
                 </div>
                 <div class="pure-control-group">
-                    <label for="remember_me">Eingeloggt bleiben</label>
+                    <label for="remember_me">{{ 'Remember me'|trans }}</label>
                     <input type="checkbox" id="remember_me" name="_remember_me" checked/>
                 </div>
                 <div class="pure-controls">
@@ -79,7 +79,7 @@
                         <i class="icon-login font-icon">&#xe80e;</i>&ensp;Login
                     </button>
                     <p>
-                        <small><a href="{{ path('POST_GET_password_request') }}">Ich habe mein Passwort vergessen.</a>
+                        <small><a href="{{ path('POST_GET_password_request') }}">{{ 'I forgot my password'|trans }}</a>
                         </small>
                     </p>
                 </div>

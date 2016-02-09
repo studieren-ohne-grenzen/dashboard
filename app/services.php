@@ -12,13 +12,28 @@ $app->register(new Silex\Provider\MonologServiceProvider(), [
 ]);
 
 // database
-$app->register(new Silex\Provider\DoctrineServiceProvider(), array(
-    'db.options' => array(
+$app->register(new Silex\Provider\DoctrineServiceProvider(), [
+    'db.options' => [
         'user' => null,
         'driver' => 'pdo_sqlite',
         'path' => __DIR__ . '/dashboard.db',
-    ),
-));
+    ],
+]);
+
+// i18n
+$app->register(new Silex\Provider\TranslationServiceProvider(), [
+    'locale' => $dashboard_config['locale']
+]);
+use Symfony\Component\Translation\Loader\YamlFileLoader;
+
+$app['translator'] = $app->share($app->extend('translator', function ($translator, $app) {
+    /** @var $translator Symfony\Component\Translation\Translator */
+    $translator->addLoader('yaml', new YamlFileLoader());
+    $translator->addResource('yaml', __DIR__ . '/locales/de.yml', 'de');
+
+    return $translator;
+}));
+
 
 // ldap
 $app->register(new SOG\Dashboard\ZendLdapServiceProvider(), [
@@ -75,3 +90,5 @@ $app->mount('/members/guests', new SOG\Dashboard\GuestControllerProvider());
 
 // group management functionality
 $app->mount('/members/groups', new \SOG\Dashboard\GroupControllerProvider());
+
+$app['theme'] = $dashboard_config['theme'];
