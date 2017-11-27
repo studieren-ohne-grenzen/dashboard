@@ -353,7 +353,7 @@ class LdapAdapter extends Ldap
      */
     public function createGuest($name, $mail)
     {
-        $username = $this->generateUsername($name);
+        $username = 'guest'.$this->generateUsername($name);
         $dn = sprintf('uid=%s,ou=guests,ou=people,o=sog-de,dc=sog', $username);
         $info = [];
 
