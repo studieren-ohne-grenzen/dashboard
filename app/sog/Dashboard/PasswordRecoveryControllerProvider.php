@@ -70,7 +70,7 @@ class PasswordRecoveryControllerProvider implements ControllerProviderInterface
                     $password_repeat = $request->request->get('password_repeat');
                     if ($this->validateNewPassword($password, $password_repeat) === false) {
                         $app['session']->getFlashBag()
-                            ->add('error', sprintf('Fehler beim Zurücksetzen des Passworts. Das gewählte Passwort muss aus mindestens %s Zeichen (Buchstaben *und* Ziffern) bestehen.', $this->password_min_length));
+                            ->add('error', sprintf('Fehler beim Zurücksetzen des Passworts. Das gewählte Passwort muss aus mindestens %s Zeichen (Buchstaben, Ziffern *und* Sonderzeichen) bestehen.', $this->password_min_length));
                         return $app->redirect($app['url_generator']->generate($this->reset_route, ['token' => $token]));
                     } else {
                         $details = $this->getRecoveryRequest($token);

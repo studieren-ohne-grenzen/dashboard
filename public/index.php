@@ -39,7 +39,7 @@ $app->match('/members/Benutzerdaten', function (Request $request) use ($app) {
                 }
             } else {
                 $app['session']->getFlashBag()
-                    ->add('warning', 'Das Passwort muss 8 Zeichen lang sein und mindestens eine Zahl und einen Buchstaben enthalten');
+                    ->add('warning', 'Das Passwort muss 8 Zeichen lang sein und mindestens eine Zahl, einen Buchstaben und ein Sonderzeichen enthalten');
             }
         }
     }

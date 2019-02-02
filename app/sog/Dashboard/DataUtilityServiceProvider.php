@@ -22,7 +22,7 @@ class DataUtilityServiceProvider implements ServiceProviderInterface
      * @param string $regex The regex for checking the password character classes
      * @return bool True if the given password complies with the password policy, false otherwise.
      */
-    private static function checkPasswordPolicy($password, $minLength = 8, $regex = '/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/')
+    private static function checkPasswordPolicy($password, $minLength = 8, $regex = '/^.*([0-9]+.*[^0-9a-zA-Z]+|[^0-9a-zA-Z]+.*[0-9]+)+.*$/')
     {
         if (strlen($password) < $minLength) {
             return false;
