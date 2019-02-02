@@ -315,7 +315,6 @@ class LdapAdapter extends Ldap
         Attribute::setAttribute($info, 'displayName', $firstName);
         Attribute::setAttribute($info, 'givenName', $firstName);
         Attribute::setAttribute($info, 'sn', $lastName);
-        Attribute::setAttribute($info, 'cn', $firstName . " " . $lastName);
 
         // password
         Attribute::setPassword($info, $password, $this->password_algorithm);
@@ -360,10 +359,10 @@ class LdapAdapter extends Ldap
         // core data
         Attribute::setAttribute($info, 'dn', $dn);
         Attribute::setAttribute($info, 'uid', $username);
-        Attribute::setAttribute($info, 'cn', $name);
-        Attribute::setAttribute($info, 'displayName', $name);
-        Attribute::setAttribute($info, 'sn', $name);
-        Attribute::setAttribute($info, 'cn', $name);
+        Attribute::setAttribute($info, 'cn', "Guest ".$name);
+        Attribute::setAttribute($info, 'displayName', "Guest ".$name);
+        Attribute::setAttribute($info, 'sn', "Guest ".$name);
+        Attribute::setAttribute($info, 'cn', "Guest ".$name);
 
         // meta data
         Attribute::setAttribute($info, 'mail', $mail);
