@@ -159,7 +159,7 @@ Passwort:     ' . $password . '<br />
 <br />
 Dein Account wird freigeschaltet, sobald dein Lokalkoordinator bestätigt hat, dass du tatsächlich bei Studieren Ohne Grenzen aktiv bist.<br />
 <br />
-Mit diesen Zugangsdaten kannst du dich auf allen SOG-Systeme einloggen. Insbesondere auf OpenAtrium, unsere wiki-ähnliche Online-Plattform mit allen Informationen und Dokumenten: https://atrium.studieren-ohne-grenzen.org<br />
+Mit diesen Zugangsdaten kannst du dich auf allen SOG-Systeme einloggen.<br />
 <br />
 Eine Übersicht deiner Daten und Gruppen gibt dir das Dashboard: https://dashboard.studieren-ohne-grenzen.org<br />
 Viele Grüße,<br />
