@@ -54,7 +54,9 @@ class LdapUserProvider implements UserProviderInterface
             $roles = $this->getRoles($dn, $ownerships);
             return new LdapUser($username, null, $attributes, $roles, $memberships, $ownerships);
         } catch (LdapException $ex) {
-            throw new UsernameNotFoundException('Der Login war nicht erfolgreich, bitte überprüfe deinen Benutzernamen und Passwort.');
+          throw new UsernameNotFoundException($ex->getMessage().'Der Login war nicht erfolgreich, bitte überprüfe deinen Benutzernamen und Passwort.');
+          $logger = $this->get('logger');
+          $logger->error(($ex->getMessage()));
         }
     }
 
