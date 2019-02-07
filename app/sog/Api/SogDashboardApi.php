@@ -168,7 +168,7 @@ Das SOG-IT-Team
 </html>
 ';
         $message = \Swift_Message::newInstance()
-            ->setSubject('[Studieren Ohne Grenzen] Zugangsdaten OpenAtrium')
+            ->setSubject('[Studieren Ohne Grenzen] Zugangsdaten')
             ->setFrom([$this->app['mailer.from']])
             ->setTo([$email => $firstName])
             ->setBody($text, 'text/html');
@@ -187,7 +187,7 @@ Das SOG-IT-Team
     private function notifyNewUserAdmin($firstName, $lastName, $email, $group)
     {
         $text = "Soeben hat sich ein neues Mitglied fuer Deine Lokalgruppe angemeldet.<br>
-Das neue Mitglied ist schon auf dem Lokalgruppen-Verteiler eingetragen und hat einen OpenAtrium-Account erhalten.<br><br>
+Das neue Mitglied ist schon auf dem Lokalgruppen-Verteiler eingetragen und hat einen Account für alle Services erhalten.<br><br>
 <b>Achtung:</b> Der SOG-Account des Mitglieds muss erst von dir aktiviert werden. Bitte bestätige am Besten jetzt <a href='" . $this->dashboard_url . "'>direkt im Dashboard</a>, dass " . $firstName . " " . $lastName . " tatsächlich in eurer LG aktiv ist!
 <br><br>
 Hier die Daten des neuen Mitglieds:<br>";
