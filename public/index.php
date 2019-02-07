@@ -182,6 +182,7 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
                     case 'activate':
                         try {
                             $app['ldap']->activateMember($userID);
+                            $app['ldap']->approveGroupMembership($userID, 'allgemein'); // TODO: Make 'allgemein' configurable
                             $app['session']->getFlashBag()->add('success', $userAttr['cn'][0] . ' wurde freigeschaltet, du kannst ihn/sie nun zu deiner Gruppe "' . $selGroupName . '" hinzufügen!');
                         } catch (LdapException $ex) {
                             $app['session']->getFlashBag()->add('error', 'Fehler beim Freischalten von ' . $userAttr['cn'][0] . ': ' . $ex->getMessage());
