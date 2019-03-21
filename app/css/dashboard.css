@@ -39,7 +39,7 @@ hr.spacer {
 }
 
 .sidebar {
-    background: rgb(0, 48, 73);
+    background: #0b405b;
     color: #fff;
 }
 
@@ -123,7 +123,7 @@ hr.spacer {
 
 /* login form */
 .login-bar {
-    background-color: rgb(0, 48, 73);
+    background-color: #0b405b;
     padding: 1em 3em;
     margin-bottom: 2em;
 }
