@@ -22,17 +22,11 @@ module.exports = function(group_name, group_mailinglistId) {
         return makeLink('https://owncloud.studieren-ohne-grenzen.org/index.php/apps/files/?dir=%2F' + encodeURI(dataset.cn));
     };
 
-    var getAtriumLink = function (dataset) {
-        return makeLink('https://atrium.studieren-ohne-grenzen.org/' + dataset.mailinglistId);
-    };
-
     basicModal.show({
         body: "<h1>" + group_name + "</h1>" +
         "<dl>" +
         "<dt>OwnCloud</dt>" +
         "<dd>" + getOwnCloudLink(groupData) + "</dd>" +
-        "<dt>Open Atrium</dt>" +
-        "<dd>" + getAtriumLink(groupData) + "</dd>" +
         "<dt>Verteiler</dt>" +
         "<dd>" + getListLink(groupData) + "</dd>" +
         "</dl>" +
