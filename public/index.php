@@ -221,7 +221,7 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
                         if ($selGroup === 'allgemein') {
                           // The current user is Admin of Allgemein, so they can delete users globally
                           try {
-                              $app['ldap']->deleteMember($userDN);
+                              $app['ldap']->deleteUser($userID);
                               $app['session']->getFlashBag()->add('success', 'Das Mitglied ' . $userAttr['cn'][0] . ' wurde gelöscht!');
                           } catch (LdapException $ex) {
                               $app['session']->getFlashBag()->add('error', 'Fehler beim Löschen des Mitglieds ' . $userAttr['cn'][0] . ': ' . $ex->getMessage());
