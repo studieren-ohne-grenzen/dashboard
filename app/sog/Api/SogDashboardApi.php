@@ -210,4 +210,14 @@ Hier die Daten des neuen Mitglieds:<br>";
         $dn = $this->app['ldap']->findUserDN($uid);
         $this->app['ldap']->updateEmail($dn, $email);
     }
+
+    /**
+     * Delete membership
+     *
+     * @param string $uid The generated unique username for the member
+     */
+    public function deleteUser($uid)
+    {
+        return $this->app['ldap']->deleteMember($uid);
+    }
 }

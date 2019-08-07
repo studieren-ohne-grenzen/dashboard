@@ -20,6 +20,28 @@ class LdapAdapter extends Ldap
      */
     private $password_algorithm = Attribute::PASSWORD_HASH_SSHA;
 
+    const DN_GROUPS = 'ou=groups,o=sog-de,dv=sog';
+    const DN_PEOPLE = 'ou=people,o=sog-de,dc=sog';
+    const DN_PEOPLE_ACTIVE = 'ou=active,ou=people,o=sog-de,dc=sog';
+    const DN_PEOPLE_INACTIVE = 'ou=inactive,ou=people,o=sog-de,dc=sog';
+    const DN_PEOPLE_GUESTS = 'ou=guests,ou=people,o=sog-de,dc=sog';
+
+    public function getDnOfGroup($ou) {
+      return 'ou='.$ou.','.self::DN_GROUPS;
+    }
+
+    public function getDnOfActivePerson($uid) {
+      return 'uid='.$uid.','.self::DN_PEOPLE_ACTIVE;
+    }
+
+    public function getDnOfInactivePerson($uid) {
+      return 'uid='.$uid.','.self::DN_PEOPLE_INACTIVE;
+    }
+
+    public function getDnOfGuest($uid) {
+      return 'uid='.$uid.','.self::DN_PEOPLE_GUESTS;
+    }
+
     /**
      * Returns all groups (OUs) with their common names
      *
@@ -31,7 +53,7 @@ class LdapAdapter extends Ldap
     {
         $results = $this->search(
             '(objectClass=groupOfNames)',
-            'ou=groups,o=sog-de,dc=sog',
+            self::DN_GROUPS,
             self::SEARCH_SCOPE_ONE,
             $fields,
             'cn'
@@ -52,7 +74,7 @@ class LdapAdapter extends Ldap
     {
         $results = $this->search(
             'objectClass=inetOrgPerson',
-            'ou=people,o=sog-de,dc=sog',
+            self::DN_PEOPLE,
             self::SEARCH_SCOPE_SUB,
             ['cn', 'uid', 'mail', 'dn'],
             'cn'
@@ -158,7 +180,7 @@ class LdapAdapter extends Ldap
     {
         $results = $this->search(
             sprintf('(&(objectClass=groupOfNames)(ou=%s))', $group_ou),
-            'ou=groups,o=sog-de,dc=sog',
+            self::DN_GROUPS,
             self::SEARCH_SCOPE_ONE,
             $fields,
             $fields[0]
@@ -178,7 +200,7 @@ class LdapAdapter extends Ldap
     {
         $results = $this->search(
             sprintf('(&(objectClass=inetOrgPerson)(%s=%s))', $attribute, $mail),
-            'ou=people,o=sog-de,dc=sog',
+            self::DN_PEOPLE,
             self::SEARCH_SCOPE_SUB,
             ['dn', 'uid', 'cn', 'displayName', $attribute],
             'dn'
@@ -228,7 +250,7 @@ class LdapAdapter extends Ldap
     {
         $results = $this->search(
             sprintf('(&(objectClass=groupOfNames)(%s=%s))', $attribute, $user_dn),
-            'ou=groups,o=sog-de,dc=sog',
+            self::DN_GROUPS,
             self::SEARCH_SCOPE_ONE,
             $fields,
             'cn'
@@ -303,7 +325,7 @@ class LdapAdapter extends Ldap
      */
     public function createMember($username, $password, $firstName, $lastName, $mail)
     {
-        $dn = sprintf('uid=%s,ou=inactive,ou=people,o=sog-de,dc=sog', $username);
+        $dn = $this->getDnOfInactivePerson($username);
         $sog_mail = sprintf('%s@studieren-ohne-grenzen.org', $username);
         $sog_mail_alias = sprintf('%s@s-o-g.org', $username);
         $info = [];
@@ -343,6 +365,27 @@ class LdapAdapter extends Ldap
     }
 
     /**
+     * Adds a new object with the given parameters to the ou=inactive subtree.
+     *
+     * @param string $dn The dn of the member
+     * @throws LdapException
+     */
+    public function deleteMember($dn)
+    {
+        $groups = $this->getMemberships($dn, ['ou']);
+        foreach($groups as $group) {
+          $dnOfGroup = $this->getDnOfGroup($group['ou']);
+          $this->removeFromGroup($dn, $dnOfGroup, 'member');
+        }
+        $ownedGroups = $this->getOwnedGroups($dn);
+        foreach($ownedGroups as $group) {
+          $dnOfGroup = $this->getDnOfGroup($group['ou']);
+          $this->removeFromGroup($dn, $dnOfGroup, 'owner');
+        }
+        $this->delete($dn);
+    }
+
+    /**
      * Create a guest user, reserved for non-members who should receive messages to a mailing list.
      *
      * @param string $name The name of the guest
@@ -353,7 +396,7 @@ class LdapAdapter extends Ldap
     public function createGuest($name, $mail)
     {
         $username = 'guest'.$this->generateUsername($name);
-        $dn = sprintf('uid=%s,ou=guests,ou=people,o=sog-de,dc=sog', $username);
+        $dn = $this->getDnOfGuest($username);
         $info = [];
 
         // core data
@@ -410,9 +453,9 @@ class LdapAdapter extends Ldap
      */
     public function usernameExists($uid)
     {
-        return ($this->exists(sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid)) ||
-            $this->exists(sprintf('uid=%s,ou=inactive,ou=people,o=sog-de,dc=sog', $uid)) ||
-            $this->exists(sprintf('uid=%s,ou=guests,ou=people,o=sog-de,dc=sog', $uid)));
+        return ($this->exists($this->getDnOfActivePerson($uid)) ||
+            $this->exists($this->getDnOfInactivePerson($uid)) ||
+            $this->exists($this->getDnOfGuest($uid)));
     }
 
     /**
@@ -426,7 +469,7 @@ class LdapAdapter extends Ldap
     public function approveGroupMembership($uid, $group)
     {
 
-        $dnOfGroup = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $group);
+        $dnOfGroup = $this->getDnOfGroup($group);
         $entry = $this->getEntry($dnOfGroup);
         if (is_null($entry)) {
             throw new LdapException($this, sprintf('Can\'t find group %s', $group));
@@ -452,7 +495,7 @@ class LdapAdapter extends Ldap
         }
         $results = $this->search(
             sprintf('(&(objectClass=inetOrgPerson)(uid=%s))', $uid),
-            'ou=people,o=sog-de,dc=sog',
+            self::DN_PEOPLE,
             self::SEARCH_SCOPE_SUB,
             ['dn'],
             'dn'
@@ -469,8 +512,8 @@ class LdapAdapter extends Ldap
      */
     public function activateMember($uid)
     {
-        $active = sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid);
-        $inactive = sprintf('uid=%s,ou=inactive,ou=people,o=sog-de,dc=sog', $uid);
+        $active = $this->getDnOfActivePerson($uid);
+        $inactive = $this->getDnOfInactivePerson($uid);
         $this->move($inactive, $active);
 
         $this->refreshPendingRequests($inactive, $active);
@@ -487,7 +530,7 @@ class LdapAdapter extends Ldap
     {
         $results = $this->search(
             sprintf('(&(objectClass=groupOfNames)(pending=%s))', $from),
-            'ou=groups,o=sog-de,dc=sog',
+            self::DN_GROUPS,
             self::SEARCH_SCOPE_ONE,
             ['ou']
         );
@@ -508,7 +551,7 @@ class LdapAdapter extends Ldap
      */
     public function dropMembershipRequest($uid, $group)
     {
-        $dnOfGroup = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $group);
+        $dnOfGroup = $this->getDnOfGroup($group);
         $entry = $this->getEntry($dnOfGroup);
         if (is_null($entry)) {
             throw new LdapException($this, sprintf('Can\'t find group %s', $group));
@@ -532,7 +575,7 @@ class LdapAdapter extends Ldap
      */
     public function requestGroupMembership($uid, $group)
     {
-        $dnOfGroup = sprintf('ou=%s,ou=groups,o=sog-de,dc=sog', $group);
+        $dnOfGroup = $this->getDnOfGroup($group);
         $entry = $this->getEntry($dnOfGroup);
         if (is_null($entry)) {
             throw new LdapException($this, sprintf('Can\'t find group %s', $group));
@@ -554,8 +597,8 @@ class LdapAdapter extends Ldap
      */
     public function deactivateMember($uid)
     {
-        $active = sprintf('uid=%s,ou=active,ou=people,o=sog-de,dc=sog', $uid);
-        $inactive = sprintf('uid=%s,ou=inactive,ou=people,o=sog-de,dc=sog', $uid);
+        $active = $this->getDnOfActivePerson($uid);
+        $inactive = $this->getDnOfInactivePerson($uid);
         $this->move($active, $inactive);
     }
 }
