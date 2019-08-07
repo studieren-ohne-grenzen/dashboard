@@ -217,6 +217,19 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
                             $app['session']->getFlashBag()->add('error', 'Fehler beim Löschen der Mitgliedschaftsanfrage von ' . $userAttr['cn'][0] . ' für die Gruppe "' . $selGroupName . '": ' . $ex->getMessage());
                         }
                         break;
+                    case 'del-user':
+                        if ($selGroup === 'allgemein') {
+                          // The current user is Admin of Allgemein, so they can delete users globally
+                          try {
+                              $app['ldap']->deleteMember($userID);
+                              $app['session']->getFlashBag()->add('success', 'Das Mitglied ' . $userAttr['cn'][0] . ' wurde gelöscht!');
+                          } catch (LdapException $ex) {
+                              $app['session']->getFlashBag()->add('error', 'Fehler beim Löschen des Mitglieds ' . $userAttr['cn'][0] . ': ' . $ex->getMessage());
+                          }
+                        }else{
+                          $app['session']->getFlashBag()->add('error', 'Keine Berechtigung für die gewählte Gruppe');
+                        }
+                        break;
                     default:
                         $app['session']->getFlashBag()->add('error', 'Fehler: Der gesendete Befehl wird nicht unterstützt.');
                 }
