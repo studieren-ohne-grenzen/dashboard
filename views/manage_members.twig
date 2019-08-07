@@ -104,7 +104,7 @@
             ]
         };
 
-        var currentOu document.getElementById('send-action').elements['ou'].value
+        var currentOu = document.getElementById('send-action').elements['ou'].value
 
         var controlList = new List('member-list', options);
         var data = {{ memberList|json_encode|raw }};
