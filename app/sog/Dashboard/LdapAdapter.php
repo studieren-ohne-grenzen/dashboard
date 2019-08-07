@@ -86,12 +86,13 @@ class LdapAdapter extends Ldap
      * Adds the DN to the given group
      *
      * @param string $dnOfUser dn of the user to add
-     * @param string $dnOfGroup dn of the group
+     * @param string $ou group ou
      * @param string $role A groupOfNames attribute, such as owner, pending, member (default)
      * @throws LdapException
      */
-    public function addToGroup($dnOfUser, $dnOfGroup, $role = 'member')
+    public function addToGroup($dnOfUser, $ou, $role = 'member')
     {
+        $dnOfGroup = $this->getDnOfGroup($ou);
         $entry = $this->getEntry($dnOfGroup);
         Attribute::setAttribute($entry, $role, $dnOfUser, true);
         $this->update($dnOfGroup, $entry);
@@ -101,12 +102,13 @@ class LdapAdapter extends Ldap
      * Removes the DN from the given group
      *
      * @param string $dnOfUser dn of the user to remove
-     * @param string $dnOfGroup dn of the group
+     * @param string $ou ou of the group
      * @param string $role A groupOfNames attribute, such as owner, pending, member (default)
      * @throws LdapException
      */
-    public function removeFromGroup($dnOfUser, $dnOfGroup, $role = 'member')
+    public function removeFromGroup($dnOfUser, $ou, $role = 'member')
     {
+        $dnOfGroup = $this->getDnOfGroup($ou);
         $entry = $this->getEntry($dnOfGroup);
         Attribute::removeFromAttribute($entry, $role, $dnOfUser);
         $this->update($dnOfGroup, $entry);
@@ -219,9 +221,9 @@ class LdapAdapter extends Ldap
      * @return bool True if the given user is a owner of any group, false otherwise.
      * @throws LdapException
      */
-    public function isOwner($user_dn)
+    public function isOwner($uid)
     {
-        $result = $this->getOwnedGroups($user_dn);
+        $result = $this->getOwnedGroups($uid);
         // we don't care about specifics, we only want to know if the user is owner of any group
         return ($result != null && $result->count() > 0);
     }
@@ -229,11 +231,12 @@ class LdapAdapter extends Ldap
     /**
      * Returns the groups owned by the user with the given dn
      *
-     * @param string $user_dn The user DN for which we want to check
+     * @param string $uid The uid for which we want to check
      * @return bool|Collection The groups owned by the user
      */
-    public function getOwnedGroups($user_dn)
+    public function getOwnedGroups($uid)
     {
+        $user_dn = $this->getDnOfActivePerson($uid);
         return $this->getMemberships($user_dn, ['cn', 'ou'], 'owner');
     }
 

@@ -82,7 +82,7 @@ class GuestControllerProvider implements ControllerProviderInterface
 
         if (null !== $token) {
             $user = $token->getUser();
-            $ownedGroups = $app['ldap']->getOwnedGroups($user->getAttributes()['dn'])->toArray();
+            $ownedGroups = $app['ldap']->getOwnedGroups($user->getAttributes()['uid'])->toArray();
 
             $selGroup = $request->request->get('ou');
             if (!isset($selGroup)) $selGroup = $ownedGroups[0]['ou'][0];

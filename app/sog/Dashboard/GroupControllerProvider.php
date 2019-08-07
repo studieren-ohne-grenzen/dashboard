@@ -132,7 +132,7 @@ class GroupControllerProvider implements ControllerProviderInterface
      */
     public function ownerAdd(Request $request)
     {
-        $this->app['ldap']->addToGroup($this->user_dn, $this->group_dn, 'owner');
+        $this->app['ldap']->addToGroup($this->user_dn, $this->ou, 'owner');
         $this->app['session']->getFlashBag()
             ->add('success', 'Das Mitglied wurde erfolgreich als zusätzlicher Koordinator hinzugefügt.');
         return new RefererRedirectResponse($request);
@@ -146,7 +146,7 @@ class GroupControllerProvider implements ControllerProviderInterface
      */
     public function ownerRemove(Request $request)
     {
-        $this->app['ldap']->removeFromGroup($this->user_dn, $this->group_dn, 'owner');
+        $this->app['ldap']->removeFromGroup($this->user_dn, $this->ou, 'owner');
         $this->app['session']->getFlashBag()
             ->add('success', 'Das Mitglied wurde erfolgreich als Koordinator ausgetragen.');
         return new RefererRedirectResponse($request);

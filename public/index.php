@@ -71,7 +71,7 @@ $app->match('/members/meine-Gruppen', function (Request $request) use ($app) {
                         if (in_array($userDN, $groupAttr['owner'])) {
                             $app['session']->getFlashBag()->add('error', 'Nicht möglich! Du bist Koordinator der Gruppe "' . $groupAttr['cn'][0] . '". Zum Beenden deiner Mitgliedschaft wende dich bitte an das Ressort IT.');
                         } else {
-                            $app['ldap']->removeFromGroup($userDN, $groupDN);
+                            $app['ldap']->removeFromGroup($userDN, $groupOU);
                             $app['session']->getFlashBag()->add('success', 'Deine Mitgliedschaft in der Gruppe "' . $groupAttr['cn'][0] . '" wurde beendet.');
                         }
                     } catch (LdapException $ex) {
@@ -147,7 +147,7 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
 
     if (null !== $token) {
         $user = $token->getUser();
-        $ownedGroups = $app['ldap']->getOwnedGroups($user->getAttributes()['dn'])->toArray();
+        $ownedGroups = $app['ldap']->getOwnedGroups($user->getAttributes()['uid'])->toArray();
         $selGroup = $request->query->get('ou');
 
         if (count($ownedGroups) === 0) {
@@ -190,7 +190,7 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
                         break;
                     case 'add':
                         try {
-                            $app['ldap']->addToGroup($userDN, $selGroupDN);
+                            $app['ldap']->addToGroup($userDN, $selGroup);
                             $app['ldap']->dropMembershipRequest($userID, $selGroup);
                             $app['session']->getFlashBag()->add('success', $userAttr['cn'][0] . ' wurde zu der Gruppe "' . $selGroupName . '" hinzugefügt!');
                         } catch (LdapException $ex) {
@@ -202,7 +202,7 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
                             if (in_array($userDN, $groupAttr['owner'])) {
                                 $app['session']->getFlashBag()->add('error', 'Nicht möglich! "' . $userAttr['cn'][0] . '" ist Koordinator der Gruppe "' . $selGroupName . '". Bitte entferne ihn zuerst als Koordinator.');
                             } else {
-                                $app['ldap']->removeFromGroup($userDN, $selGroupDN);
+                                $app['ldap']->removeFromGroup($userDN, $selGroup);
                                 $app['session']->getFlashBag()->add('success', $userAttr['cn'][0] . ' wurde von der Gruppe "' . $selGroupName . '" entfernt!');
                             }
                         } catch (LdapException $ex) {
