@@ -104,6 +104,8 @@
             ]
         };
 
+        var currentOu document.getElementById('send-action').elements['ou'].value
+
         var controlList = new List('member-list', options);
         var data = {{ memberList|json_encode|raw }};
         var activeFilters = [];
@@ -219,7 +221,7 @@
                     buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'activate\')" class="pure-button button-warning"><i class="icon-user-ok font-icon">&#xe822;</i>&ensp;freischalten</button>';
                 } else {
                     if (member) {
-                        if (document.getElementById('send-action').elements['ou'] === 'allgemein') {
+                        if (currentOu === 'allgemein') {
                           // in the general group we only allow to delete user entirely, as removing from group doesn't make sense
                           buttons = '<button onclick="submitButton(\'' + data[i]['name'] + '\', \'' + data[i]['uid'] + '\', \'del-user\')" class="pure-button button-error"><i class="icon-trash-empty font-icon">&#xe804;</i>&ensp;Mitglied löschen</button>';
                         }else{
