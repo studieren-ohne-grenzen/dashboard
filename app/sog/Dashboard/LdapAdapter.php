@@ -20,7 +20,7 @@ class LdapAdapter extends Ldap
      */
     private $password_algorithm = Attribute::PASSWORD_HASH_SSHA;
 
-    const DN_GROUPS = 'ou=groups,o=sog-de,dv=sog';
+    const DN_GROUPS = 'ou=groups,o=sog-de,dc=sog';
     const DN_PEOPLE = 'ou=people,o=sog-de,dc=sog';
     const DN_PEOPLE_ACTIVE = 'ou=active,ou=people,o=sog-de,dc=sog';
     const DN_PEOPLE_INACTIVE = 'ou=inactive,ou=people,o=sog-de,dc=sog';
