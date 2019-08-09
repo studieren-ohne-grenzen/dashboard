@@ -410,13 +410,13 @@ class LdapAdapter extends Ldap
         $dn = $this->getDnOfActivePerson($uid);
         $groups = $this->getMemberships($dn, ['ou']);
         foreach($groups as $group) {
-          $dnOfGroup = $this->getDnOfGroup($group['ou'][0]);
-          $this->removeFromGroup($dn, $dnOfGroup, 'member');
+          $ou = $group['ou'][0];
+          $this->removeFromGroup($dn, $ou, 'member');
         }
         $ownedGroups = $this->getOwnedGroups($dn);
         foreach($ownedGroups as $group) {
-          $dnOfGroup = $this->getDnOfGroup($group['ou'][0]);
-          $this->removeFromGroup($dn, $dnOfGroup, 'owner');
+          $ou = $group['ou'][0];
+          $this->removeFromGroup($dn, $ou, 'owner');
         }
         $this->delete($dn);
     }
