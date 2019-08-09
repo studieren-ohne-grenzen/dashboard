@@ -85,14 +85,15 @@ class LdapAdapter extends Ldap
     /**
      * Adds the DN to the given group
      *
-     * @param string $dnOfUser dn of the user to add
+     * @param string $userID
      * @param string $ou group ou
      * @param string $role A groupOfNames attribute, such as owner, pending, member (default)
      * @throws LdapException
      */
-    public function addToGroup($dnOfUser, $ou, $role = 'member')
+    public function addToGroup($userID, $ou, $role = 'member')
     {
         $dnOfGroup = $this->getDnOfGroup($ou);
+        $dnOfUser =  $this->findUserDN($uid);
         $entry = $this->getEntry($dnOfGroup);
         Attribute::setAttribute($entry, $role, $dnOfUser, true);
         $this->update($dnOfGroup, $entry);
@@ -101,14 +102,15 @@ class LdapAdapter extends Ldap
     /**
      * Removes the DN from the given group
      *
-     * @param string $dnOfUser dn of the user to remove
+     * @param string $userID
      * @param string $ou ou of the group
      * @param string $role A groupOfNames attribute, such as owner, pending, member (default)
      * @throws LdapException
      */
-    public function removeFromGroup($dnOfUser, $ou, $role = 'member')
+    public function removeFromGroup($userID, $ou, $role = 'member')
     {
         $dnOfGroup = $this->getDnOfGroup($ou);
+        $dnOfUser =  $this->findUserDN($uid);
         $entry = $this->getEntry($dnOfGroup);
         Attribute::removeFromAttribute($entry, $role, $dnOfUser);
         $this->update($dnOfGroup, $entry);
@@ -117,16 +119,17 @@ class LdapAdapter extends Ldap
     /**
      * Checks whether the given user is member of the given group.
      *
-     * @param string $dnOfUser
+     * @param string $uid
      * @param string $dnOfGroup
      * @return bool True if user is member of group, false otherwise
      * @throws LdapException
      */
-    public function isMemberOfGroup($dnOfUser, $dnOfGroup)
+    public function isMemberOfGroup($uid, $dnOfGroup)
     {
+        $user_dn = $this->findUserDN($uid);
         return (
             $this->search(
-                sprintf('member=%s', $dnOfUser),
+                sprintf('member=%s', $user_dn),
                 $dnOfGroup,
                 self::SEARCH_SCOPE_BASE
             )->count() > 0);
@@ -243,14 +246,15 @@ class LdapAdapter extends Ldap
     /**
      * Retrieves all memberships for the given DN
      *
-     * @param string $user_dn The DN for which to get the memberships
+     * @param string $userID
      * @param array $fields A list of fields we want to return from the search
      * @param string $attribute The attribute which we use for filtering
      * @return bool|\Zend\Ldap\Collection
      * @throws LdapException
      */
-    public function getMemberships($user_dn, $fields = ['cn'], $attribute = 'member')
+    public function getMemberships($uid, $fields = ['cn'], $attribute = 'member')
     {
+        $user_dn = $this->findUserDN($uid);
         $results = $this->search(
             sprintf('(&(objectClass=groupOfNames)(%s=%s))', $attribute, $user_dn),
             self::DN_GROUPS,
@@ -259,6 +263,35 @@ class LdapAdapter extends Ldap
             'cn'
         );
         return $results;
+    }
+
+    /**
+     * Adds an email alias the given DN.
+     *
+     * @param string $dn User's dn
+     * @param string $newEmail The new email address
+     * @throws LdapException
+     */
+    public function addEmailAlias($dn, $newEmail)
+    {
+        $entry = $this->getEntry($dn);
+        Attribute::setAttribute($entry, 'mailAlias', $newEmail, true);
+        Attribute::removeDuplicatesFromAttributes($entry, 'mailAlias');
+        $this->update($dn, $entry);
+    }
+
+    /**
+     * Removes the email alias for the given DN.
+     *
+     * @param string $dn User's dn
+     * @param string $newEmail The new email address
+     * @throws LdapException
+     */
+    public function removeEmailAlias($dn, $mail)
+    {
+        $entry = $this->getEntry($dn);
+        Attribute::removeFromAttributes($entry, 'mailAlias', $mail);
+        $this->update($dn, $entry);
     }
 
     /**

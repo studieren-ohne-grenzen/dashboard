@@ -218,6 +218,6 @@ Hier die Daten des neuen Mitglieds:<br>";
      */
     public function deleteUser($uid)
     {
-        return $this->app['ldap']->deleteMember($uid);
+        return $this->app['ldap']->deleteUser($uid);
     }
 }
