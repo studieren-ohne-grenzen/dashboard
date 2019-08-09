@@ -362,14 +362,20 @@ Hier die Daten des neuen Mitglieds:<br>";
     }
 
     public function ensureEmailAliasesForAllGroups() {
-      $groups = $this->app['ldap']->getGroups(['mail', 'ou'])->toArray();
+      $output = '';
       foreach($groups as $group) {
-        if (!isset($group['mail'])) continue;
-        $groupMail = $group['mail'][0];
-        $owners = $this->app['ldap']->getOwners($group['ou'])->toArray();
-        foreach ($owners as $owner) {
-          $this->app['ldap']->addEmailAlias($owner, $groupMail);
+        $attrs = $this->app['ldap']->getEntry($group['dn'], ['mail', 'ou']);
+        $output .= $group['dn'].' '.var_export($attrs, true)."\r\n";
+        if (!isset($attrs['mail'])) continue;
+        $groupMail = $attrs['mail'][0];
+        $owners = $this->app['ldap']->getOwners($attrs['ou'][0])->toArray();
+        foreach ($owners[0]['owner'] as $owner) {
+          $ownerEntry = $this->app['ldap']->getEntry($owner);
+          if (!isset($ownerEntry) || strpos($owner, 'guest') !== FALSE) continue;
+          $output .= $attrs['ou'][0]." : $owner -> $groupMail\r\n";
+          $app['ldap']->addEmailAlias($owner, $groupMail);
         }
       }
+      return $output;
     }
 }
