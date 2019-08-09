@@ -273,6 +273,7 @@ class LdapAdapter extends Ldap
      */
     public function addEmailAlias($dn, $newEmail)
     {
+        $dn = $this->findUserDN($dn);
         $entry = $this->getEntry($dn);
         Attribute::setAttribute($entry, 'mailAlias', $newEmail, true);
         Attribute::removeDuplicatesFromAttributes($entry, 'mailAlias');
@@ -288,6 +289,7 @@ class LdapAdapter extends Ldap
      */
     public function removeEmailAlias($dn, $mail)
     {
+        $dn = $this->findUserDN($dn);
         $entry = $this->getEntry($dn);
         Attribute::removeFromAttributes($entry, 'mailAlias', $mail);
         $this->update($dn, $entry);
