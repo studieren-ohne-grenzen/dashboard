@@ -124,17 +124,6 @@ class SogDashboardApi
         shell_exec($cmd);
     }
 
-    /**
-     * Request membership in the given group for a user.
-     *
-     * @param string $uid The generated unique username for the member
-     * @param string $group The CN of the group for which to request the membership
-     * @return boolean True, if there isn't already an active request from the user for the group; false otherwise
-     */
-    public function requestGroupMembership($uid, $group)
-    {
-        return $this->app['ldap']->requestGroupMembership($uid, $group);
-    }
 
     /**
      * Send a mail to the user.
@@ -199,6 +188,44 @@ Hier die Daten des neuen Mitglieds:<br>";
         return $this->app['notify_owners']($group, '[Studieren Ohne Grenzen] Neuanmeldung in deiner Lokalgruppe', $text);
     }
 
+
+    /**
+     * Updates the password for the given user.
+     *
+     * @param string $uid The user for which to update the password
+     * @param string $old_password The old password, we need to bind to the DN first
+     * @param string $new_password The new password
+     * @throws LdapException
+     */
+    public function updateUserPassword($uid, $old_password, $new_password) {
+      $dn = $this->app['ldap']->findUserDN($uid);
+      $this->app['ldap']->updatePassword($dn, $old_password, $new_password);
+    }
+
+    /**
+     * Request membership in the given group for a user.
+     *
+     * @param string $uid The generated unique username for the member
+     * @param string $group The CN of the group for which to request the membership
+     * @return boolean True, if there isn't already an active request from the user for the group; false otherwise
+     */
+    public function requestGroupMembership($uid, $group)
+    {
+        return $this->app['ldap']->requestGroupMembership($uid, $group);
+    }
+
+    /**
+     * Remove a membership request for $group.
+     *
+     * @param string $uid The username of the user who has done the request
+     * @param string $group The group for which the request shall be removed, we expect the `ou` value
+     * @throws LdapException If group can't be found or update wasn't successful
+     * @return boolean True, if pending contained $user and the entry has been deleted; false otherwise
+     */
+    public function dropMembershipRequest($uid, $group) {
+      return $this->app['ldap']->dropMembershipRequest($uid, $group);
+    }
+
     /**
      * Update the mail-alternative field for the given UID
      *
@@ -212,12 +239,137 @@ Hier die Daten des neuen Mitglieds:<br>";
     }
 
     /**
-     * Delete membership
+     * Checks if the passed user is the owner of a group
+     *
+     * @param string $group The group
+     * @param string $uid The user
+     * @return bool True if the given user is a owner of the group, false otherwise.
+     * @throws LdapException
+     */
+    public function isOwnerOfGroup($group, $uid) {
+      $groups = $this->app['ldap']->getOwnedGroups($uid);
+      foreach($groups as $group) {
+        if ($group['ou'] === $group) return true;
+      }
+      return false;
+    }
+
+    /**
+     * Get members of group
+     *
+     * @param string $group
+     */
+    public function getOwnersOfGroup($group)
+    {
+        return $this->app['ldap']->getOwners($group);
+    }
+
+    /**
+     * Get the current members of a group
+     *
+     * @param string $group
+     */
+    public function getMembersOfGroup($group)
+    {
+        $this->app['ldap']->getMembers($group);
+    }
+
+    /**
+     * Get the pending members of a group
+     *
+     * @param string $group
+     */
+    public function getPendingMembersOfGroup($group)
+    {
+        $this->app['ldap']->getMembers($group, 'pending');
+    }
+
+    /**
+     * Add a user as an owner
+     *
+     * @param string $group
+     * @param string $userID
+     */
+    public function addMemberToGroup($group, $userID)
+    {
+        $dnOfUser = $this->app['ldap']->getDnOfUser($userID);
+        $this->app['ldap']->addToGroup($dnOfUser, $group, 'member');
+    }
+
+    /**
+     * Removes the current user from the current group as owner.
+     *
+     * @param string $group
+     * @param string $userID
+     */
+    public function removeMemberFromGroup($group, $userID)
+    {
+        $dnOfUser = $this->app['ldap']->getDnOfUser($userID);
+        $this->app['ldap']->removeFromGroup($dnOfUser, $group, 'member');
+    }
+
+    /**
+     * Add a user as an owner
+     *
+     * @param string $group
+     * @param string $userID
+     */
+    public function addOwnerToGroup($group, $userID)
+    {
+        $dnOfUser = $this->app['ldap']->getDnOfActivePerson($userID);
+        $this->app['ldap']->addToGroup($dnOfUser, $group, 'owner');
+    }
+
+    /**
+     * Removes the current user from the current group as owner.
+     *
+     * @param string $group
+     * @param string $userID
+     */
+    public function removeOwnerFromGroup($group, $userID)
+    {
+        $dnOfUser = $this->app['ldap']->getDnOfActivePerson($userID);
+        $this->app['ldap']->removeFromGroup($dnOfUser, $group, 'owner');
+    }
+
+    /**
+     * Move a (new) inactive member to the active subtree.
+     *
+     * @param string $uid The username for the member to be activated
+     * @throws LdapException
+     */
+    public function activateUser($uid) {
+      $this->app['ldap']->activateMember($uid);
+    }
+
+    /**
+     * Moves the given user to the inactive tree
+     *
+     * @param string $uid
+     */
+    public function deactivateUser($uid) {
+      $this->app['ldap']->deactivateMember($uid);
+    }
+
+    /**
+     * Delete user entirely
      *
      * @param string $uid The generated unique username for the member
      */
     public function deleteUser($uid)
     {
         return $this->app['ldap']->deleteUser($uid);
+    }
+
+    public function ensureEmailAliasesForAllGroups() {
+      $groups = $this->app['ldap']->getGroups(['mail', 'ou'])->toArray();
+      foreach($groups as $group) {
+        if (!isset($group['mail'])) continue;
+        $groupMail = $group['mail'][0];
+        $owners = $this->app['ldap']->getOwners($group['ou'])->toArray();
+        foreach ($owners as $owner) {
+          $this->app['ldap']->addEmailAlias($owner, $groupMail);
+        }
+      }
     }
 }
