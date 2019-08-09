@@ -93,7 +93,7 @@ class LdapAdapter extends Ldap
     public function addToGroup($userID, $ou, $role = 'member')
     {
         $dnOfGroup = $this->getDnOfGroup($ou);
-        $dnOfUser =  $this->findUserDN($uid);
+        $dnOfUser =  $this->findUserDN($userID);
         $entry = $this->getEntry($dnOfGroup);
         Attribute::setAttribute($entry, $role, $dnOfUser, true);
         $this->update($dnOfGroup, $entry);
@@ -110,7 +110,7 @@ class LdapAdapter extends Ldap
     public function removeFromGroup($userID, $ou, $role = 'member')
     {
         $dnOfGroup = $this->getDnOfGroup($ou);
-        $dnOfUser =  $this->findUserDN($uid);
+        $dnOfUser =  $this->findUserDN($userID);
         $entry = $this->getEntry($dnOfGroup);
         Attribute::removeFromAttribute($entry, $role, $dnOfUser);
         $this->update($dnOfGroup, $entry);

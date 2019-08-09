@@ -190,7 +190,7 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
                         break;
                     case 'add':
                         try {
-                            $app['ldap']->addToGroup($userDN, $selGroup);
+                            $app['ldap']->addToGroup($userID, $selGroup);
                             $app['ldap']->dropMembershipRequest($userID, $selGroup);
                             $app['session']->getFlashBag()->add('success', $userAttr['cn'][0] . ' wurde zu der Gruppe "' . $selGroupName . '" hinzugefügt!');
                         } catch (LdapException $ex) {
