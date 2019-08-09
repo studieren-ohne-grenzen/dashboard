@@ -239,8 +239,7 @@ class LdapAdapter extends Ldap
      */
     public function getOwnedGroups($uid)
     {
-        $user_dn = $this->getDnOfActivePerson($uid);
-        return $this->getMemberships($user_dn, ['cn', 'ou'], 'owner');
+        return $this->getMemberships($uid, ['cn', 'ou'], 'owner');
     }
 
     /**

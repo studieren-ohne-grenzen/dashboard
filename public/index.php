@@ -147,7 +147,7 @@ $app->match('/members/Mitglieder-verwalten', function (Request $request) use ($a
 
     if (null !== $token) {
         $user = $token->getUser();
-        $ownedGroups = $app['ldap']->getOwnedGroups($user->getAttributes()['uid'])->toArray();
+        $ownedGroups = $app['ldap']->getOwnedGroups($user->getAttributes()['dn'])->toArray();
         $selGroup = $request->query->get('ou');
 
         if (count($ownedGroups) === 0) {
