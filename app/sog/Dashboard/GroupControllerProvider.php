@@ -152,7 +152,7 @@ class GroupControllerProvider implements ControllerProviderInterface
         if (count($groupAttrs['owner']) === 2) {
           // if this is the last owner besides the dashboardadmin, refuse to remove
             $this->app['session']->getFlashBag()
-            ->add('success', 'Du bist der/die letzte Koordinator*in und musst erst eine*n Nachfolger*in setzen, bevor du dich entfernen kannst.');
+            ->add('warning', 'Du bist der/die letzte Koordinator*in und musst erst eine*n Nachfolger*in setzen, bevor du dich entfernen kannst.');
             return new RefererRedirectResponse($request);
         }
         $this->app['ldap']->removeFromGroup($this->user_dn, $this->ou, 'owner');
