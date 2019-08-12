@@ -76,7 +76,6 @@ class GroupControllerProvider implements ControllerProviderInterface
             ->before([$this, 'ensureGroupAdmin']);
         $controllers->post('/owner/remove', [$this, 'ownerRemove'])
             ->before([$this, 'setDNs'])
-            ->before([$this, 'ensureNotOwn'])
             ->before([$this, 'ensureGroupAdmin']);
 
         // TODO: implement request/accept/drop membership things and the manage-members route here
@@ -149,8 +148,14 @@ class GroupControllerProvider implements ControllerProviderInterface
      */
     public function ownerRemove(Request $request)
     {
+        $groupAttrs = $this->app['ldap']->getEntry($this->group_dn, ['mail', 'owner']);
+        if (count($groupAttrs['owner']) === 2) {
+          // if this is the last owner besides the dashboardadmin, refuse to remove
+            $this->app['session']->getFlashBag()
+            ->add('success', 'Du bist der/die letzte Koordinator*in und musst erst eine*n Nachfolger*in setzen, bevor du dich entfernen kannst.');
+            return new RefererRedirectResponse($request);
+        }
         $this->app['ldap']->removeFromGroup($this->user_dn, $this->ou, 'owner');
-        $groupAttrs = $this->app['ldap']->getEntry($this->group_dn, ['mail']);
         $mail = isset($groupAttrs['mail']) ? $groupAttrs['mail'][0] : null;
         if (isset($mail)) $this->app['ldap']->removeEmailAlias($this->uid, $mail);
         $this->app['session']->getFlashBag()
