@@ -174,7 +174,7 @@
             } else if (action === 'rm'){
                 confirm = window.confirm("Sicher, dass " + name + " aus " + groupName + " entfernt werden soll?");
             }else if (action === 'del-user') {
-                confirm = window.confirm("Sicher, dass " + name  + " gelöscht werden soll?");
+                confirm = window.confirm("Sicher, dass " + name  + " aus dem gesamten Verein gelöscht werden soll? Dies ist meistens nur bei gekündigten Mitglieschaften sinnvoll.");
             }
             if (confirm) {
                 var submitForm = document.getElementById('send-action');
