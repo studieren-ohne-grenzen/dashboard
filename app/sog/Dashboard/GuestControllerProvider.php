@@ -82,13 +82,13 @@ class GuestControllerProvider implements ControllerProviderInterface
 
         if (null !== $token) {
             $user = $token->getUser();
-            $ownedGroups = $app['ldap']->getOwnedGroups($user->getAttributes()['uid'])->toArray();
+            $ownedGroups = $app['ldap']->getOwnedGroups($user->getAttributes()['uid'][0])->toArray();
 
             $selGroup = $request->request->get('ou');
             if (!isset($selGroup)) $selGroup = $ownedGroups[0]['ou'][0];
 
             foreach ($ownedGroups as $og) {
-                if ($og['ou'] == $selGroup) {
+                if ($og['ou'][0] == $selGroup) {
                     $ownerPermission = true;
                     break;
                 }
@@ -129,14 +129,12 @@ class GuestControllerProvider implements ControllerProviderInterface
         if ($user_dn === false) {
             $info = $app['ldap']->createGuest($name, $mail);
             $user_dn = Attribute::getAttribute($info, 'dn', 0);
-        }
-
-        if ($app['ldap']->isMemberOfGroup($user_dn, $group)) {
-            $app['session']->getFlashBag()->add('info', 'Der Gast ist bereits auf der Liste eingetragen.');
-        } else {
             $app['ldap']->addToGroup($user_dn, $group);
             $app['session']->getFlashBag()->add('success', 'Der Gast wurde der Liste hinzugefügt.');
+        }else{
+            $app['session']->getFlashBag()->add('info', 'Der Gast existiert bereits.');
         }
+
         return new RefererRedirectResponse($request);
     }
 
