@@ -86,7 +86,7 @@ class SogDashboardApi
 
         $data = $this->app['ldap']->createMember($username, $password, $firstName, $lastName, $email);
 
-        $this->createSieveForwarding($data['mail'][0], $email);
+        // $this->createSieveForwarding($data['mail'][0], $email);
 
         $this->requestGroupMembership($username, $group);
         $this->requestGroupMembership($username, 'allgemein');
