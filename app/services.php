@@ -32,6 +32,10 @@ $app->register(new SOG\Dashboard\RandomStringServiceProvider());
 $app->register(new Silex\Provider\SwiftmailerServiceProvider());
 $app['mailer.from'] = $dashboard_config['mailer.from'];
 $app['swiftmailer.options'] = $dashboard_config['swiftmailer.options'];
+// 2020-03-24: Fix for sending mails with the new server
+$app['swiftmailer.transport'] = $app->share(function($app) {
+  return new \Swift_SmtpTransport($app['swiftmailer.options']['host'], $app['swiftmailer.options']['port'], 'tls');
+});
 
 $app->register(new Silex\Provider\SessionServiceProvider());
 
