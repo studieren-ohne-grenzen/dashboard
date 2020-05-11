@@ -58,7 +58,7 @@ class SogDashboardApi
         $this->app['swiftmailer.options'] = $config['swiftmailer.options'];
         $this->app['swiftmailer.use_spool'] = false;
         // 2020-03-24: Fix for sending mails with the new server
-        $app['swiftmailer.transport'] = $app->share(function($app) {
+        $this->app['swiftmailer.transport'] = $this->app->share(function($app) {
           return new \Swift_SmtpTransport($app['swiftmailer.options']['host'], $app['swiftmailer.options']['port'], 'tls');
         });
 
