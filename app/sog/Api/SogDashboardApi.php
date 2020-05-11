@@ -57,6 +57,10 @@ class SogDashboardApi
         $this->app['mailer.from'] = $config['mailer.from'];
         $this->app['swiftmailer.options'] = $config['swiftmailer.options'];
         $this->app['swiftmailer.use_spool'] = false;
+        // 2020-03-24: Fix for sending mails with the new server
+        $app['swiftmailer.transport'] = $app->share(function($app) {
+          return new \Swift_SmtpTransport($app['swiftmailer.options']['host'], $app['swiftmailer.options']['port'], 'tls');
+        });
 
         // can be used for passwords etc, by calling $this->app['random']($length = 8)
         $this->app->register(new RandomStringServiceProvider());
