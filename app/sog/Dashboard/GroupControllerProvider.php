@@ -50,7 +50,7 @@ class GroupControllerProvider implements ControllerProviderInterface
         /** @var ControllerCollection $controllers */
         $controllers = $app['controllers_factory'];
 
-        $app['notify_owners'] = $app->protect(function ($group_ou, $subject, $text) use ($app) {
+        $app['notify_owners'] = $app->protect(function ($group_ou, $subject, $html, $text) use ($app) {
             $owners = $app['ldap']->getOwnerDetails($group_ou, ['mail', 'cn']);
             if (empty($owners)) {
                 // provide a fallback email
@@ -66,7 +66,8 @@ class GroupControllerProvider implements ControllerProviderInterface
                 ->setSubject($subject)
                 ->setFrom([$app['mailer.from']])
                 ->setTo($to)
-                ->setBody($text, 'text/html');
+                ->setBody($html, 'text/html');
+                ->addPart($text, 'text/plain');
             return $app['mailer']->send($message);
         });
 

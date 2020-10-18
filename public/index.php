@@ -89,15 +89,22 @@ $app->match('/members/meine-Gruppen', function (Request $request) use ($app) {
                 case 'start-request':
                     try {
                         $app['ldap']->requestGroupMembership($userUID, $groupOU);
-                        $text = "<p>Hallo,</p>\n
+                        $html = "Hallo,\n
+                            %s hat eine neue Anfrage für die Mitgliedschaft in deiner Gruppe %s beantragt. Du kannst die Anfrage im Dashboard unter 'Neue Anfragen' beantworten.\n
+                            Mit freundlichen Grüßen, dein SOG IT-Ressort\n";
+                        $text = sprintf($text,
+                            $userUID,
+                            $groupAttr['cn'][0]
+                        );
+                        $html = "<p>Hallo,</p>\n
                             <a>%s hat eine neue Anfrage für die Mitgliedschaft in deiner Gruppe %s beantragt. Du kannst die Anfrage <a href='%s'>im Dashboard unter 'Neue Anfragen'</a> beantworten.</p>\n
                             <p>Mit freundlichen Grüßen, dein SOG IT-Ressort</p>\n";
-                        $text = sprintf($text,
+                        $html = sprintf($html,
                             $userUID,
                             $groupAttr['cn'][0],
                             $app['url_generator']->generate('/members/manage-groups', [], UrlGenerator::ABSOLUTE_URL)
                         );
-                        $app['notify_owners']($groupOU, sprintf('[Studieren Ohne Grenzen] Anfrage zur Mitgliedschaft in deiner Gruppe %s', $groupAttr['cn'][0]), $text);
+                        $app['notify_owners']($groupOU, sprintf('[Studieren Ohne Grenzen] Anfrage zur Mitgliedschaft in deiner Gruppe %s', $groupAttr['cn'][0]), $html, $text);
                         $app['session']->getFlashBag()->add('success', 'Es wurde eine neue Mitgliedschaftsanfrage für die Gruppe "' . $groupAttr['cn'][0] . '" erstellt.');
                     } catch (LdapException $ex) {
                         $app['session']->getFlashBag()->add('error', 'Fehler beim Erstellen einer Mitgliedschaftsanfrage für die Gruppe "' . $groupAttr['cn'][0] . '": ' . $ex->getMessage());
