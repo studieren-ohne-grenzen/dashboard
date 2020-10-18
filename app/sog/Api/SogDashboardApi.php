@@ -7,6 +7,7 @@ use SOG\Dashboard\DataUtilityServiceProvider;
 use SOG\Dashboard\GroupControllerProvider;
 use SOG\Dashboard\RandomStringServiceProvider;
 use SOG\Dashboard\ZendLdapServiceProvider;
+use Ahc\Jwt\JWT;
 
 /**
  * Class SogDashboardApi
@@ -30,13 +31,17 @@ class SogDashboardApi
      */
     private $app;
     /**
-     * @var string Full URL to the Dashboard application
+     * @var string Full URL to the Vogelnest application
      */
-    private $dashboard_url = 'https://dashboard.studieren-ohne-grenzen.org';
+    private $vogelnest_url = 'https://vogelnest.studieren-ohne-grenzen.org';
     /**
-     * @var int The default length for a random user password
+     * @var string Full URL to the Vogelnest-API
      */
-    private $password_length = 8;
+    private $vogelnest_api_url = 'https://vogelnest-api.studieren-ohne-grenzen.org';
+    /**
+     * @var int The default length for a random initial user password - replaced after email verification
+     */
+    private $password_length = 24;
 
     /**
      * Instantiates a new LdapAdapter for creating and updating relevant entities.
@@ -95,7 +100,7 @@ class SogDashboardApi
         $this->requestGroupMembership($username, $group);
         $this->requestGroupMembership($username, 'allgemein');
 
-        $this->notifyNewUser($firstName, $username, $email, $password);
+        $this->notifyNewUser($firstName, $username, $email);
         $this->notifyNewUserAdmin($firstName, $lastName, $email, $group);
 
         return $username;
@@ -136,35 +141,60 @@ class SogDashboardApi
      * @param string $firstName
      * @param string $username
      * @param string $email
-     * @param string $password
      */
-    private function notifyNewUser($firstName, $username, $email, $password)
+    private function notifyNewUser($firstName, $username, $email)
     {
-        $text = '
+        $token = (new JWT($dashboard_config['jwt_key'], 'HS256', 3600))
+                  ->encode(['type' => 'initial_confirmation', 'username' => $username, 'email' => $email]));
+
+        $html = "
 <html><head><title></title></head><body>
-Hallo ' . $firstName . ',<br />
+Hallo " . $firstName . ",<br />
 Wir freuen uns sehr, dich als neues Mitglied bei Studieren Ohne Grenzen begrüßen zu dürfen.<br />
 <br />
-Damit du direkt einsteigen und mitarbeiten kannst, haben wir dir automatisch einen Zugang für unsere Online-Plattform erstellt. Über diese Plattform tauschen wir wichtige Nachrichten, Informationen und Dateien aus und diskutieren auch Lokalgruppen-übergreifend.<br />
+Damit du direkt einsteigen und mitarbeiten kannst, haben wir dir automatisch einen Zugang für unsere Online-Plattformen erstellt.
+Über diese Plattformen tauschen wir wichtige Nachrichten, Informationen und Dateien aus und diskutieren auch Lokalgruppen-übergreifend.<br />
 <br />
-Benutzername: ' . $username . '<br />
-Passwort:     ' . $password . '<br />
+Dein Benutzername ist: " . $username . "<br />
+Bitte öffne folgenden Link, um deine Mailadresse zu bestätigen und ein Passwort zu vergeben:<br />
+<a href='" . $this->$vogelnest_api_url . "/confirm?key=" . $token . "'>Account bestätigen</a><br />
 <br />
 Dein Account wird freigeschaltet, sobald dein Lokalkoordinator bestätigt hat, dass du tatsächlich bei Studieren Ohne Grenzen aktiv bist.<br />
 <br />
-Mit diesen Zugangsdaten kannst du dich auf allen SOG-Systeme einloggen.<br />
+Mit deinem Benutzernamen und dem von dir vergebenen Passwort kannst du dich auf allen SOG-Systeme einloggen.<br />
 <br />
-Eine Übersicht deiner Daten und Gruppen gibt dir das Dashboard: https://dashboard.studieren-ohne-grenzen.org<br />
+Eine Übersicht deiner Daten und Gruppen gibt dir das Vogelnest: " . $this->$vogelnest_url . "<br />
 Viele Grüße,<br />
 Das SOG-IT-Team
 </body>
 </html>
-';
+";
+
+        $text = "
+Hallo " . $firstName . ",\n
+Wir freuen uns sehr, dich als neues Mitglied bei Studieren Ohne Grenzen begrüßen zu dürfen.\n
+\n
+Damit du direkt einsteigen und mitarbeiten kannst, haben wir dir automatisch einen Zugang für unsere Online-Plattformen erstellt.
+Über diese Plattformen tauschen wir wichtige Nachrichten, Informationen und Dateien aus und diskutieren auch Lokalgruppen-übergreifend.\n
+\n
+Dein Benutzername ist: " . $username . "\n
+Bitte öffne folgenden Link, um deine Mailadresse zu bestätigen und ein Passwort zu vergeben:\n
+" . $this->$vogelnest_api_url . "/confirm?key=" . $token . "\n
+\n
+Dein Account wird freigeschaltet, sobald dein Lokalkoordinator bestätigt hat, dass du tatsächlich bei Studieren Ohne Grenzen aktiv bist.\n
+\n
+Mit deinem Benutzernamen und dem von dir vergebenen Passwort kannst du dich auf allen SOG-Systeme einloggen.\n
+\n
+Eine Übersicht deiner Daten und Gruppen gibt dir das Vogelnest: " . $this->$vogelnest_url . "\n
+Viele Grüße,\n
+Das SOG-IT-Team
+";
         $message = \Swift_Message::newInstance()
             ->setSubject('[Studieren Ohne Grenzen] Zugangsdaten')
             ->setFrom([$this->app['mailer.from']])
             ->setTo([$email => $firstName])
-            ->setBody($text, 'text/html');
+            ->setBody($html, 'text/html');
+            ->addPart($text, 'text/plain');
         return $this->app['mailer']->send($message);
     }
 
@@ -179,17 +209,29 @@ Das SOG-IT-Team
      */
     private function notifyNewUserAdmin($firstName, $lastName, $email, $group)
     {
-        $text = "Soeben hat sich ein neues Mitglied fuer Deine Lokalgruppe angemeldet.<br>
-Das neue Mitglied ist schon auf dem Lokalgruppen-Verteiler eingetragen und hat einen Account für alle Services erhalten.<br><br>
-<b>Achtung:</b> Der SOG-Account des Mitglieds muss erst von dir aktiviert werden. Bitte bestätige am Besten jetzt <a href='" . $this->dashboard_url . "'>direkt im Dashboard</a>, dass " . $firstName . " " . $lastName . " tatsächlich in eurer LG aktiv ist!
-<br><br>
-Hier die Daten des neuen Mitglieds:<br>";
-        $text .= "Vorname: " . $firstName . "<br>";
-        $text .= "Nachname: " . $lastName . "<br>";
-        $text .= "Mail: " . $email . "<br>";
-        $text .= "Standort: " . $group . "<br>";
+        $html = "
+<html><head><title></title></head><body>
+Soeben hat sich" . $firstName . " " . $lastName . " für Deine Lokalgruppe " . $group . "angemeldet.<br />
+Das neue Mitglied ist schon auf dem Lokalgruppen-Verteiler eingetragen und hat einen Account erhalten.<br />
+<b>Achtung:</b> Der SOG-Account des Mitglieds muss erst von dir aktiviert werden.
+Bitte bestätige am Besten jetzt <a href='" . $this->vogelnest_url . "/groups/" . $group . "'>direkt im Vogelnest</a>, dass " . $firstName . " " . $lastName . " tatsächlich in eurer LG aktiv ist!<br />
+Viele Grüße,<br />
+Das SOG-IT-Team
+</body>
+</html>
+";
 
-        return $this->app['notify_owners']($group, '[Studieren Ohne Grenzen] Neuanmeldung in deiner Lokalgruppe', $text);
+        $text = "
+Soeben hat sich" . $firstName . " " . $lastName . " für Deine Lokalgruppe " . $group . "angemeldet.\n
+Das neue Mitglied ist schon auf dem Lokalgruppen-Verteiler eingetragen und hat einen Account erhalten.\n
+Achtung: Der SOG-Account des Mitglieds muss erst von dir aktiviert werden.\n
+Bitte bestätige am Besten jetzt direkt im Vogelnest, dass " . $firstName . " " . $lastName . " tatsächlich in eurer LG aktiv ist:\n
+" . $this->vogelnest_url . "/groups/" . $group . "\n
+Viele Grüße,\n
+Das SOG-IT-Team
+";
+
+        return $this->app['notify_owners']($group, '[Studieren Ohne Grenzen] Neuanmeldung in deiner Lokalgruppe', $html, $text);
     }
 
 

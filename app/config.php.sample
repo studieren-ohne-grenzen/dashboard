@@ -1,6 +1,7 @@
 <?php
 $dashboard_config = [];
 $dashboard_config['debug'] = true; // should be false on production
+$dashboard_config['jwt_key'] = 'a very secret key';
 // see http://framework.zend.com/manual/current/en/modules/zend.ldap.api.html
 $dashboard_config['ldap.options'] = [
     'host' => 'host',
