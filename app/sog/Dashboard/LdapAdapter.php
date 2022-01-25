@@ -463,15 +463,23 @@ class LdapAdapter extends Ldap
      * @param string $name The given name for the member
      * @return string The generated unique UID
      */
-    public function generateUsername($name)
+    public function generateUsername($username)
     {
-        $username = strtolower($name);
-        // normalize special chars in username
+        // Replace the German special characters with their nice alternatives
+        // Of course, this does not replace things like é, we will do that later.
+        // We have to have the rule Ö -> Oe because strtolower only lowers ASCII.
         $username = str_replace(
-            ['ä', 'ö', 'ü', 'ß', ' '],
-            ['ae', 'oe', 'ue', 'ss', '.'],
+            ['ä',  'ö',  'ü',  'ß',  'Ü',  'Ö',  'Ä',  'ẞ'],
+            ['ae', 'oe', 'ue', 'ss', 'Ue', 'Oe', 'Ae', 'Ss'],
             $username
         );
+        // Remove the rest of the special characters and replace them with alternatives.
+        // This would only replace ü with u for instance, not ue, so the rule above make sense.
+        $username = transliterator_transliterate('Any-Latin; Latin-ASCII; [\u0080-\u7fff] remove', $username);
+        // Lowercase - important that this happens only when everything is now ASCII
+        $username = strtolower($username);
+        // Replace spaces in names with dots
+        $username = str_replace([' '], ['.'], $username);
 
         $suffix = 2;
         $check = $username;
